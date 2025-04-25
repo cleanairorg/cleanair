@@ -56,6 +56,9 @@ jobs:
           MYSQL_USER=${{ vars.MYSQL_USER }}
           MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
           EOL
+          
+      - name: Display repo name
+        run: echo "Repo name is ${{ github.repository }}"
 
       - name: Deploy to staging server
         uses: appleboy/scp-action@v0.1.7
