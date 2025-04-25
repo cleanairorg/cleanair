@@ -1,0 +1,74 @@
+﻿services:
+  web:
+    image: placeholder-from-github-backend-image
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+    environment:
+      # ASPNETCORE_ENVIRONMENT: Production # This sets the environment to production in the actual container.
+      ConnectionStrings__CalculatorDb: Server=mariadb;Database=${MYSQL_DATABASE};User=${MYSQL_USER};Password=${MYSQL_PASSWORD};
+  
+  
+  frontend:
+    image: placeholder-from-github-frontend-image
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+  
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+  
+  flyway:
+    image: flyway/flyway:latest
+    depends_on:
+      - mariadb
+    environment:
+      FLYWAY_URL: jdbc:mariadb://mariadb:3306/${MYSQL_DATABASE}
+      FLYWAY_USER: ${MYSQL_USER}
+      FLYWAY_PASSWORD: ${MYSQL_PASSWORD}
+      FLYWAY_CONNECT_RETRIES: 5
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+    volumes:
+      - ./db/migrations:/flyway/sql
+    command: migrate
+  
+  seq-logging:
+    image: datalust/seq
+    ports:
+      - "5341:5341"
+      - "5342:80"
+    environment:
+      - ACCEPT_EULA=Y
+
+  zipkin-tracing:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+  
+        
+  featurehub:
+    image: featurehub/party-server:latest
+    restart: always
+    volumes:
+      - featurehub-h2-data:/db
+    ports:
+      - 8085:8085
+  
+  
+volumes:
+  mariadb_data:
+  featurehub-h2-data:
