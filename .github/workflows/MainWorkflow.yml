@@ -51,6 +51,7 @@ jobs:
       - name: Create .env file for staging
         run: |
           cat > .env <<EOL
+          GITHUB_REPOSITORY=${{ github.repository }}
           MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE=${{ vars.MYSQL_DATABASE }}
           MYSQL_USER=${{ vars.MYSQL_USER }}
