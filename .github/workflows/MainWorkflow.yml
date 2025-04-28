@@ -52,10 +52,9 @@ jobs:
         run: |
           cat > .env <<EOL
           GITHUB_REPOSITORY=${{ github.repository }}
-          MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE=${{ vars.MYSQL_DATABASE }}
-          MYSQL_USER=${{ vars.MYSQL_USER }}
-          MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ vars.POSTGRES_DATABASE }}
+          POSTGRES_USER=${{ vars.POSTGRES_USER }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           EOL
           
