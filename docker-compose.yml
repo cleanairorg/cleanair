@@ -9,6 +9,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Staging
       ConnectionStrings__DefaultConnection: Server=mariadb;Database=${MYSQL_DATABASE};User=${MYSQL_USER};Password=${MYSQL_PASSWORD};
+      AppOptions__JwtSecret: ${JWT_SECRET}
+      AppOptions__DbConnectionString: Server=mariadb;Database=${MYSQL_DATABASE};User=${MYSQL_USER};Password=${MYSQL_PASSWORD};
   
   frontend:
     image: ghcr.io/${GITHUB_REPOSITORY}-frontend:staging
