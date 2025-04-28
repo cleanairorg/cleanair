@@ -55,6 +55,7 @@ jobs:
           MYSQL_DATABASE=${{ vars.MYSQL_DATABASE }}
           MYSQL_USER=${{ vars.MYSQL_USER }}
           MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
           EOL
           
       - name: Display repo name
