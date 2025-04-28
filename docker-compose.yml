@@ -5,8 +5,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - #mariadb
-      - postgres  
+      - postgres # før var det mariadb 
     environment:
       ASPNETCORE_ENVIRONMENT: Staging
       ConnectionStrings__DefaultConnection: Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
