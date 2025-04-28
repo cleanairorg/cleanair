@@ -67,7 +67,7 @@ jobs:
           host: ${{ vars.STAGING_SERVER_IP }}
           username: ${{ vars.STAGING_SERVER_USERNAME }}
           key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
-          source: "./docker-compose.yml,.env,server/infrastructure.Postgres/Migrations/**,./client/default.conf"
+          source: "./docker-compose.yml,.env,server/infrastructure.Postgres/Migrations/**,./client/nginx.conf"
           target: cleanair/
 
       - name: Start containers on staging server
