@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.1",
+    "crypto-browserify": "^3.12.1",
     "daisyui": "^5.0.12",
     "jotai": "^2.12.2",
     "jotai-devtools": "^0.11.0",
