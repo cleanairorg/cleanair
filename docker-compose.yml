@@ -39,7 +39,7 @@ services:
       FLYWAY_CONNECT_RETRIES: 5
       FLYWAY_LOCATIONS: filesystem:/flyway/sql
     volumes:
-      - ./server/Infrastructure.Postgres/Migrations:/flyway/sql
+      - ./server/infrastructure.Postgres/Migrations:/flyway/sql
     command: migrate
   
   frontend:
