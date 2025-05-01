@@ -1,4 +1,0 @@
-﻿CREATE TABLE TestTable (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(50) NOT NULL
-);

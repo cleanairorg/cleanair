@@ -39,7 +39,7 @@ services:
       FLYWAY_CONNECT_RETRIES: 5
       FLYWAY_LOCATIONS: filesystem:/flyway/sql
     volumes:
-      - ./server/infrastructure.Postgres/Migrations:/flyway/sql
+      - ./server/Infrastructure.Postgres/Migrations:/flyway/sql
     command: migrate
   
   frontend:
@@ -48,18 +48,6 @@ services:
       - "80:80"
     depends_on:
       - web
-  
-  # MariaDB er udkommenteret og erstattet med PostgreSQL
-  # mariadb:
-  #   image: mariadb:latest
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
-  #     MYSQL_USER: ${MYSQL_USER}
-  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-  #   volumes:
-  #     - mariadb_data:/var/lib/mysql
 
 volumes:
-  # mariadb_data:
   postgres_data:
