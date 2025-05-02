@@ -1,12 +1,15 @@
-﻿namespace Core.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
 
-public class Devicelog
+namespace Core.Domain.Entities;
+
+public partial class Devicelog
 {
+    public string Id { get; set; } = null!;
+
     public string Deviceid { get; set; } = null!;
 
     public decimal Value { get; set; }
-
-    public string Id { get; set; } = null!;
 
     public string Unit { get; set; } = null!;
 
