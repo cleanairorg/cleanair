@@ -70,34 +70,16 @@ jobs:
           ls -al ./server/Infrastructure.Postgres/Migrations || echo "Directory not found"
           echo "Searching for .sql files recursively:"
           find ./server -name "*.sql" || echo "No .sql files found"
-            
-      - name: Stage .sql migration files
-        run: |
-          mkdir -p cleanair_deploy/sql
-          cp -r ./server/Infrastructure.Postgres/Migrations/* cleanair_deploy/sql/
+               
 
-      - name: Confirm files before deployment
-        run: |
-          echo "Files to be deployed:"
-          ls -al ./docker-compose.yml || echo "Missing docker-compose.yml"
-          ls -al .env || echo "Missing .env"
-          ls -al ./cleanair_deploy/sql || echo "Missing sql folder"
-          ls -al ./client/default.conf || echo "Missing default.conf"
-    
-    
       - name: Deploy to staging server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ vars.STAGING_SERVER_IP }}
           username: ${{ vars.STAGING_SERVER_USERNAME }}
           key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
-          source: |
-            ./docker-compose.yml
-            .env
-            cleanair_deploy/sql
-            ./client/default.conf
+          source: "./docker-compose.yml,.env,./server/Infrastructure.Postgres/Migrations/**.sql,./client/default.conf"
           target: cleanair/
-
 
 
       - name: Start containers on staging server
