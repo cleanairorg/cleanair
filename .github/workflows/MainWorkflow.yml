@@ -64,7 +64,13 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           EOL
           
-          
+      - name: Debugging Missing Sql files.     
+        run: |
+          echo "Checking contents of Migrations directory:"
+          ls -al ./server/infrastructure.Postgres/Migrations || echo "Directory not found"
+          echo "Searching for .sql files recursively:"
+          find ./server -name "*.sql" || echo "No .sql files found"
+            
           
       - name: Deploy to staging server
         uses: appleboy/scp-action@v0.1.7
@@ -72,7 +78,7 @@ jobs:
           host: ${{ vars.STAGING_SERVER_IP }}
           username: ${{ vars.STAGING_SERVER_USERNAME }}
           key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
-          source: "./docker-compose.yml,.env,./server/infrastructure.Postgres/Migrations/**.sql,./client/default.conf"
+          source: "./docker-compose.yml,.env,./server/infrastructure.Postgres/Migrations/*,./client/default.conf"
           target: cleanair/
 
 
