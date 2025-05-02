@@ -3,17 +3,12 @@ import { WsClientProvider } from 'ws-request-hook';
 import ApplicationRoutes from "./ApplicationRoutes.tsx";
 import { DevTools } from "jotai-devtools";
 import 'jotai-devtools/styles.css';
-
-// Polyfill for crypto.randomUUID
-import 'crypto-browserify';
+import { v4 as uuidv4 } from 'uuid'; 
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 const prod = import.meta.env.PROD;
 
-// Fallback for randomUUID if not supported natively
-export const randomUid = typeof crypto.randomUUID === 'function'
-    ? crypto.randomUUID()
-    : 'fallback-uuid'; // use a fallback UUID
+export const randomUid = uuidv4();
 
 export default function App() {
     const [serverUrl, setServerUrl] = useState<string | undefined>(undefined);
