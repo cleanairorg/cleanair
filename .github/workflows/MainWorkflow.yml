@@ -67,16 +67,23 @@ jobs:
       - name: Debugging     
         run: |
           echo "Checking contents of Migrations directory:"
-          ls -al ./server/infrastructure.Postgres/Migrations || echo "Directory not found"
+          ls -al ./server/Infrastructure.Postgres/Migrations || echo "Directory not found"
           echo "Searching for .sql files recursively:"
           find ./server -name "*.sql" || echo "No .sql files found"
             
       - name: Stage .sql migration files
         run: |
           mkdir -p cleanair_deploy/sql
-          cp -r ./server/infrastructure.Postgres/Migrations/* cleanair_deploy/sql/
-    
-    
+          cp -r ./server/Infrastructure.Postgres/Migrations/* cleanair_deploy/sql/
+
+      - name: Verify staged SQL files
+        run: |
+          echo "Contents of cleanair_deploy/sql:"
+          if [ -d cleanair_deploy/sql ]; then
+            ls -al cleanair_deploy/sql
+          else
+            echo "Directory cleanair_deploy/sql does not exist!"
+          fi
     
       - name: Deploy to staging server
         uses: appleboy/scp-action@v0.1.7
