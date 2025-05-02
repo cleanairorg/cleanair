@@ -85,6 +85,7 @@ jobs:
             echo "Directory cleanair_deploy/sql does not exist!"
           fi
     
+    
       - name: Deploy to staging server
         uses: appleboy/scp-action@v0.1.7
         with:
