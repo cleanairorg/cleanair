@@ -74,7 +74,7 @@ jobs:
       - name: Stage .sql migration files
         run: |
           mkdir -p cleanair_deploy/sql
-          cp -r ./server/infrastructure.Postgres/Migrations/* cleanair_deploy/sql/
+          cp -r ./server/Infrastructure.Postgres/Migrations/* cleanair_deploy/sql/
     
     
     
