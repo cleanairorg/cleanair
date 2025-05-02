@@ -53,15 +53,10 @@ jobs:
 
       - run: |
           echo "Checking contents of Migrations directory:"
-          ls -al ./server/Infrastructure.Postgres/Migrations || echo "Directory not found"
+          ls -al ./server/infrastructure.Postgres/Migrations || echo "Directory not found"
           echo "Searching for .sql files recursively:"
           find ./server -name "*.sql" || echo "No .sql files found"
           
-      - name: Prepare deployment files
-        run: |
-          mkdir -p cleanair_deploy
-          cp ./server/Infrastructure.Postgres/Migrations/* cleanair_deploy/
-
 
       - name: Deploy to staging server
         uses: appleboy/scp-action@v0.1.7
@@ -72,7 +67,7 @@ jobs:
           source: |
             ./docker-compose.yml
             .env
-            cleanair_deploy
+            ./server/infrastructure.Postgres/Migrations
             ./client/default.conf
           target: cleanair/
 
