@@ -66,7 +66,7 @@ jobs:
           source: |
             ./docker-compose.yml
             .env
-            ./server/Infrastructure.Postgres/Migrations/**
+            ./server/Infrastructure.Postgres/Migrations/*
             ./client/default.conf
           target: cleanair/
 
