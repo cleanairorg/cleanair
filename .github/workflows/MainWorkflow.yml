@@ -1,4 +1,4 @@
-﻿name: CI/CD
+﻿﻿name: CI/CD
 
 on:
   push:
@@ -56,7 +56,7 @@ jobs:
           ls -al ./server/infrastructure.Postgres/Migrations || echo "Directory not found"
           echo "Searching for .sql files recursively:"
           find ./server -name "*.sql" || echo "No .sql files found"
-          
+
 
       - name: Deploy to staging server
         uses: appleboy/scp-action@v0.1.7
