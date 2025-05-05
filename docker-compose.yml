@@ -1,7 +1,7 @@
-# docker-compose.yml
 services:
   postgres:
     image: postgres:latest
+    container_name: database
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
@@ -16,23 +16,25 @@ services:
       timeout: 5s
       retries: 5
   
-  web:
-    image: ghcr.io/${GITHUB_REPOSITORY}-backend:staging
-    ports:
-      - "8080:8080"
+  backend:
     depends_on:
       postgres:
         condition: service_healthy
+    image: ghcr.io/${GITHUB_REPOSITORY}-backend:staging
+    container_name: backend
+    ports:
+      - "8080:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Staging
       AppOptions__DbConnectionString: Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       AppOptions__JwtSecret: ${JWT_SECRET}
   
   flyway:
-    image: flyway/flyway:latest
     depends_on:
       postgres:
         condition: service_healthy
+    image: flyway/flyway:latest
+    container_name: flyway
     environment:
       FLYWAY_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       FLYWAY_USER: ${POSTGRES_USER}
@@ -44,11 +46,12 @@ services:
     command: migrate
   
   frontend:
+    depends_on:
+      - backend
     image: ghcr.io/${GITHUB_REPOSITORY}-frontend:staging
+    container_name: frontend
     ports:
       - "80:80"
-    depends_on:
-      - web
 
 volumes:
   postgres_data:
