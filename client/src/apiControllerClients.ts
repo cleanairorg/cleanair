@@ -5,12 +5,16 @@ const prod = import.meta.env.PROD
 
 const isRelativePath = baseUrl.startsWith('/');
 
+if (isRelativePath) {
+    throw new Error("VITE_API_BASE_URL must be an absolute URL.");
+}
+
 export const subscriptionClient = new SubscriptionClient(
-    isRelativePath ? baseUrl : (prod ? "https://" + baseUrl : "http://" + baseUrl)
+    prod ? "https://" + baseUrl : "http://" + baseUrl
 );
 export const weatherStationClient = new WeatherStationClient(
-    isRelativePath ? baseUrl : (prod ? "https://" + baseUrl : "http://" + baseUrl)
+    prod ? "https://" + baseUrl : "http://" + baseUrl
 );
 export const authClient = new AuthClient(
-    isRelativePath ? baseUrl : (prod ? "https://" + baseUrl : "http://" + baseUrl)
+    prod ? "https://" + baseUrl : "http://" + baseUrl
 );
