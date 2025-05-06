@@ -61,6 +61,7 @@ jobs:
           POSTGRES_DB=${{ vars.POSTGRES_DATABASE }}
           POSTGRES_USER=${{ vars.POSTGRES_USER }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
+          ENVIRONMENT=Staging
           EOL
           
       - name: Debugging     
