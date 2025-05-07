@@ -23,7 +23,7 @@ public static class Extensions
         app.UseRouting();
         var port = GetAvailablePort(wsPort);
         Environment.SetEnvironmentVariable("PORT", port.ToString());
-        var url = $"ws://0.0.0.0:{port}";
+        var url = $"ws://0.0.0.0:{port}/ws";
         var logger = app.Services.GetRequiredService<ILogger<NonStaticWsExtensionClassForLogger>>();
         logger.LogInformation("WS running on url: " + url);
         var server = new WebSocketServer(url);
