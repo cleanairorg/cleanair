@@ -15,9 +15,10 @@ export default function App() {
 
     useEffect(() => {
         const finalUrl = prod
-            ? `wss://${baseUrl}?id=${randomUid}`
-            : `ws://${baseUrl}?id=${randomUid}`;
+            ? `wss://${baseUrl}/ws?id=${randomUid}`
+            : `ws://${baseUrl}/ws?id=${randomUid}`;
 
+        console.log("Connecting to WebSocket:", finalUrl)
         setServerUrl(finalUrl);
     }, [prod, baseUrl]);
 
