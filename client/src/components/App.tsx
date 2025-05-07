@@ -5,7 +5,7 @@ import { DevTools } from "jotai-devtools";
 import 'jotai-devtools/styles.css';
 import { v4 as uuidv4 } from 'uuid'; 
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+const baseUrl = "79.76.52.174";
 const prod = import.meta.env.PROD;
 
 export const randomUid = uuidv4();
