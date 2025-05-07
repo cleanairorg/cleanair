@@ -20,7 +20,7 @@ export class AuthClient {
     }
 
     login(dto: AuthRequestDto): Promise<AuthResponseDto> {
-        let url_ = this.baseUrl + "/api/auth/Login";
+        let url_ = this.baseUrl + "/auth/Login";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -57,7 +57,7 @@ export class AuthClient {
     }
 
     register(dto: AuthRequestDto): Promise<AuthResponseDto> {
-        let url_ = this.baseUrl + "/api/auth/Register";
+        let url_ = this.baseUrl + "/auth/Register";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -94,7 +94,7 @@ export class AuthClient {
     }
 
     secured(): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/auth/Secured";
+        let url_ = this.baseUrl + "/auth/Secured";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {

@@ -14,7 +14,6 @@ public class WeatherStationController(
 {
     public const string GetLogsRoute = nameof(GetLogs);
 
-
     public const string AdminChangesPreferencesRoute = nameof(AdminChangesPreferences);
 
     [HttpGet]

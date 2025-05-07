@@ -8,7 +8,7 @@ namespace Api.Rest.Controllers;
 [ApiController]
 public class AuthController(ISecurityService securityService) : ControllerBase
 {
-    public const string ControllerRoute = "api/auth/";
+    public const string ControllerRoute = "auth/";
 
     public const string LoginRoute = ControllerRoute + nameof(Login);
 
