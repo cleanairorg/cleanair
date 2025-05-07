@@ -12,9 +12,13 @@ public class WeatherStationController(
     IConnectionManager connectionManager,
     ISecurityService securityService) : ControllerBase
 {
-    public const string GetLogsRoute = nameof(GetLogs);
+    public const string ControllerRoute = "api/";
+    
+    public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
 
-    public const string AdminChangesPreferencesRoute = nameof(AdminChangesPreferences);
+    public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);
+    
+    public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
 
     [HttpGet]
     [Route(GetLogsRoute)]
@@ -34,8 +38,7 @@ public class WeatherStationController(
         await weatherStationService.UpdateDeviceFeed(dto, claims);
         return Ok();
     }
-
-    public const string DeleteDataRoute = nameof(DeleteData);
+    
     [HttpDelete]
     [Route(DeleteDataRoute)]
     public async Task<ActionResult> DeleteData([FromHeader]string authorization)

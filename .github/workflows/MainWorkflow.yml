@@ -46,7 +46,7 @@ jobs:
       - name: Build and Push Frontend Docker image
         run: |
           docker build \
-            --build-arg VITE_API_BASE_URL="/api" \
+            --build-arg VITE_API_BASE_URL="79.76.52.174" \
             -t ghcr.io/${{ github.repository }}-frontend:staging \
             -f client/Dockerfile .
           docker push ghcr.io/${{ github.repository }}-frontend:staging

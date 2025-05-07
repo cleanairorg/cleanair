@@ -20,8 +20,8 @@ public static class RestStartupExtensions
     public static WebApplication ConfigureRestApi(this WebApplication app)
     {
         app.UseExceptionHandler();
-        app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         app.MapControllers();
+        app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         return app;
     }
 }
