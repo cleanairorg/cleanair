@@ -15,8 +15,8 @@ export default function App() {
 
     useEffect(() => {
         const finalUrl = prod
-            ? `wss://${baseUrl}?id=${randomUid}`
-            : `ws://${baseUrl}?id=${randomUid}`;
+            ? `wss://${baseUrl}:8181?id=${randomUid}`
+            : `ws://${baseUrl}:8181?id=${randomUid}`;
 
         setServerUrl(finalUrl);
     }, [prod, baseUrl]);
