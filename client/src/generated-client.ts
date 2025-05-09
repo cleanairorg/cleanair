@@ -20,7 +20,7 @@ export class AuthClient {
     }
 
     login(dto: AuthRequestDto): Promise<AuthResponseDto> {
-        let url_ = this.baseUrl + "/auth/Login";
+        let url_ = this.baseUrl + "/api/auth/Login";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -57,7 +57,7 @@ export class AuthClient {
     }
 
     register(dto: AuthRequestDto): Promise<AuthResponseDto> {
-        let url_ = this.baseUrl + "/auth/Register";
+        let url_ = this.baseUrl + "/api/auth/Register";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -94,7 +94,7 @@ export class AuthClient {
     }
 
     secured(): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/auth/Secured";
+        let url_ = this.baseUrl + "/api/auth/Secured";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -143,7 +143,7 @@ export class SubscriptionClient {
     }
 
     subscribe(authorization: string | undefined, dto: ChangeSubscriptionDto): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/Subscribe";
+        let url_ = this.baseUrl + "/api/Subscribe";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -186,7 +186,7 @@ export class SubscriptionClient {
     }
 
     unsubscribe(authorization: string | undefined, dto: ChangeSubscriptionDto): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/Unsubscribe";
+        let url_ = this.baseUrl + "/api/Unsubscribe";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -229,7 +229,7 @@ export class SubscriptionClient {
     }
 
     exampleBroadcast(dto: ExampleBroadcastDto): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/ExampleBroadcast";
+        let url_ = this.baseUrl + "/api/ExampleBroadcast";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -282,7 +282,7 @@ export class WeatherStationClient {
     }
 
     getLogs(authorization: string | undefined): Promise<Devicelog[]> {
-        let url_ = this.baseUrl + "/GetLogs";
+        let url_ = this.baseUrl + "/api/GetLogs";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -316,7 +316,7 @@ export class WeatherStationClient {
     }
 
     adminChangesPreferences(dto: AdminChangesPreferencesDto, authorization: string | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/AdminChangesPreferences";
+        let url_ = this.baseUrl + "/api/AdminChangesPreferences";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -359,7 +359,7 @@ export class WeatherStationClient {
     }
 
     deleteData(authorization: string | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/DeleteData";
+        let url_ = this.baseUrl + "/api/DeleteData";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {

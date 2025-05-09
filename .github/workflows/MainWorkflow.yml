@@ -61,6 +61,9 @@ jobs:
           POSTGRES_DB=${{ vars.POSTGRES_DATABASE }}
           POSTGRES_USER=${{ vars.POSTGRES_USER }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
+          MQTT_BROKER_HOST=${{ secrets.MQTT_BROKER_HOST }}
+          MQTT_USERNAME=${{ secrets.MQTT_USERNAME }}
+          MQTT_PASSWORD=${{ secrets.MQTT_PASSWORD }}
           ENVIRONMENT=Staging
           EOL
           
