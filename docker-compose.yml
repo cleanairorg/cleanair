@@ -30,6 +30,9 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
       AppOptions__DbConnectionString: Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       AppOptions__JwtSecret: ${JWT_SECRET}
+      AppOptions__MQTT_BROKER_HOST: ${MQTT_BROKER_HOST}
+      AppOptions__MQTT_USERNAME: ${MQTT_USERNAME}
+      AppOptions__MQTT_PASSWORD: ${MQTT_PASSWORD}
   
   flyway:
     depends_on:
