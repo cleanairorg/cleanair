@@ -6,6 +6,7 @@ import 'jotai-devtools/styles.css';
 import { v4 as uuidv4 } from 'uuid'; 
 
 const baseUrl = "79.76.52.174";
+const wsPort = "8181";
 const prod = import.meta.env.PROD;
 
 export const randomUid = uuidv4();
@@ -15,8 +16,8 @@ export default function App() {
 
     useEffect(() => {
         const finalUrl = prod
-            ? `wss://${baseUrl}:8181/ws?id=${randomUid}`
-            : `ws://${baseUrl}:8181/ws?id=${randomUid}`;
+            ? `wss://${baseUrl}:${wsPort}?id=${randomUid}`
+            : `ws://${baseUrl}:${wsPort}?id=${randomUid}`;
 
         setServerUrl(finalUrl);
     }, [prod, baseUrl]);
