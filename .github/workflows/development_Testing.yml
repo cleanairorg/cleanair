@@ -1,0 +1,59 @@
+name: development_Testing.yml
+on:
+  push:
+    branches:
+      - development
+      - 
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Install required tools
+        run: |
+          dotnet tool install -g dotnet-sonarscanner
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          dotnet tool install -g dotnet-stryker
+          
+      - name: Sonarqube Code Analysis Start
+        run: |
+          dotnet sonarscanner begin \
+          /k:"${{ vars.SONAR_PROJECT }}" \
+          /d:sonar.host.url="${{ vars.SONAR_URL }}" \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.coverageReportPaths="coverage-report/SonarQube.xml" \
+          /d:sonar.qualitygate.wait=true \
+          /d:sonar.qualitygate.timeout=300
+          
+      - name: Build Project
+        run: dotnet build
+        
+      - name: Run Unit Tests and Collect code coverage
+        run: dotnet test --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger "trx;LogFileName=test_results.trx"
+        
+      - name: Generate report
+        run: |
+          reportgenerator \
+          -reports:TestResults/**/coverage.cobertura.xml \
+          -targetdir:coverage-report \
+          -reporttypes:SonarQube
+          
+      - name: Mutation Tests with Stryker
+        run: dotnet stryker --break-at 80 --output ./TestResults/StrykerOutput
+          
+      - name: Complete Mutation Report
+        run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          
+      - name: Upload Mutation Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stryker-report
+          path: ./TestResults/StrykerOutput/
+          
+          
