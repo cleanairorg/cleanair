@@ -5,7 +5,7 @@ on:
       - development
       - 
 jobs:
-  integration:
+  DevelopmentTesting:
     runs-on: ubuntu-latest
     
     steps:
@@ -31,7 +31,7 @@ jobs:
           /d:sonar.qualitygate.timeout=300
           
       - name: Build Project
-        run: dotnet build
+        run: dotnet build CleanAir.slnx
         
       - name: Run Unit Tests and Collect code coverage
         run: dotnet test --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger "trx;LogFileName=test_results.trx"
