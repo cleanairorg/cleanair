@@ -3,9 +3,9 @@ import { WsClientProvider } from 'ws-request-hook';
 import ApplicationRoutes from "./ApplicationRoutes.tsx";
 import { DevTools } from "jotai-devtools";
 import 'jotai-devtools/styles.css';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 
-const baseUrl = import.meta.env.WS_URL;
+const baseUrl = import.meta.env.VITE_API_WS_URL;
 const prod = import.meta.env.PROD;
 
 export const randomUid = uuidv4();
@@ -15,7 +15,7 @@ export default function App() {
 
     useEffect(() => {
         const finalUrl = `ws://${baseUrl}?id=${randomUid}`;
-
+        console.log("WebSocket URL:", finalUrl); // Tilføjet for debugging
         setServerUrl(finalUrl);
     }, [prod, baseUrl]);
 
