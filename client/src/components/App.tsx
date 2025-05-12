@@ -5,6 +5,7 @@ import { DevTools } from "jotai-devtools";
 import 'jotai-devtools/styles.css';
 import { v4 as uuidv4 } from 'uuid';
 
+const wsUrl = import.meta.env.VITE_API_WS_URL
 const prod = import.meta.env.PROD;
 
 export const randomUid = uuidv4();
@@ -13,8 +14,7 @@ export default function App() {
     const [serverUrl, setServerUrl] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        const finalUrl = `ws://79.76.52.174:8181?id=${randomUid}`;
-        console.log("Connecting to WebSocket:", finalUrl);
+        const finalUrl = `ws://${wsUrl}?id=${randomUid}`;
         setServerUrl(finalUrl);
     }, []);
 
