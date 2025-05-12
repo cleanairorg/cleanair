@@ -38,6 +38,16 @@ public static class GenerateTypescriptClient
 
         // Add the import at the top
         lines.Insert(0, "import { BaseDto } from 'ws-request-hook';");
+        
+        // Fjern alle /api præfikser fra URL'er
+        for (int i = 0; i < lines.Count; i++)
+        {
+            // Matcher "/api/something" og erstatter med "/something"
+            if (lines[i].Contains("\"/api/"))
+            {
+                lines[i] = lines[i].Replace("\"/api/", "\"/");
+            }
+        }
 
         // Log the lines after modification (optional)
         app.Services.GetRequiredService<ILogger<Program>>()
