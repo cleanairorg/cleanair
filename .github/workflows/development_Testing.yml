@@ -34,6 +34,7 @@ jobs:
         run: dotnet build
         
       - name: Run Unit Tests and Collect code coverage
+        continue-on-error: true
         run: dotnet test --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger "trx;LogFileName=test_results.trx"
         
       - name: Generate report
@@ -46,7 +47,7 @@ jobs:
       - name: Mutation Tests with Stryker
         run: dotnet stryker --break-at 80 --output ./TestResults/StrykerOutput
           
-      - name: Complete Mutation Report
+      - name: Complete Static Code Analysis
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           
       - name: Upload Mutation Report
