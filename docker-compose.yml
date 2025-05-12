@@ -23,7 +23,7 @@ services:
     image: ghcr.io/${GITHUB_REPOSITORY}-backend:staging
     container_name: backend
     ports:
-      - "8181:8181"  
+      - "8181:8181"
     expose:
       - "8080"
     environment:

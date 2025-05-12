@@ -1,4 +1,4 @@
-﻿name: CI/CD
+﻿﻿name: CI/CD
 
 on:
   push:
@@ -31,7 +31,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHUB_TOKEN }}
-          
+
+
 
       - name: Build and Push Backend Docker image
         run: |
@@ -39,18 +40,19 @@ jobs:
             -t ghcr.io/${{ github.repository }}-backend:staging \
             -f server/Dockerfile .
           docker push ghcr.io/${{ github.repository }}-backend:staging
-          
-          
+
+
+
       - name: Build and Push Frontend Docker image
         run: |
           docker build \
             --build-arg VITE_API_BASE_URL="/api" \
-            --build-arg VITE_API_WS_URL="79.76.52.174:8181" \
             -t ghcr.io/${{ github.repository }}-frontend:staging \
             -f client/Dockerfile .
           docker push ghcr.io/${{ github.repository }}-frontend:staging
-          
-          
+
+
+
       - name: Create .env file for staging
         run: |
           cat > .env <<EOL
@@ -64,6 +66,13 @@ jobs:
           MQTT_PASSWORD=${{ secrets.MQTT_PASSWORD }}
           ENVIRONMENT=Staging
           EOL
+
+      - name: Debugging
+        run: |
+          echo "Checking contents of Migrations directory:"
+          ls -al ./server/Infrastructure.Postgres/Migrations || echo "Directory not found"
+          echo "Searching for .sql files recursively:"
+          find ./server -name "*.sql" || echo "No .sql files found"
 
 
       - name: Deploy to staging server
