@@ -1,0 +1,90 @@
+﻿name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      #- name: Semantic Application Version
+      #  id: semver-app
+      #  uses: paulhatch/semantic-version@v5.4.0
+      #  with:
+      #    bump_each_commit: true    
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHUB_TOKEN }}
+          
+
+      - name: Build and Push Backend Docker image
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository }}-backend:staging \
+            -f server/Dockerfile .
+          docker push ghcr.io/${{ github.repository }}-backend:staging
+          
+          
+      - name: Build and Push Frontend Docker image
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL="/api" \
+            --build-arg VITE_API_WS_URL="79.76.52.174:8181" \
+            -t ghcr.io/${{ github.repository }}-frontend:staging \
+            -f client/Dockerfile .
+          docker push ghcr.io/${{ github.repository }}-frontend:staging
+          
+          
+      - name: Create .env file for staging
+        run: |
+          cat > .env <<EOL
+          GITHUB_REPOSITORY=${{ github.repository }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ vars.POSTGRES_DATABASE }}
+          POSTGRES_USER=${{ vars.POSTGRES_USER }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          MQTT_BROKER_HOST=${{ secrets.MQTT_BROKER_HOST }}
+          MQTT_USERNAME=${{ secrets.MQTT_USERNAME }}
+          MQTT_PASSWORD=${{ secrets.MQTT_PASSWORD }}
+          ENVIRONMENT=Staging
+          EOL
+
+
+      - name: Deploy to staging server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.STAGING_SERVER_IP }}
+          username: ${{ vars.STAGING_SERVER_USERNAME }}
+          key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
+          source: "./docker-compose.yml,.env,./server/Infrastructure.Postgres/Migrations/**.sql,./client/default.conf"
+          target: cleanair/
+
+
+      - name: Start containers on staging server
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ vars.STAGING_SERVER_IP }}
+          username: ${{ vars.STAGING_SERVER_USERNAME }}
+          key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/cleanair
+            echo "${{ secrets.GHUB_TOKEN  }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose pull
+            docker compose down
+            docker compose up -d

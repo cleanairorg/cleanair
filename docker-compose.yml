@@ -1,74 +1,62 @@
 services:
-  web:
-    image: placeholder-from-github-backend-image
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mariadb
+  postgres:
+    image: postgres:latest
+    container_name: database
     environment:
-      # ASPNETCORE_ENVIRONMENT: Production # This sets the environment to production in the actual container.
-      ConnectionStrings__CalculatorDb: Server=mariadb;Database=${MYSQL_DATABASE};User=${MYSQL_USER};Password=${MYSQL_PASSWORD};
-  
-  
-  frontend:
-    image: placeholder-from-github-frontend-image
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "80:80"
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+  backend:
     depends_on:
-      - web
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-  
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
+      postgres:
+        condition: service_healthy
+    image: ghcr.io/${GITHUB_REPOSITORY}-backend:staging
+    container_name: backend
     ports:
-      - "3306:3306"
+      - "8181:8181"
+    expose:
+      - "8080"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - mariadb_data:/var/lib/mysql
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
+      AppOptions__DbConnectionString: Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      AppOptions__JwtSecret: ${JWT_SECRET}
+      AppOptions__MQTT_BROKER_HOST: ${MQTT_BROKER_HOST}
+      AppOptions__MQTT_USERNAME: ${MQTT_USERNAME}
+      AppOptions__MQTT_PASSWORD: ${MQTT_PASSWORD}
   
   flyway:
-    image: flyway/flyway:latest
     depends_on:
-      - mariadb
+      postgres:
+        condition: service_healthy
+    image: flyway/flyway:latest
+    container_name: flyway
     environment:
-      FLYWAY_URL: jdbc:mariadb://mariadb:3306/${MYSQL_DATABASE}
-      FLYWAY_USER: ${MYSQL_USER}
-      FLYWAY_PASSWORD: ${MYSQL_PASSWORD}
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      FLYWAY_USER: ${POSTGRES_USER}
+      FLYWAY_PASSWORD: ${POSTGRES_PASSWORD}
       FLYWAY_CONNECT_RETRIES: 5
       FLYWAY_LOCATIONS: filesystem:/flyway/sql
     volumes:
-      - ./db/migrations:/flyway/sql
+      - ./server/Infrastructure.Postgres/Migrations:/flyway/sql
     command: migrate
   
-  seq-logging:
-    image: datalust/seq
+  frontend:
+    depends_on:
+      - backend
+    image: ghcr.io/${GITHUB_REPOSITORY}-frontend:staging
+    container_name: frontend
     ports:
-      - "5341:5341"
-      - "5342:80"
-    environment:
-      - ACCEPT_EULA=Y
+      - "80:80"
 
-  zipkin-tracing:
-    image: openzipkin/zipkin
-    ports:
-      - "9411:9411"
-  
-        
-  featurehub:
-    image: featurehub/party-server:latest
-    restart: always
-    volumes:
-      - featurehub-h2-data:/db
-    ports:
-      - 8085:8085
-  
-  
 volumes:
-  mariadb_data:
-  featurehub-h2-data:
+  postgres_data:

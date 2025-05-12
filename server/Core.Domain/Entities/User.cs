@@ -1,6 +1,9 @@
-﻿namespace Core.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
 
-public class User
+namespace Core.Domain.Entities;
+
+public partial class User
 {
     public string Id { get; set; } = null!;
 

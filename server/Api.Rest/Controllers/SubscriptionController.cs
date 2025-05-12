@@ -11,11 +11,13 @@ public class SubscriptionController(
     IConnectionManager connectionManager,
     IWebsocketSubscriptionService websocketSubscriptionService) : ControllerBase
 {
-    public const string SubscriptionRoute = nameof(Subscribe);
+    public const string ControllerRoute = "api/";
+    
+    public const string SubscriptionRoute = ControllerRoute + nameof(Subscribe);
 
-    public const string UnsubscribeRoute = nameof(Unsubscribe);
+    public const string UnsubscribeRoute = ControllerRoute + nameof(Unsubscribe);
 
-    public const string ExampleBroadcastRoute = nameof(ExampleBroadcast);
+    public const string ExampleBroadcastRoute = ControllerRoute + nameof(ExampleBroadcast);
 
     [HttpPost]
     [Route(SubscriptionRoute)]

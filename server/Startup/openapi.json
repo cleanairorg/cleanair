@@ -91,7 +91,7 @@
         }
       }
     },
-    "/Subscribe": {
+    "/api/Subscribe": {
       "post": {
         "tags": [
           "Subscription"
@@ -134,7 +134,7 @@
         }
       }
     },
-    "/Unsubscribe": {
+    "/api/Unsubscribe": {
       "post": {
         "tags": [
           "Subscription"
@@ -177,7 +177,7 @@
         }
       }
     },
-    "/ExampleBroadcast": {
+    "/api/ExampleBroadcast": {
       "post": {
         "tags": [
           "Subscription"
@@ -210,7 +210,7 @@
         }
       }
     },
-    "/GetLogs": {
+    "/api/GetLogs": {
       "get": {
         "tags": [
           "WeatherStation"
@@ -243,7 +243,7 @@
         }
       }
     },
-    "/AdminChangesPreferences": {
+    "/api/AdminChangesPreferences": {
       "post": {
         "tags": [
           "WeatherStation"
@@ -286,7 +286,7 @@
         }
       }
     },
-    "/DeleteData": {
+    "/api/DeleteData": {
       "delete": {
         "tags": [
           "WeatherStation"
@@ -382,15 +382,15 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "deviceid": {
             "type": "string"
           },
           "value": {
             "type": "number",
             "format": "decimal"
-          },
-          "id": {
-            "type": "string"
           },
           "unit": {
             "type": "string"
