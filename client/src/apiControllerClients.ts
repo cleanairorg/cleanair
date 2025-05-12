@@ -3,12 +3,9 @@ import {AuthClient, SubscriptionClient, WeatherStationClient} from "./generated-
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 const prod = import.meta.env.PROD
 
-// For REST API
-const baseUrl = prod
-    ? apiBaseUrl  // I produktion: Bruges "/api" (relativ sti)
-    : `http://${apiBaseUrl}`; // I udvikling: Bruges værdi fra .env.development
+const isRelativePath = apiBaseUrl.startsWith('/');
 
-console.log("API Base URL:", baseUrl);
+const baseUrl = isRelativePath ? apiBaseUrl : (prod ? "http://" + apiBaseUrl : "http://" + apiBaseUrl);
 
 export const subscriptionClient = new SubscriptionClient(baseUrl);
 export const weatherStationClient = new WeatherStationClient(baseUrl);

@@ -14,8 +14,8 @@ export default function App() {
     const [serverUrl, setServerUrl] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        // WebSocket direkte på serverens IP og port
         const finalUrl = `ws://${wsUrl}?id=${randomUid}`;
+        console.log("Connecting to WebSocket:", finalUrl);
         setServerUrl(finalUrl);
     }, []);
 
