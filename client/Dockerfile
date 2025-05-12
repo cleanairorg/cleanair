@@ -18,7 +18,10 @@ COPY client/ ./
 
 # Sætter build-time variabel for API URL (bruges af Vite under build)
 ARG VITE_API_BASE_URL
+ARG VITE_API_WS_URL
+
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_API_WS_URL=$VITE_API_WS_URL
 
 # Bygger produktions-version af frontend
 RUN npm run build
