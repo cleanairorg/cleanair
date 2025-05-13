@@ -62,6 +62,7 @@ services:
         
   seq:
     image: datalust/seq
+    container_name: logger
     ports:
       - "5341:5341"    # HTTP ingestion API
       - "5342:80"  # Web UI 

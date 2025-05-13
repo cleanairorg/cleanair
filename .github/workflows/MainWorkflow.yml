@@ -62,7 +62,7 @@ jobs:
           MQTT_BROKER_HOST=${{ secrets.MQTT_BROKER_HOST }}
           MQTT_USERNAME=${{ secrets.MQTT_USERNAME }}
           MQTT_PASSWORD=${{ secrets.MQTT_PASSWORD }}
-          SQL_URL=${{ vars.SQL_URL }}
+          SQL_URL=${{ vars.SEQ_URL }}
           ENVIRONMENT=Staging
           EOL
 
