@@ -35,6 +35,12 @@ jobs:
         
       - name: Run Unit Tests and Collect code coverage
         run: dotnet test --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger "trx;LogFileName=test_results.trx"
+        env:
+          APPOPTIONS__JwtSecret: "HemmeligTestJwtNøgle2025ForCleanAirProjekt"
+          APPOPTIONS__DbConnectionString: ""
+          APPOPTIONS__MQTT_BROKER_HOST: "localhost"
+          APPOPTIONS__MQTT_USERNAME: "testuser"
+          APPOPTIONS__MQTT_PASSWORD: "testpassword"
         
       - name: Generate report
         run: |
