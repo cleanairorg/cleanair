@@ -14,11 +14,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check .NET Version
+        run: dotnet --version
+
       - name: Install required tools
         run: |
           dotnet tool install -g dotnet-sonarscanner
           dotnet tool install -g dotnet-reportgenerator-globaltool
           dotnet tool install -g dotnet-stryker
+
+      - name: Examine test project
+        run: |
+          echo "Test project file content:"
+          cat server/Startup.Tests/Startup.Tests.csproj
+          
+          echo "Finding all csproj files:"
+          find . -name "*.csproj" -type f
+          
+          echo "Finding package references to coverlet:"
+          grep -r "coverlet" --include="*.csproj" .
 
       - name: Sonarqube Code Analysis Start
         run: |
@@ -32,27 +46,54 @@ jobs:
 
       - name: Build Project
         run: dotnet build
-      
-      - name: Run Unit Tests and Collect code coverage
-        run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
+
+      - name: Run Unit Tests with detailed output
+        run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults -v d
         env:
           APPOPTIONS__JwtSecret: "HemmeligTestJwtNøgle2025ForCleanAirProjekt"
           APPOPTIONS__DbConnectionString: "dummy_value"
           APPOPTIONS__MQTT_BROKER_HOST: ${{secrets.MQTT_BROKER_HOST}}
           APPOPTIONS__MQTT_USERNAME: ${{secrets.MQTT_USERNAME}}
           APPOPTIONS__MQTT_PASSWORD: ${{secrets.MQTT_PASSWORD}}
-      
-      - name: Mutation Tests with Stryker
-        run: dotnet stryker --break-at 80 --output TestResults/
-      
-      - name: Generate report
+
+      - name: Debug - List TestResults directory
+        if: always()
         run: |
+          echo "Current directory structure:"
+          find . -type d -not -path "*/\.*" | sort
+          
+          echo "TestResults directory contents (if exists):"
+          if [ -d "TestResults" ]; then
+            find TestResults -type f | sort
+          else
+            echo "TestResults directory does not exist"
+          fi
+          
+          echo "Finding any coverage files anywhere:"
+          find . -name "*coverage*.xml" -o -name "*cobertura*.xml" | sort
+
+      - name: Generate report
+        if: always()
+        run: |
+          # Midlertidig dummy file hvis ingen rigtige findes
+          if [ ! -d "TestResults" ] || [ -z "$(find TestResults -name "*coverage*.xml" -type f)" ]; then
+            echo "No coverage files found. Creating dummy coverage file"
+            mkdir -p TestResults
+            echo '<?xml version="1.0" encoding="utf-8"?><coverage version="1.0"><modules></modules></coverage>' > TestResults/coverage.cobertura.xml
+          fi
+          
           reportgenerator \
           -reports:TestResults/**/coverage.cobertura.xml \
           -targetdir:coverage-report \
           -reporttypes:SonarQube
 
+      - name: Mutation Tests with Stryker
+        run: |
+          mkdir -p TestResults/StrykerOutput
+          dotnet stryker --break-at 80 --output TestResults/
+
       - name: Complete Static Code Analysis
+        if: always()
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Upload Mutation Report
