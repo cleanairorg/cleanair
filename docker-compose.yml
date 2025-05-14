@@ -81,4 +81,3 @@ services:
 
 volumes:
   postgres_data:
-  featurehub-h2-data:/db:
