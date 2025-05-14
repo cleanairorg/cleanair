@@ -13,13 +13,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Install required tools
         run: |
           dotnet tool install -g dotnet-sonarscanner
           dotnet tool install -g dotnet-reportgenerator-globaltool
           dotnet tool install -g dotnet-stryker
-          
+
       - name: Sonarqube Code Analysis Start
         run: |
           dotnet sonarscanner begin \
@@ -29,41 +29,36 @@ jobs:
           /d:sonar.coverageReportPaths="coverage-report/SonarQube.xml" \
           /d:sonar.qualitygate.wait=true \
           /d:sonar.qualitygate.timeout=300
-          
+
       - name: Build Project
         run: dotnet build
-    
+      
       - name: Run Unit Tests and Collect code coverage
-        run: dotnet test --collect:"XPlat Code Coverage" --results-directory ./TestResults
+        run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
         env:
           APPOPTIONS__JwtSecret: "HemmeligTestJwtNøgle2025ForCleanAirProjekt"
           APPOPTIONS__DbConnectionString: "dummy_value"
           APPOPTIONS__MQTT_BROKER_HOST: ${{secrets.MQTT_BROKER_HOST}}
           APPOPTIONS__MQTT_USERNAME: ${{secrets.MQTT_USERNAME}}
           APPOPTIONS__MQTT_PASSWORD: ${{secrets.MQTT_PASSWORD}}
-          
-      - name: Debug - Find Coverage Files
-        if: always()
-        run: find . -name "*.cobertura.xml" -type f   
-        
+      
+      - name: Mutation Tests with Stryker
+        run: dotnet stryker --break-at 80 --output TestResults/
+      
       - name: Generate report
         run: |
           reportgenerator \
           -reports:TestResults/**/coverage.cobertura.xml \
           -targetdir:coverage-report \
           -reporttypes:SonarQube
-          
-      - name: Mutation Tests with Stryker
-        run: dotnet stryker --break-at 80 --output ./TestResults/StrykerOutput
-          
+
       - name: Complete Static Code Analysis
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          
+
       - name: Upload Mutation Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: stryker-report
-          path: ./TestResults/StrykerOutput/
-          
-          
+          path: TestResults/StrykerOutput/
+          if-no-files-found: warn
