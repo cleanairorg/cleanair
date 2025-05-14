@@ -33,6 +33,7 @@ services:
       AppOptions__MQTT_BROKER_HOST: ${MQTT_BROKER_HOST}
       AppOptions__MQTT_USERNAME: ${MQTT_USERNAME}
       AppOptions__MQTT_PASSWORD: ${MQTT_PASSWORD}
+      AppOptions__SeqUrl: ${SEQ_URL}
   
   flyway:
     depends_on:
@@ -57,6 +58,16 @@ services:
     container_name: frontend
     ports:
       - "80:80"
+        
+        
+  seq:
+    image: datalust/seq
+    container_name: logger
+    ports:
+      - "5341:5341"    # HTTP ingestion API
+      - "5342:80"  # Web UI 
+    environment:
+      - ACCEPT_EULA=Y
 
 volumes:
   postgres_data:

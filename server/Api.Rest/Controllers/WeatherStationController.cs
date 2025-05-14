@@ -13,7 +13,6 @@ public class WeatherStationController(
     ISecurityService securityService) : ControllerBase
 {
     public const string ControllerRoute = "api/";
-    
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
 
     public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);

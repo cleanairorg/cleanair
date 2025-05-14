@@ -3,14 +3,17 @@ using Api.Rest;
 using Api.Websocket;
 using Application;
 using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Logging;
 using Application.Interfaces.Infrastructure.MQTT;
 using Application.Models;
+using Infrastructure.Logging;
 using Infrastructure.MQTT;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
 using NSwag.Generation;
 using Scalar.AspNetCore;
+using Serilog;
 using Startup.Documentation;
 using Startup.Proxy;
 
@@ -21,9 +24,20 @@ public class Program
     public static async Task Main()
     {
         var builder = WebApplication.CreateBuilder();
-        ConfigureServices(builder.Services, builder.Configuration);
+        
+        var appOptions = builder.Configuration.GetSection("AppOptions").Get<AppOptions>()!;
+        LoggingConfiguration.Configure(appOptions.SeqUrl); // Sets configuration
+
+        builder.Host.UseSerilog();  // sets standard Asp net logger to use serilog
+        
+        ConfigureServices(builder.Services, builder.Configuration); 
         var app = builder.Build();
         await ConfigureMiddleware(app);
+        
+        var logger = app.Services.GetRequiredService<ILoggingService>(); 
+        logger.LogInformation("Logger Service\ud83d\udd25 is running.\ud83d\ude80");
+        Log.Information("SEQ URL used at startup: {SeqUrl}", appOptions.SeqUrl);
+        
         await app.RunAsync();
     }
 
@@ -32,7 +46,7 @@ public class Program
         var appOptions = services.AddAppOptions(configuration);
 
         services.RegisterApplicationServices();
-
+        services.RegisterLoggingService();
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
 
