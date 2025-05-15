@@ -9,7 +9,7 @@ public static class FeatureHubExtensions
         services.AddSingleton<IFeatureHubRepository>(sp =>
         {
             var config = sp.GetRequiredService<IOptions<AppOptions>>().Value;
-            var fhConfig = new EdgeFeatureHubConfig(config.FeatureHubUrl, config.FeatureHubApiKey);
+            var fhConfig = new EdgeFeatureHubConfig(config.FEATUREHUB_URL, config.FEATUREHUB_API_KEY);
             return fhConfig.Repository;
         });
 
