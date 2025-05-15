@@ -10,7 +10,7 @@ public class FeatureFlagController(IFeatureHubRepository repo) : ControllerBase
     {
         try
         {
-            var flag = repo.GetFeature("some-flag-name");
+            var flag = repo.GetFeature("CleanFeature");
             return Ok(new
             {
                 enabled = flag.IsEnabled,
