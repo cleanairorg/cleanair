@@ -1,0 +1,29 @@
+﻿.graphs-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem;
+    background-color: #1f2b38;
+}
+
+.graph-card {
+    background-color: #2e3e50;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    width: 200px;
+}
+
+.graph-line {
+    margin-top: 1rem;
+    height: 30px;
+    background-color: #4ecdc4;
+    border-radius: 8px;
+}
+
+.temperature-line {
+    background-color: #f67280;
+}
+
+.humidity-line {
+    background-color: #36c9a7;
+}

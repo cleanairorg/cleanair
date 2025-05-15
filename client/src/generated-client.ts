@@ -20,7 +20,7 @@ export class AuthClient {
     }
 
     login(dto: AuthRequestDto): Promise<AuthResponseDto> {
-        let url_ = this.baseUrl + "/auth/Login";
+        let url_ = this.baseUrl + "/api/auth/Login";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -44,20 +44,20 @@ export class AuthClient {
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
-                let result200: any = null;
-                result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthResponseDto;
-                return result200;
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthResponseDto;
+            return result200;
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<AuthResponseDto>(null as any);
     }
 
     register(dto: AuthRequestDto): Promise<AuthResponseDto> {
-        let url_ = this.baseUrl + "/auth/Register";
+        let url_ = this.baseUrl + "/api/auth/Register";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -81,20 +81,20 @@ export class AuthClient {
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
-                let result200: any = null;
-                result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthResponseDto;
-                return result200;
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthResponseDto;
+            return result200;
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<AuthResponseDto>(null as any);
     }
 
     secured(): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/auth/Secured";
+        let url_ = this.baseUrl + "/api/auth/Secured";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -125,7 +125,7 @@ export class AuthClient {
             return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<FileResponse>(null as any);
@@ -143,7 +143,7 @@ export class SubscriptionClient {
     }
 
     subscribe(authorization: string | undefined, dto: ChangeSubscriptionDto): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/Subscribe";
+        let url_ = this.baseUrl + "/api/Subscribe";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -179,14 +179,14 @@ export class SubscriptionClient {
             return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<FileResponse>(null as any);
     }
 
     unsubscribe(authorization: string | undefined, dto: ChangeSubscriptionDto): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/Unsubscribe";
+        let url_ = this.baseUrl + "/api/Unsubscribe";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -222,14 +222,14 @@ export class SubscriptionClient {
             return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<FileResponse>(null as any);
     }
 
     exampleBroadcast(dto: ExampleBroadcastDto): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/ExampleBroadcast";
+        let url_ = this.baseUrl + "/api/ExampleBroadcast";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -264,7 +264,7 @@ export class SubscriptionClient {
             return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<FileResponse>(null as any);
@@ -282,7 +282,7 @@ export class WeatherStationClient {
     }
 
     getLogs(authorization: string | undefined): Promise<Devicelog[]> {
-        let url_ = this.baseUrl + "/GetLogs";
+        let url_ = this.baseUrl + "/api/GetLogs";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -303,20 +303,20 @@ export class WeatherStationClient {
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
-                let result200: any = null;
-                result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Devicelog[];
-                return result200;
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Devicelog[];
+            return result200;
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<Devicelog[]>(null as any);
     }
 
     adminChangesPreferences(dto: AdminChangesPreferencesDto, authorization: string | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/AdminChangesPreferences";
+        let url_ = this.baseUrl + "/api/AdminChangesPreferences";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -352,14 +352,14 @@ export class WeatherStationClient {
             return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<FileResponse>(null as any);
     }
 
     deleteData(authorization: string | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/DeleteData";
+        let url_ = this.baseUrl + "/api/DeleteData";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -391,7 +391,7 @@ export class WeatherStationClient {
             return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
         return Promise.resolve<FileResponse>(null as any);

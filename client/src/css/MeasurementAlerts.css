@@ -1,0 +1,26 @@
+﻿.measurement-alerts {
+    background-color: #1f2b38;
+    padding: 1rem;
+    border-radius: 12px;
+    overflow-y: auto;
+    height: 100%;
+    max-height: 670px;
+    display: flex;
+    flex-direction: column;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.alert.critical {
+    background-color: red;
+    color: white;
+}
+
+.alert.warning {
+    background-color: #f28b3b;
+    color: white;
+}

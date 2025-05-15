@@ -1,0 +1,33 @@
+﻿.current-values {
+    background-color: #1f2b38;
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-title {
+    background-color: transparent;
+    border-radius: 0;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.value {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.value.green { background-color: #2b3d4f; }
+.value.red { background-color: #2b3d4f; }
+.value.yellow { background-color: #2b3d4f; }
+
+.last-week {
+    text-align: center;
+    background-color: green;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: auto;
+}
