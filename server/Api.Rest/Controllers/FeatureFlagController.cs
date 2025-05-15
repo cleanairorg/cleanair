@@ -8,17 +8,20 @@ public class FeatureFlagController(IFeatureHubRepository repo) : ControllerBase
     [HttpGet]
     public IActionResult Check()
     {
-        var flag = repo.GetFeature("CleanFeature");
-
-        var isEnabled = flag.IsEnabled;
-        var message = isEnabled
-            ? "✅ The feature is currently ENABLED."
-            : "❌ The feature is currently DISABLED.";
-
-        return Ok(new
+        try
         {
-            enabled = isEnabled,
-            message
-        });
+            var flag = repo.GetFeature("some-flag-name");
+            return Ok(new
+            {
+                enabled = flag.IsEnabled,
+                message = flag.IsEnabled
+                    ? "✅ Feature is ENABLED."
+                    : "🚫 Feature is DISABLED."
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
+        }
     }
 }
