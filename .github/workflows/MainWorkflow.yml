@@ -63,6 +63,8 @@ jobs:
           MQTT_USERNAME=${{ secrets.MQTT_USERNAME }}
           MQTT_PASSWORD=${{ secrets.MQTT_PASSWORD }}
           SEQ_URL=${{ vars.SEQ_URL }}
+          FEATURE_HUB_API_KEY=${{ secrets.FEATURE_HUB_API_KEY }}
+          FEATURE_HUB_URL=${{ vars.FEATURE_HUB_URL }}
           ENVIRONMENT=Staging
           EOL
 
@@ -88,4 +90,6 @@ jobs:
             echo "${{ secrets.GHUB_TOKEN  }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose pull
             docker compose down
-            docker compose up -d
+            docker compose up -d featurehub backend
+          
+          #  docker compose up -d 

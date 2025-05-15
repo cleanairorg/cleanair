@@ -51,6 +51,8 @@ services:
       AppOptions__MQTT_USERNAME: ${MQTT_USERNAME}
       AppOptions__MQTT_PASSWORD: ${MQTT_PASSWORD}
       AppOptions__SeqUrl: ${SEQ_URL}
+      AppOptions__FeatureHubApiKey: ${FEATUREHUB_API_KEY}
+      AppOptions__FeatureHubUrl: ${FEATUREHUB_URL}
   
   flyway:
     depends_on:
