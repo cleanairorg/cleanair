@@ -16,6 +16,23 @@ services:
       timeout: 5s
       retries: 5
       
+  featurehub:
+    image: featurehub/party-server:latest
+    container_name: featurehub
+    restart: always
+    environment:
+      JAVA_OPTS: "-Xmx200m -Xms100m"  # Begrænser Java heap memory
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 250M
+    volumes:
+      - featurehub-h2-data:/db
+    ports:
+      - "8085:8085"    
+      
+      
   backend:
     depends_on:
       postgres:
@@ -68,6 +85,12 @@ services:
       - "5342:80"  # Web UI 
     environment:
       - ACCEPT_EULA=Y
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 150M
 
 volumes:
   postgres_data:
+  featurehub-h2-data:
