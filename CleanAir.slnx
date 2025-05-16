@@ -6,10 +6,12 @@
         <Project Path="server/Startup.Tests/Startup.Tests.csproj" Type="Classic C#"/>
         <Project Path="server/Startup/Startup.csproj" Type="Classic C#"/>
         <Project Path="server\Api.Websocket\Api.Websocket.csproj" Type="Classic C#"/>
+        <Project Path="server\Infrastructure.Logging\Infrastructure.Logging.csproj" Type="Classic C#"/>
         <Project Path="server\Infrastructure.Postgres.Scaffolding\Infrastructure.Postgres.Scaffolding.csproj"
                  Type="Classic C#"/>
         <Project Path="server\Infrastructure.Postgres\Infrastructure.Postgres.csproj" Type="Classic C#"/>
         <Project Path="server\Infrastructure.Websocket\Infrastructure.Websocket.csproj" Type="Classic C#"/>
         <Project Path="server\Infrastructure.MQTT\Infrastructure.MQTT.csproj" Type="Classic C#"/>
+        <Project Path="server\Tests\Tests.csproj" Type="Classic C#"/>
     </Folder>
 </Solution>
