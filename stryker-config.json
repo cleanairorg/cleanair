@@ -2,21 +2,11 @@
   "stryker-config": {
     "reporters": ["html"],
     "mutate": [
-      "server/Api.Rest/**/*.cs",
-      "server/Api.Websocket/**/*.cs",
-      "server/Application/**/*.cs",
-      "server/Core.Domain/**/*.cs",
-      "server/Infrastructure.MQTT/**/*.cs",
-      "server/Infrastructure.Postgres/**/*.cs",
-      "server/Infrastructure.Websocket/**/*.cs",
-      "!server/Api.Websocket/ExampleEventHandler.cs",
-      "!server/Startup/**/*",
-      "!server/Startup.Tests/**/*",
-      "!server/Infrastructure.Postgres.Scaffolding/**/*",
-      "!server/Infrastructure.Logging/**/*"
+      "server/Core.Domain/Entities/User.cs"
     ],
     "test-projects": [
       "server/Tests/Tests.csproj"
-    ]
+    ],
+    "ignore-methods": ["*Log*", "*ToString*", "set_*", "get_*"]
   }
 }
