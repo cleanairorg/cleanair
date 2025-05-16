@@ -53,8 +53,8 @@ jobs:
           -reporttypes:SonarQube
           
       - name: Mutation Tests with Stryker
-        run: dotnet stryker --break-at 80 --output ./TestResults/StrykerOutput
-          
+        run: dotnet stryker --config-file:./stryker-config.json --output ./TestResults/StrykerOutput
+      
       - name: Complete Static Code Analysis
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           
