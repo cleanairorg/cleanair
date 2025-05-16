@@ -316,6 +316,27 @@
           }
         }
       }
+    },
+    "/api/GetMeasurementNow": {
+      "get": {
+        "tags": [
+          "WeatherStation"
+        ],
+        "operationId": "WeatherStation_GetMeasurementNow",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
