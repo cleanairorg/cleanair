@@ -1,0 +1,66 @@
+﻿.header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    background-color: #1f2b38;
+    padding: 0.5rem 1rem;
+    height: 60px;
+}
+
+/* LOGIN + REGISTER on the left */
+.header-left {
+    display: flex;
+    gap: 0.5rem;
+    left: 100px;
+}
+
+/* CleanAir logo on the right */
+.header-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Selected device perfectly centered */
+.header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Buttons */
+.login-button,
+.register-button {
+    background-color: #2e3e50;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+/* Dropdown */
+.selected-device {
+    font-size: 1.1rem;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    background-color: #2e3e50;
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+
+/* Logo */
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    height: 36px;
+    margin-top: -38px;
+}

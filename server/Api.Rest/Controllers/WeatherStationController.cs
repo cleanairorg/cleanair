@@ -16,8 +16,10 @@ public class WeatherStationController(
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
 
     public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);
-    
+
     public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
+    
+    public const string GetMeasurementNowRoute = ControllerRoute + nameof(GetMeasurementNow);
 
     [HttpGet]
     [Route(GetLogsRoute)]
@@ -37,16 +39,27 @@ public class WeatherStationController(
         await weatherStationService.UpdateDeviceFeed(dto, claims);
         return Ok();
     }
-    
+
     [HttpDelete]
     [Route(DeleteDataRoute)]
-    public async Task<ActionResult> DeleteData([FromHeader]string authorization)
+    public async Task<ActionResult> DeleteData([FromHeader] string authorization)
     {
         var jwt = securityService.VerifyJwtOrThrow(authorization);
 
         await weatherStationService.DeleteDataAndBroadcast(jwt);
+
+        return Ok();
+    }
+
+    [HttpGet]
+    [Route(GetMeasurementNowRoute)]
+    public async Task<ActionResult> GetMeasurementNow()
+    {
+        //securityService.VerifyJwtOrThrow(authorization);
+        
+        await weatherStationService.GetMeasurementNowAndBroadcast();
         
         return Ok();
     }
-    
+
 }

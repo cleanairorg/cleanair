@@ -57,6 +57,11 @@ public class WeatherStationService(
         await weatherStationRepository.DeleteAllData();
         await connectionManager.BroadcastToTopic(StringConstants.Dashboard, new AdminHasDeletedData());
     }
+
+    public async Task GetMeasurementNowAndBroadcast()
+    {
+        await mqttPublisher.Publish("1", "cleanair/measurement/now");
+    }
 }
 
 public class AdminHasDeletedData : ApplicationBaseDto
