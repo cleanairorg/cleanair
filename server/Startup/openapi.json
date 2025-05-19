@@ -17,7 +17,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AuthRequestDto"
+                "$ref": "#/components/schemas/AuthLoginRequestDto"
               }
             }
           },
@@ -49,7 +49,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AuthRequestDto"
+                "$ref": "#/components/schemas/AuthRegisterRequestDto"
               }
             }
           },
@@ -63,6 +63,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/GetUserInfo": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Auth_GetUserInfo",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthGetUserInfoDto"
                 }
               }
             }
@@ -333,7 +363,7 @@
           }
         }
       },
-      "AuthRequestDto": {
+      "AuthLoginRequestDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -348,6 +378,44 @@
           "password": {
             "type": "string",
             "minLength": 4
+          }
+        }
+      },
+      "AuthRegisterRequestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "password",
+          "role"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "minLength": 3
+          },
+          "password": {
+            "type": "string",
+            "minLength": 4
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "AuthGetUserInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
           }
         }
       },
@@ -388,16 +456,28 @@
           "deviceid": {
             "type": "string"
           },
-          "value": {
-            "type": "number",
-            "format": "decimal"
-          },
           "unit": {
             "type": "string"
           },
           "timestamp": {
             "type": "string",
             "format": "date-time"
+          },
+          "temperature": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "humidity": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "pressure": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "airquality": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

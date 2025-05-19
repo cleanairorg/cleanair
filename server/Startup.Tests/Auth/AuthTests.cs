@@ -61,7 +61,7 @@ public class AuthTests : WebApplicationFactory<Program>
     {
         var user = MockObjects.GetUser();
         var response = await _httpClient.PostAsJsonAsync(AuthController.RegisterRoute,
-            new AuthRequestDto
+            new AuthRegisterRequestDto
             {
                 Email = user.Email,
                 Password = "pass"
@@ -75,8 +75,8 @@ public class AuthTests : WebApplicationFactory<Program>
     [Test]
     public async Task Register_With_Short_Pass_Returns_Bad_Request()
     {
-        var response = await _httpClient.PostAsJsonAsync<AuthRequestDto>(
-            AuthController.RegisterRoute, new AuthRequestDto
+        var response = await _httpClient.PostAsJsonAsync<AuthRegisterRequestDto>(
+            AuthController.RegisterRoute, new AuthRegisterRequestDto
             {
                 Email = "bob@bob.dk",
                 Password = "a"
@@ -95,7 +95,7 @@ public class AuthTests : WebApplicationFactory<Program>
         await ctx.SaveChangesAsync();
 
         var response = await _httpClient.PostAsJsonAsync(
-            AuthController.LoginRoute, new AuthRequestDto
+            AuthController.LoginRoute, new AuthRegisterRequestDto
             {
                 Email = user.Email,
                 Password = "pass"
@@ -114,7 +114,7 @@ public class AuthTests : WebApplicationFactory<Program>
         await ctx.SaveChangesAsync();
 
         var response = await CreateClient().PostAsJsonAsync(AuthController.LoginRoute,
-            new AuthRequestDto
+            new AuthRegisterRequestDto
             {
                 Email = user.Email,
                 Password = "invalid password"
@@ -127,7 +127,7 @@ public class AuthTests : WebApplicationFactory<Program>
     public async Task Login_For_Non_Existing_User_Is_Unauthorized()
     {
         var response = await CreateClient().PostAsJsonAsync(AuthController.LoginRoute,
-            new AuthRequestDto { Email = "bob@bob.dk", Password = "password" });
+            new AuthRegisterRequestDto { Email = "bob@bob.dk", Password = "password" });
         if (HttpStatusCode.BadRequest != response.StatusCode)
             throw new Exception("Expected BadRequest status code");
     }
@@ -142,7 +142,7 @@ public class AuthTests : WebApplicationFactory<Program>
         await ctx.SaveChangesAsync();
 
         var response = await CreateClient().PostAsJsonAsync(AuthController.RegisterRoute,
-            new AuthRequestDto
+            new AuthRegisterRequestDto
             {
                 Email = user.Email,
                 Password = "password"

@@ -1,4 +1,4 @@
-import {Route, Routes, useNavigate} from "react-router";
+import {Navigate, Route, Routes, useNavigate} from "react-router";
 import useInitializeData from "../hooks/useInitializeData.tsx";
 import {DashboardRoute, SignInRoute} from '../routeConstants.ts';
 import useSubscribeToTopics from "../hooks/useSubscribeToTopics.tsx";
@@ -16,12 +16,16 @@ import Graphs from "./Graphs.tsx";
 export default function AppRoutes(){
 
     const navigate = useNavigate();
-    const [jwt] = useAtom(JwtAtom);
+    const [jwt, setJwt] = useAtom(JwtAtom);
     useInitializeData();
     useSubscribeToTopics();
 
     useEffect(() => {
-        if (jwt == undefined || jwt.length < 1) {
+        const storedJwt = localStorage.getItem("jwt");
+        if (storedJwt) {
+            setJwt(storedJwt);
+            navigate(DashboardRoute);
+        } else if (!jwt) {
             navigate(SignInRoute)
             toast("Please sign in to continue")
         }
@@ -43,10 +47,12 @@ export default function AppRoutes(){
         <>
             {/*the browser router is defined in main tsx so that i can use useNavigate anywhere*/}
             <Routes>
+                {/* Login route */}
+                <Route path="/" element={<Login />} />
+                <Route path={SignInRoute} element={<Login />} />
 
-                <Route element={AppContent} path={DashboardRoute}/>
-                <Route element={<Login/>} path={SignInRoute}/>
-
+                {/* Protected dashboard route */}
+                <Route path={DashboardRoute} element={jwt ? AppContent : <Navigate to={SignInRoute} replace />} />
             </Routes>
         </>
     );

@@ -10,9 +10,12 @@ END $EF$;
 CREATE TABLE weatherstation.devicelog (
     id text NOT NULL,
     deviceid text NOT NULL,
-    value numeric NOT NULL,
     unit text NOT NULL,
     timestamp timestamp with time zone NOT NULL,
+    temperature numeric(4,2) NOT NULL,
+    humidity numeric(4,2) NOT NULL,
+    pressure numeric(6,2) NOT NULL,
+    airquality integer NOT NULL,
     CONSTRAINT devicelog_pkey PRIMARY KEY (id)
 );
 

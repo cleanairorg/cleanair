@@ -19,7 +19,7 @@ export class AuthClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    login(dto: AuthRequestDto): Promise<AuthResponseDto> {
+    login(dto: AuthLoginRequestDto): Promise<AuthResponseDto> {
         let url_ = this.baseUrl + "/auth/Login";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -56,7 +56,7 @@ export class AuthClient {
         return Promise.resolve<AuthResponseDto>(null as any);
     }
 
-    register(dto: AuthRequestDto): Promise<AuthResponseDto> {
+    register(dto: AuthRegisterRequestDto): Promise<AuthResponseDto> {
         let url_ = this.baseUrl + "/auth/Register";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -91,6 +91,43 @@ export class AuthClient {
             });
         }
         return Promise.resolve<AuthResponseDto>(null as any);
+    }
+
+    getUserInfo(email: string | undefined): Promise<AuthGetUserInfoDto> {
+        let url_ = this.baseUrl + "/auth/GetUserInfo?";
+        if (email === null)
+            throw new Error("The parameter 'email' cannot be null.");
+        else if (email !== undefined)
+            url_ += "email=" + encodeURIComponent("" + email) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetUserInfo(_response);
+        });
+    }
+
+    protected processGetUserInfo(response: Response): Promise<AuthGetUserInfoDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthGetUserInfoDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<AuthGetUserInfoDto>(null as any);
     }
 
     secured(): Promise<FileResponse> {
@@ -402,9 +439,21 @@ export interface AuthResponseDto {
     jwt: string;
 }
 
-export interface AuthRequestDto {
+export interface AuthLoginRequestDto {
     email: string;
     password: string;
+}
+
+export interface AuthRegisterRequestDto {
+    email: string;
+    password: string;
+    role: string;
+}
+
+export interface AuthGetUserInfoDto {
+    id?: string;
+    email?: string;
+    role?: string;
 }
 
 export interface ChangeSubscriptionDto {
@@ -420,9 +469,12 @@ export interface ExampleBroadcastDto {
 export interface Devicelog {
     id?: string;
     deviceid?: string;
-    value?: number;
     unit?: string;
     timestamp?: Date;
+    temperature?: number;
+    humidity?: number;
+    pressure?: number;
+    airquality?: number;
 }
 
 export interface AdminChangesPreferencesDto {

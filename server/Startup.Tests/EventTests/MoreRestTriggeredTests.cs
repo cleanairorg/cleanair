@@ -61,7 +61,7 @@ public class MoreRestTriggeredTests
             Timestamp = DateTime.UtcNow,
             Deviceid = Guid.NewGuid().ToString(),
             Unit = "Celcius",
-            Value = 100,
+            //Value = 100,
             Id = Guid.NewGuid().ToString()
         });
         dbCtx.SaveChanges();
