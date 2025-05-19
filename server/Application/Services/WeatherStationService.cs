@@ -25,10 +25,14 @@ public class WeatherStationService(
         var deviceLog = new Devicelog
         {
             Timestamp = DateTime.UtcNow,
+            Temperature = dto.Value,
+            Humidity = dto.Value,
+            Pressure = dto.Value,
+            Airquality = dto.Value,
             Deviceid = dto.DeviceId,
             Unit = dto.Unit,
-            Value = dto.Value,
-            Id = Guid.NewGuid().ToString()
+            Id = Guid.NewGuid()
+                .ToString()
         };
         weatherStationRepository.AddDeviceLog(deviceLog);
         var recentLogs = weatherStationRepository.GetRecentLogs();

@@ -505,11 +505,14 @@ export interface ExampleBroadcastDto {
 }
 
 export interface Devicelog {
-    id?: string;
     deviceid?: string;
-    value?: number;
+    id?: string;
     unit?: string;
     timestamp?: Date;
+    temperature?: number;
+    humidity?: number;
+    pressure?: number;
+    airquality?: number;
 }
 
 export interface AdminChangesPreferencesDto {

@@ -424,15 +424,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {
-            "type": "string"
-          },
           "deviceid": {
             "type": "string"
           },
-          "value": {
-            "type": "number",
-            "format": "decimal"
+          "id": {
+            "type": "string"
           },
           "unit": {
             "type": "string"
@@ -440,6 +436,22 @@
           "timestamp": {
             "type": "string",
             "format": "date-time"
+          },
+          "temperature": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "humidity": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "pressure": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "airquality": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

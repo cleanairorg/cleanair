@@ -11,6 +11,7 @@ public class LoggingConfiguration
             .Enrich.FromLogContext()
             .WriteTo.Console()
             .WriteTo.Seq(seqUrl ?? "http://localhost:5341") // ✅ Use AppOptions value
+            .MinimumLevel.Information()
             .CreateLogger();
     }
 
