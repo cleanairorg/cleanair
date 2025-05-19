@@ -24,17 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api.Rest\Api.Rest.csproj" />
-    <ProjectReference Include="..\Api.Websocket\Api.Websocket.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure.MQTT\Infrastructure.MQTT.csproj" />
-    <ProjectReference Include="..\Infrastructure.Postgres\Infrastructure.Postgres.csproj" />
-    <ProjectReference Include="..\Infrastructure.Websocket\Infrastructure.Websocket.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Application\" />
   </ItemGroup>
 
 </Project>
