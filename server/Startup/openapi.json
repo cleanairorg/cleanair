@@ -358,6 +358,41 @@
           }
         }
       }
+    },
+    "/api/GetDailyAverages": {
+      "post": {
+        "tags": [
+          "WeatherStation"
+        ],
+        "operationId": "WeatherStation_GetDailyAverages",
+        "requestBody": {
+          "x-name": "timeRangeDto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeRangeDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AggregatedLogDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -467,6 +502,46 @@
           },
           "interval": {
             "type": "string"
+          }
+        }
+      },
+      "AggregatedLogDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "avgTemperature": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "avgHumidity": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "avgPressure": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "avgAirQuality": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TimeRangeDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },

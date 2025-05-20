@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Logging;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models.Dtos.RestDtos;
 using Core.Domain.Entities;
@@ -10,7 +12,8 @@ namespace Api.Rest.Controllers;
 public class WeatherStationController(
     IWeatherStationService weatherStationService,
     IConnectionManager connectionManager,
-    ISecurityService securityService) : ControllerBase
+    ISecurityService securityService, 
+    ILoggingService logger) : ControllerBase
 {
     public const string ControllerRoute = "api/";
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
@@ -61,5 +64,22 @@ public class WeatherStationController(
         
         return Ok();
     }
+
+
+    [HttpPost("api/GetDailyAverages")]
+    public ActionResult<List<AggregatedLogDto>> GetDailyAverages([FromBody] TimeRangeDto timeRangeDto)
+    {
+        Console.WriteLine("------------");
+        Console.WriteLine($"[Console] GetDailyAverages DTO: {JsonSerializer.Serialize(timeRangeDto)}");
+        Console.WriteLine("------------");
+
+        var result = weatherStationService.GetDailyAverages(timeRangeDto);
+        
+        return Ok(result);
+    }
+    
+    
+
+
 
 }

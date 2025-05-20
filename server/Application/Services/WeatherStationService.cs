@@ -48,8 +48,28 @@ public class WeatherStationService(
     {
         return weatherStationRepository.GetRecentLogs();
     }
+    
 
+    public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
+    {
+        var from = dto.StartDate.ToUniversalTime();
+        var to = dto.EndDate.ToUniversalTime();
 
+        if (dto.StartDate > dto.EndDate)
+        {
+            logger.LogError("Start date cannot be greater than end date");
+            throw new ArgumentException("StartDate cannot be after EndDate.");
+        }
+            
+
+        
+        return weatherStationRepository.GetDailyAverages(new TimeRangeDto
+        {
+            StartDate = from,
+            EndDate = to
+        });
+    }
+    
     public Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims)
     {
         mqttPublisher.Publish(dto, StringConstants.Device + $"/{dto.DeviceId}/" + StringConstants.ChangePreferences);

@@ -1,98 +1,94 @@
-﻿import '../css/Graphs.css'
-import { useAtom } from 'jotai'
-import { DeviceLogsAtom } from '../atoms'
-import { useMemo } from 'react'
-import {
-    AreaChart,
-    Area,
-    CartesianGrid,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-} from 'recharts'
-import useInitializeData from '../hooks/useInitializeData'
-
-/*
-TO DO:
-Logging for backend
-Making a menu for different graphs?
-Pick time / a endpoint more that takes timespan as a param
-Day and or hour
-make endpoint just take the 10 newest measurements in db
-take the whole timestamp and make a median of the day
-*/
+﻿import { useEffect, useMemo } from 'react';
+import { useAtom } from 'jotai';
+import { DeviceLogsAtom, JwtAtom } from '../atoms';
+import { weatherStationClient } from '../apiControllerClients';
+import GraphFilter from './GraphFilter';
+import type { Devicelog, TimeRangeDto } from '../generated-client';
+import ChartCard from './ChartCard';
 
 export default function Graphs() {
-    useInitializeData() // fetches logs on load
+    const [logs, setLogs] = useAtom(DeviceLogsAtom);
+    const [jwt] = useAtom(JwtAtom);
 
-    const [logs] = useAtom(DeviceLogsAtom)
+    const fetchGraphData = async (
+        type: 'today' | 'weekly' | 'monthly',
+        selectedMonth?: number,
+        selectedYear?: number
+    ) => {
+        if (!jwt) return;
+
+        let startDate: Date;
+        let endDate: Date;
+
+        if (type === 'today') {
+            startDate = new Date();
+            startDate.setHours(0, 0, 0, 0);
+            endDate = new Date();
+            endDate.setHours(23, 59, 59, 999);
+        } else if (type === 'weekly') {
+            endDate = new Date();
+            startDate = new Date();
+            startDate.setDate(endDate.getDate() - 6);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+        } else if (type === 'monthly' && selectedMonth && selectedYear) {
+            startDate = new Date(Date.UTC(selectedYear, selectedMonth - 1, 1));
+            endDate = new Date(Date.UTC(selectedYear, selectedMonth, 0, 23, 59, 59));
+        } else {
+            return;
+        }
+
+        const dto = {
+            startDate,
+            endDate
+        } satisfies TimeRangeDto;
+
+        const result = await weatherStationClient.getDailyAverages(dto);
+
+        const transformed: Devicelog[] = result.map(r => ({
+            timestamp: r.date ? new Date(r.date) : undefined,
+            temperature: r.avgTemperature,
+            humidity: r.avgHumidity,
+            pressure: r.avgPressure,
+            airquality: r.avgAirQuality,
+            id: crypto.randomUUID(),
+            unit: '',
+            deviceid: ''
+        }));
+
+        setLogs(transformed);
+    };
+
+    useEffect(() => {
+        fetchGraphData('today');
+    }, []);
 
     const formatChartData = useMemo(() => {
         return logs.map((log) => ({
-            time: log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '',
+            time: log.timestamp
+                ? new Date(log.timestamp).toLocaleDateString([], {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+                : '',
             temperature: Number(log.temperature),
             humidity: Number(log.humidity),
             pressure: Number(log.pressure),
             airquality: Number(log.airquality),
-        }))
-    }, [logs])
+        }));
+    }, [logs]);
 
     return (
-        <div className="graphs-container px-4 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ChartCard title="Temperature (°C)" color="#f87171" dataKey="temperature" data={formatChartData} />
-            <ChartCard title="Humidity (%)" color="#60a5fa" dataKey="humidity" data={formatChartData} />
-            <ChartCard title="Pressure (hPa)" color="#34d399" dataKey="pressure" data={formatChartData} />
-            <ChartCard title="Air Quality (PPM)" color="#fbbf24" dataKey="airquality" data={formatChartData} />
+        <div className="px-4 py-6">
+            <GraphFilter onSelect={fetchGraphData} />
+            <div className="graphs-container flex flex-wrap gap-6">
+                <ChartCard title="Temperature (°C)" color="#f87171" dataKey="temperature" data={formatChartData}/>
+                <ChartCard title="Humidity (%)" color="#60a5fa" dataKey="humidity" data={formatChartData}/>
+                <ChartCard title="Pressure (hPa)" color="#34d399" dataKey="pressure" data={formatChartData}/>
+                <ChartCard title="Air Quality (PPM)" color="#fbbf24" dataKey="airquality" data={formatChartData}/>
+            </div>
         </div>
-    )
-}
-
-function ChartCard({
-                       title,
-                       dataKey,
-                       color,
-                       data,
-                   }: {
-    title: string
-    dataKey: 'temperature' | 'humidity' | 'pressure' | 'airquality'
-    color: string
-    data: {
-        time: string
-        temperature: number
-        humidity: number
-        pressure: number
-        airquality: number
-    }[]
-}) {
-    const gradientId = `${dataKey}-gradient`
-
-    return (
-        <div className="graph-card bg-white dark:bg-gray-900 p-4 rounded shadow min-w-[300px] flex-1 max-w-[48%]">
-            <h3 className="text-lg font-semibold mb-2">{title}</h3>
-            <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
-                    <defs>
-                        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={color} stopOpacity={0.4} />
-                            <stop offset="95%" stopColor={color} stopOpacity={1} />
-                        </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
-                    <YAxis />
-                    <Tooltip formatter={(value: number) => `${value}`} />
-                    <Area
-                        type="monotone"
-                        dataKey={dataKey}
-                        stroke={color}
-                        strokeWidth={2}
-                        fill={`url(#${gradientId})`}
-                        fillOpacity={1}
-                        dot={false}
-                    />
-                </AreaChart>
-            </ResponsiveContainer>
-        </div>
-    )
+    );
 }
