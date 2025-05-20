@@ -1,0 +1,9 @@
+.login-box{
+    background-color: #1f2b38;
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    overflow: hidden;
+}

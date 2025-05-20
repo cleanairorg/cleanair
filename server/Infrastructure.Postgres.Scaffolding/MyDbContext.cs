@@ -1,4 +1,6 @@
-﻿using Core.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Scaffolding;
@@ -23,10 +25,19 @@ public partial class MyDbContext : DbContext
             entity.ToTable("devicelog", "weatherstation");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Airquality).HasColumnName("airquality");
             entity.Property(e => e.Deviceid).HasColumnName("deviceid");
+            entity.Property(e => e.Humidity)
+                .HasPrecision(4, 2)
+                .HasColumnName("humidity");
+            entity.Property(e => e.Pressure)
+                .HasPrecision(6, 2)
+                .HasColumnName("pressure");
+            entity.Property(e => e.Temperature)
+                .HasPrecision(4, 2)
+                .HasColumnName("temperature");
             entity.Property(e => e.Timestamp).HasColumnName("timestamp");
             entity.Property(e => e.Unit).HasColumnName("unit");
-            entity.Property(e => e.Value).HasColumnName("value");
         });
 
         modelBuilder.Entity<User>(entity =>

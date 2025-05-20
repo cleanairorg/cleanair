@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import '../css/App.css';
-import Header from './Header';
-import DeviceSettings from './DeviceSettings';
-import CurrentValues from './CurrentValues';
-import MeasurementAlerts from './MeasurementAlerts';
-import Graphs from './Graphs';
+import AppRoutes from './AppRoutes.tsx';
 import { v4 as uuidv4 } from 'uuid';
 import { DevTools } from "jotai-devtools";
 import 'jotai-devtools/styles.css';
@@ -23,27 +19,13 @@ export default function App() {
         setServerUrl(finalUrl);
     }, [prod, baseUrl]);
 
-    const AppContent = (
-        <div className="app">
-            <Header />
-            <main className="main-layout">
-                <DeviceSettings />
-                <CurrentValues />
-                <MeasurementAlerts />
-            </main>
-            <Graphs />
-        </div>
-    );
-
     return (
         <>
-            {serverUrl ? (
+            {serverUrl &&
                 <WsClientProvider url={serverUrl}>
-                    {AppContent}
+                    <AppRoutes />
                 </WsClientProvider>
-            ) : (
-                AppContent
-            )}
+            }
             {!prod && <DevTools />}
         </>
     );
