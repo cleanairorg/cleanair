@@ -27,7 +27,7 @@ public class WeatherStationService(
             Timestamp = DateTime.UtcNow,
             Deviceid = dto.DeviceId,
             Unit = dto.Unit,
-            Value = dto.Value,
+            //Value = dto.Value,
             Id = Guid.NewGuid().ToString()
         };
         weatherStationRepository.AddDeviceLog(deviceLog);
