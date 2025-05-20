@@ -2,7 +2,7 @@ using Core.Domain.Entities;
 
 namespace Application.Interfaces.Infrastructure.Postgres;
 
-public interface IWeatherStationRepository
+public interface ICleanAirRepository
 {
     List<Devicelog> GetRecentLogs();
     Devicelog AddDeviceLog(Devicelog deviceLog);

@@ -5,10 +5,10 @@ using Core.Domain.Entities;
 
 namespace Application.Interfaces;
 
-public interface IWeatherStationService
+public interface ICleanAirService
 {
     List<Devicelog> GetDeviceFeed(JwtClaims client);
-    Task AddToDbAndBroadcast(DeviceLogDto? dto);
+    Task AddToDbAndBroadcast(CollectDataDto? dto);
     Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims);
     Task DeleteDataAndBroadcast(JwtClaims jwt);
 }

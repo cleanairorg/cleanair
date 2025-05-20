@@ -13,25 +13,35 @@ using Microsoft.Extensions.Options;
 
 namespace Application.Services;
 
-public class WeatherStationService(
+public class CleanAirService(
     IOptionsMonitor<AppOptions> optionsMonitor,
-    ILogger<WeatherStationService> logger,
-    IWeatherStationRepository weatherStationRepository,
+    ILogger<CleanAirService> logger,
+    ICleanAirRepository cleanAirRepository,
     IMqttPublisher mqttPublisher,
-    IConnectionManager connectionManager) : IWeatherStationService
+    IConnectionManager connectionManager) : ICleanAirService
 {
-    public Task AddToDbAndBroadcast(DeviceLogDto? dto)
+    public Task AddToDbAndBroadcast(CollectDataDto? dto)
     {
+        
+        if (dto == null)
+        {
+            logger.LogWarning("CleanAirService: AddToDbAndBroadcast, dto is null");
+            return Task.CompletedTask;
+        }
+        
         var deviceLog = new Devicelog
         {
-            Timestamp = DateTime.UtcNow,
+            Id = Guid.NewGuid().ToString(),
             Deviceid = dto.DeviceId,
-            Unit = dto.Unit,
-            Value = dto.Value,
-            Id = Guid.NewGuid().ToString()
+            Timestamp = DateTime.UtcNow,
+            Temperature = (decimal)dto.Temperature,
+            Humidity = (decimal)dto.Humidity,
+            Pressure = (decimal)dto.Pressure,
+            Airquality = (int)dto.AirQuality,
+            Unit = "Celsius"
         };
-        weatherStationRepository.AddDeviceLog(deviceLog);
-        var recentLogs = weatherStationRepository.GetRecentLogs();
+        cleanAirRepository.AddDeviceLog(deviceLog);
+        var recentLogs = cleanAirRepository.GetRecentLogs();
         var broadcast = new ServerBroadcastsLiveDataToDashboard
         {
             Logs = recentLogs
@@ -42,7 +52,7 @@ public class WeatherStationService(
 
     public List<Devicelog> GetDeviceFeed(JwtClaims client)
     {
-        return weatherStationRepository.GetRecentLogs();
+        return cleanAirRepository.GetRecentLogs();
     }
 
 
@@ -54,7 +64,7 @@ public class WeatherStationService(
 
     public async Task DeleteDataAndBroadcast(JwtClaims jwt)
     {
-        await weatherStationRepository.DeleteAllData();
+        await cleanAirRepository.DeleteAllData();
         await connectionManager.BroadcastToTopic(StringConstants.Dashboard, new AdminHasDeletedData());
     }
 }

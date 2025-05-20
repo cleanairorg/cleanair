@@ -9,9 +9,15 @@ public partial class Devicelog
 
     public string Deviceid { get; set; } = null!;
 
-    public decimal Value { get; set; }
-
     public string Unit { get; set; } = null!;
 
     public DateTime Timestamp { get; set; }
+
+    public decimal Temperature { get; set; }
+
+    public decimal Humidity { get; set; }
+
+    public decimal Pressure { get; set; }
+
+    public int Airquality { get; set; }
 }

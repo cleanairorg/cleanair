@@ -69,7 +69,7 @@ public class MoreRestTriggeredTests
         await ApiTestSetupUtilities.TestRegisterAndAddJwt(_httpClient);
         
         //Act
-        _ = await _httpClient.DeleteAsync(WeatherStationController.DeleteDataRoute);
+        _ = await _httpClient.DeleteAsync(CleanAirController.DeleteDataRoute);
 
         await Task.Delay(1000);
         
