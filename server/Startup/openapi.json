@@ -240,6 +240,49 @@
         }
       }
     },
+    "/api/UpdateThresholds": {
+      "post": {
+        "tags": [
+          "Threshold"
+        ],
+        "operationId": "Threshold_UpdateThresholds",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "updateThresholdsDto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUpdatesThresholdsDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/GetLogs": {
       "get": {
         "tags": [
@@ -446,6 +489,46 @@
           }
         }
       },
+      "AdminUpdatesThresholdsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "thresholds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThresholdDto"
+            }
+          }
+        }
+      },
+      "ThresholdDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "warnMin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "goodMin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "goodMax": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "warnMax": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
       "Devicelog": {
         "type": "object",
         "additionalProperties": false,
@@ -539,6 +622,31 @@
               },
               "eventType": {
                 "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "UpdatedThresholdsDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationBaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "eventType": {
+                "type": "string"
+              },
+              "deviceId": {
+                "type": "string"
+              },
+              "updatedThresholds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThresholdDto"
+                }
               }
             }
           }
@@ -651,6 +759,7 @@
         "enum": [
           "AdminHasDeletedData",
           "ServerBroadcastsLiveDataToDashboard",
+          "UpdatedThresholdsDto",
           "MemberLeftNotification",
           "ExampleClientDto",
           "ExampleServerResponse",
