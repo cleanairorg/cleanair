@@ -69,13 +69,22 @@ public class WeatherStationController(
     [HttpPost("api/GetDailyAverages")]
     public ActionResult<List<AggregatedLogDto>> GetDailyAverages([FromBody] TimeRangeDto timeRangeDto)
     {
-        Console.WriteLine("------------");
+        /*Console.WriteLine("------------");
         Console.WriteLine($"[Console] GetDailyAverages DTO: {JsonSerializer.Serialize(timeRangeDto)}");
-        Console.WriteLine("------------");
+        Console.WriteLine("------------");*/
+        logger.LogInformation($"[Console] GetDailyAverages DTO: {timeRangeDto}");
 
         var result = weatherStationService.GetDailyAverages(timeRangeDto);
         
         return Ok(result);
+    }
+    
+    
+    [HttpPost("api/GetLogsForToday")]
+    public ActionResult<List<Devicelog>> GetLogsForToday([FromBody] TimeRangeDto timeRangeDto)
+    {
+        var logs = weatherStationService.GetLogsForToday(timeRangeDto);
+        return Ok(logs);
     }
     
     

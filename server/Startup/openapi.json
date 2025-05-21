@@ -393,6 +393,41 @@
           }
         }
       }
+    },
+    "/api/GetLogsForToday": {
+      "post": {
+        "tags": [
+          "WeatherStation"
+        ],
+        "operationId": "WeatherStation_GetLogsForToday",
+        "requestBody": {
+          "x-name": "timeRangeDto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeRangeDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Devicelog"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -542,6 +577,9 @@
           "endDate": {
             "type": "string",
             "format": "date-time"
+          },
+          "deviceId": {
+            "type": "string"
           }
         }
       },

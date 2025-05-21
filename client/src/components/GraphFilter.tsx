@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import '../css/DeviceSettings.css';
 
 const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -20,9 +21,9 @@ export default function GraphFilter({ onSelect }: Props) {
     return (
         <div className="flex flex-col gap-3 mb-4">
             <div className="flex gap-2">
-                <button className="btn btn-sm" onClick={() => onSelect('weekly')}>Last Week</button>
-                <button className="btn btn-sm" onClick={() => onSelect('today')}>Today</button>
-                <button className="btn btn-sm" onClick={() => setShowSelector(!showSelector)}>Monthly</button>
+                <button className="interval-button" onClick={() => onSelect('today')}>Today</button>
+                <button className="interval-button" onClick={() => onSelect('weekly')}>Last Week</button>
+                <button className="interval-button" onClick={() => setShowSelector(!showSelector)}>Monthly</button>
             </div>
             {showSelector && (
                 <div className="mt-2 border rounded p-2 shadow bg-white dark:bg-gray-800 w-fit">

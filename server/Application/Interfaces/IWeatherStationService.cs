@@ -13,4 +13,5 @@ public interface IWeatherStationService
     Task DeleteDataAndBroadcast(JwtClaims jwt);
     Task GetMeasurementNowAndBroadcast();
     List<AggregatedLogDto> GetDailyAverages(TimeRangeDto timeRangeDto);
+    List<Devicelog> GetLogsForToday(TimeRangeDto timeRangeDto);
 }

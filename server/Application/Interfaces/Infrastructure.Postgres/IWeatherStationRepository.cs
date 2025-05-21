@@ -9,5 +9,5 @@ public interface IWeatherStationRepository
     Devicelog AddDeviceLog(Devicelog deviceLog);
     Task DeleteAllData();
     List<AggregatedLogDto> GetDailyAverages(TimeRangeDto timeRangeDto);
-
+    List<Devicelog> GetLogsForToday(TimeRangeDto timeRangeDto);
 }

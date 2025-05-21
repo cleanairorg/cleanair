@@ -28,13 +28,28 @@ public class WeatherStationRepository(MyDbContext ctx) : IWeatherStationReposito
     }
     
     
-    public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
+    public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
     {
+        dto.DeviceId = new string("2");
         var from = dto.StartDate.ToUniversalTime();
         var to = dto.EndDate.ToUniversalTime();
-    
+        var deviceId = dto.DeviceId;
+
         return ctx.Devicelogs
-            .Where(x => x.Timestamp >= from && x.Timestamp <= to)
+            .Where(x => x.Deviceid == deviceId && x.Timestamp >= from && x.Timestamp <= to)
+            .OrderBy(x => x.Timestamp)
+            .ToList();
+    }
+
+    public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
+    {
+        dto.DeviceId = new string("1");
+        var from = dto.StartDate.ToUniversalTime();
+        var to = dto.EndDate.ToUniversalTime();
+        var deviceId = dto.DeviceId;
+
+        return ctx.Devicelogs
+            .Where(x => x.Deviceid == deviceId && x.Timestamp >= from && x.Timestamp <= to)
             .AsEnumerable()
             .GroupBy(x => x.Timestamp.Date)
             .Select(g => new AggregatedLogDto {
@@ -47,7 +62,4 @@ public class WeatherStationRepository(MyDbContext ctx) : IWeatherStationReposito
     }
 
 
-
-
-    
 }
