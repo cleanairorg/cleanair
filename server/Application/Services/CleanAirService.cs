@@ -42,10 +42,10 @@ public class CleanAirService(
         };
         logger.LogInformation("CleanAirService: AddToDbAndBroadcast, Added DeviceLog to Database");
         cleanAirRepository.AddDeviceLog(deviceLog);
-        var recentLogs = cleanAirRepository.GetRecentLogs();
-        var broadcast = new ServerBroadcastsLiveDataToDashboard
+        var recentLogs = cleanAirRepository.GetLatestLogs();
+        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
         {
-            Logs = recentLogs
+            LatestMeasurement = recentLogs
         };
         connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
         return Task.CompletedTask;
@@ -54,6 +54,13 @@ public class CleanAirService(
     public List<Devicelog> GetDeviceFeed(JwtClaims client)
     {
         return cleanAirRepository.GetRecentLogs();
+    }
+
+    public Devicelog GetLatestDeviceLog()
+    {
+        var latestLog = cleanAirRepository.GetLatestLogs();
+
+        return latestLog;
     }
 
 
@@ -67,6 +74,18 @@ public class CleanAirService(
     {
         await cleanAirRepository.DeleteAllData();
         await connectionManager.BroadcastToTopic(StringConstants.Dashboard, new AdminHasDeletedData());
+    }
+
+    public async Task GetMeasurementNowAndBroadcast()
+    {
+        await mqttPublisher.Publish("1", "cleanair/measurement/now");
+
+        var recentLogs = cleanAirRepository.GetLatestLogs();
+        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
+        {
+            LatestMeasurement = recentLogs
+        };
+        await connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
     }
 }
 

@@ -18,6 +18,10 @@ public class CleanAirController(
     public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);
     
     public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
+    
+    public const string GetMeasurementNowRoute = ControllerRoute + nameof(GetMeasurementNow);
+    
+    public const string GetLatestMeasurementRoute = ControllerRoute + nameof(GetLatestMeasurement);
 
     [HttpGet]
     [Route(GetLogsRoute)]
@@ -43,10 +47,35 @@ public class CleanAirController(
     public async Task<ActionResult> DeleteData([FromHeader]string authorization)
     {
         var jwt = securityService.VerifyJwtOrThrow(authorization);
-
+        
         await cleanAirService.DeleteDataAndBroadcast(jwt);
+
+        return Ok();
+    }
+
+    [HttpGet]
+    [Route(GetMeasurementNowRoute)]
+    public async Task<ActionResult> GetMeasurementNow(String authorization)
+    {
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+        if (claims.Role != "admin") {
+            return Unauthorized("You are not authorized to access this route");
+        }
+        
+        await cleanAirService.GetMeasurementNowAndBroadcast();
         
         return Ok();
     }
     
+    [HttpGet]
+    [Route(GetLatestMeasurementRoute)]
+    public async Task<ActionResult<Devicelog>> GetLatestMeasurement()
+    {
+        
+        var latestLog = cleanAirService.GetLatestDeviceLog();
+        return Ok(latestLog);
+        
+    }
+    
+
 }

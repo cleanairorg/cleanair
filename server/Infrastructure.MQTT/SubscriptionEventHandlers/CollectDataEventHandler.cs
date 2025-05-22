@@ -31,7 +31,7 @@ public class CollectDataEventHandler(ICleanAirService cleanAirService) : IMqttMe
         Console.WriteLine($"Pressure: {dto.Pressure} hPa");
         Console.WriteLine($"Air Quality: {dto.AirQuality}");
         Console.WriteLine("-------------------------");
-        
-        //ourService.AddDataToDb(dto);
+
+        cleanAirService.AddToDbAndBroadcast(dto);
     }
 }
