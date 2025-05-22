@@ -294,6 +294,81 @@ export class CleanAirClient {
         }
         return Promise.resolve<FileResponse>(null as any);
     }
+
+    getMeasurementNow(authorization: string | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/GetMeasurementNow?";
+        if (authorization === null)
+            throw new Error("The parameter 'authorization' cannot be null.");
+        else if (authorization !== undefined)
+            url_ += "authorization=" + encodeURIComponent("" + authorization) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetMeasurementNow(_response);
+        });
+    }
+
+    protected processGetMeasurementNow(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    getLatestMeasurement(): Promise<Devicelog> {
+        let url_ = this.baseUrl + "/GetLatestMeasurement";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetLatestMeasurement(_response);
+        });
+    }
+
+    protected processGetLatestMeasurement(response: Response): Promise<Devicelog> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Devicelog;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Devicelog>(null as any);
+    }
 }
 
 export class SubscriptionClient {
@@ -491,6 +566,11 @@ export interface AdminHasDeletedData extends ApplicationBaseDto {
     eventType?: string;
 }
 
+export interface ServerBroadcastsLatestReqestedMeasurement extends ApplicationBaseDto {
+    latestMeasurement?: Devicelog;
+    eventType?: string;
+}
+
 export interface ServerBroadcastsLiveDataToDashboard extends ApplicationBaseDto {
     logs?: Devicelog[];
     eventType?: string;
@@ -524,6 +604,7 @@ export interface ServerSendsErrorMessage extends BaseDto {
 /** Available eventType and string constants */
 export enum StringConstants {
     AdminHasDeletedData = "AdminHasDeletedData",
+    ServerBroadcastsLatestReqestedMeasurement = "ServerBroadcastsLatestReqestedMeasurement",
     ServerBroadcastsLiveDataToDashboard = "ServerBroadcastsLiveDataToDashboard",
     MemberLeftNotification = "MemberLeftNotification",
     ExampleClientDto = "ExampleClientDto",
