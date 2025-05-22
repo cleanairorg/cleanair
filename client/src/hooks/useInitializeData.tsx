@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import {weatherStationClient} from "../apiControllerClients.ts";
+import {cleanAirClient} from "../apiControllerClients.ts";
 import {useAtom} from "jotai";
 import {CurrentValueAtom, DeviceLogsAtom, JwtAtom} from "../atoms.ts";
 
@@ -12,7 +12,7 @@ export default function useInitializeData() {
     useEffect(() => {
         if (jwt == null || jwt.length < 1)
             return;
-        weatherStationClient.getLogs(jwt).then(r => {
+        cleanAirClient.getLogs(jwt).then(r => {
             setDeviceLogs(r || []);
         })
     }, [jwt])
@@ -21,7 +21,7 @@ export default function useInitializeData() {
         if (jwt == null || jwt.length < 1) {
             return;
         }
-        weatherStationClient.getLatestMeasurement().then(r => {
+        cleanAirClient.getLatestMeasurement().then(r => {
             setCurrentValue(r);
         })
     }, [jwt])

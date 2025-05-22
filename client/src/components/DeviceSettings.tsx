@@ -1,7 +1,7 @@
 ﻿import '../css/DeviceSettings.css';
 import {JwtAtom, UserInfoAtom} from "../atoms.ts";
 import {useAtom} from "jotai";
-import {weatherStationClient} from "../apiControllerClients.ts";
+import {cleanAirClient} from "../apiControllerClients.ts";
 import toast from "react-hot-toast";
 
 export default function DeviceSettings() {
@@ -21,7 +21,7 @@ export default function DeviceSettings() {
             {userInfo?.role === "admin" && (
             <>
                 <button className="app evaluate-button" onClick={() => {
-                    weatherStationClient.getMeasurementNow(jwt).then(success => {
+                    cleanAirClient.getMeasurementNow(jwt).then(success => {
                         toast.success("Request sent for new measurements");
                     }).catch(error => {
                         toast.error("Error getting new measurements");
