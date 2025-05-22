@@ -40,6 +40,7 @@ public class CleanAirService(
             Airquality = (int)dto.AirQuality,
             Unit = "Celsius"
         };
+        logger.LogInformation("CleanAirService: AddToDbAndBroadcast, Added DeviceLog to Database");
         cleanAirRepository.AddDeviceLog(deviceLog);
         var recentLogs = cleanAirRepository.GetRecentLogs();
         var broadcast = new ServerBroadcastsLiveDataToDashboard
