@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Application.Interfaces;
 using Application.Models.Dtos.MqttSubscriptionDto;
 using HiveMQtt.Client.Events;
 using HiveMQtt.MQTT5.Types;
 
 namespace Infrastructure.MQTT.SubscriptionEventHandlers;
 
-public class CollectDataEventHandler : IMqttMessageHandler
+public class CollectDataEventHandler(ICleanAirService cleanAirService) : IMqttMessageHandler
 {
     public string TopicFilter { get; } = "cleanair/data";
     public QualityOfService QoS { get; } = QualityOfService.AtLeastOnceDelivery;
@@ -20,6 +21,7 @@ public class CollectDataEventHandler : IMqttMessageHandler
                                       args.PublishMessage.PayloadAsString);
         var context = new ValidationContext(dto);
         Validator.ValidateObject(dto, context);
+        cleanAirService.AddToDbAndBroadcast(dto);
         
         // Print data for testing purposes
         Console.WriteLine("Parsed data:");
@@ -29,7 +31,7 @@ public class CollectDataEventHandler : IMqttMessageHandler
         Console.WriteLine($"Pressure: {dto.Pressure} hPa");
         Console.WriteLine($"Air Quality: {dto.AirQuality}");
         Console.WriteLine("-------------------------");
-        
-        //ourService.AddDataToDb(dto);
+
+        cleanAirService.AddToDbAndBroadcast(dto);
     }
 }

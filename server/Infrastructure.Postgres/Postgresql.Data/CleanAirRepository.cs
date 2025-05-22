@@ -6,11 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Postgresql.Data;
 
-public class WeatherStationRepository(MyDbContext ctx) : IWeatherStationRepository
+public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
 {
     public List<Devicelog> GetRecentLogs()
     {
         return ctx.Devicelogs.ToList();
+    }
+
+    public Devicelog GetLatestLogs()
+    {
+        return ctx.Devicelogs.OrderByDescending(x => x.Timestamp).FirstOrDefault()!;
     }
 
     public Devicelog AddDeviceLog(Devicelog deviceLog)
@@ -30,7 +35,7 @@ public class WeatherStationRepository(MyDbContext ctx) : IWeatherStationReposito
     
     public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
     {
-        dto.DeviceId = new string("2");
+      
         var from = dto.StartDate.ToUniversalTime();
         var to = dto.EndDate.ToUniversalTime();
         var deviceId = dto.DeviceId;
@@ -43,7 +48,7 @@ public class WeatherStationRepository(MyDbContext ctx) : IWeatherStationReposito
 
     public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
     {
-        dto.DeviceId = new string("1");
+        
         var from = dto.StartDate.ToUniversalTime();
         var to = dto.EndDate.ToUniversalTime();
         var deviceId = dto.DeviceId;

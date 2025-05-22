@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Rest.Controllers;
 
 [ApiController]
-public class WeatherStationController(
-    IWeatherStationService weatherStationService,
+public class CleanAirController(
+    ICleanAirService cleanAirService,
     IConnectionManager connectionManager,
     ISecurityService securityService, 
     ILoggingService logger) : ControllerBase
@@ -19,17 +19,19 @@ public class WeatherStationController(
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
 
     public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);
-
+    
     public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
     
     public const string GetMeasurementNowRoute = ControllerRoute + nameof(GetMeasurementNow);
+    
+    public const string GetLatestMeasurementRoute = ControllerRoute + nameof(GetLatestMeasurement);
 
     [HttpGet]
     [Route(GetLogsRoute)]
     public async Task<ActionResult<IEnumerable<Devicelog>>> GetLogs([FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        var feed = weatherStationService.GetDeviceFeed(claims);
+        var feed = cleanAirService.GetDeviceFeed(claims);
         return Ok(feed);
     }
 
@@ -39,31 +41,45 @@ public class WeatherStationController(
         [FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        await weatherStationService.UpdateDeviceFeed(dto, claims);
+        await cleanAirService.UpdateDeviceFeed(dto, claims);
         return Ok();
     }
-
+    
     [HttpDelete]
     [Route(DeleteDataRoute)]
-    public async Task<ActionResult> DeleteData([FromHeader] string authorization)
+    public async Task<ActionResult> DeleteData([FromHeader]string authorization)
     {
         var jwt = securityService.VerifyJwtOrThrow(authorization);
-
-        await weatherStationService.DeleteDataAndBroadcast(jwt);
+        
+        await cleanAirService.DeleteDataAndBroadcast(jwt);
 
         return Ok();
     }
 
     [HttpGet]
     [Route(GetMeasurementNowRoute)]
-    public async Task<ActionResult> GetMeasurementNow()
+    public async Task<ActionResult> GetMeasurementNow(String authorization)
     {
-        //securityService.VerifyJwtOrThrow(authorization);
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+        if (claims.Role != "admin") {
+            return Unauthorized("You are not authorized to access this route");
+        }
         
-        await weatherStationService.GetMeasurementNowAndBroadcast();
+        await cleanAirService.GetMeasurementNowAndBroadcast();
         
         return Ok();
     }
+    
+    [HttpGet]
+    [Route(GetLatestMeasurementRoute)]
+    public async Task<ActionResult<Devicelog>> GetLatestMeasurement()
+    {
+        
+        var latestLog = cleanAirService.GetLatestDeviceLog();
+        return Ok(latestLog);
+        
+    }
+    
 
 
     [HttpPost("api/GetDailyAverages")]
@@ -73,7 +89,7 @@ public class WeatherStationController(
         {
             logger.LogInformation($"[Controller]GetDailyAverages called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
             
-            var result = weatherStationService.GetDailyAverages(timeRangeDto);
+            var result = cleanAirService.GetDailyAverages(timeRangeDto);
             
             logger.LogInformation($"[Controller]GetDailyAverages succeeded. Returned {result.Count} entries.");
             return Ok(result);
@@ -93,7 +109,7 @@ public class WeatherStationController(
         {
             logger.LogInformation($"[Controller]GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
 
-            var logs = weatherStationService.GetLogsForToday(timeRangeDto);
+            var logs = cleanAirService.GetLogsForToday(timeRangeDto);
 
             logger.LogInformation($"[Controller]GetLogsForToday succeeded. Returned {logs.Count} logs.");
             return Ok(logs);

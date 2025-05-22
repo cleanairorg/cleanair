@@ -13,32 +13,39 @@ using Microsoft.Extensions.Options;
 
 namespace Application.Services;
 
-public class WeatherStationService(
+public class CleanAirService(
     IOptionsMonitor<AppOptions> optionsMonitor,
-    ILogger<WeatherStationService> logger,
-    IWeatherStationRepository weatherStationRepository,
+    ILogger<CleanAirService> logger,
+    ICleanAirRepository cleanAirRepository,
     IMqttPublisher mqttPublisher,
-    IConnectionManager connectionManager) : IWeatherStationService
+    IConnectionManager connectionManager) : ICleanAirService
 {
-    public Task AddToDbAndBroadcast(DeviceLogDto? dto)
+    public Task AddToDbAndBroadcast(CollectDataDto? dto)
     {
+        
+        if (dto == null)
+        {
+            logger.LogWarning("CleanAirService: AddToDbAndBroadcast, dto is null");
+            return Task.CompletedTask;
+        }
+        
         var deviceLog = new Devicelog
         {
-            Timestamp = DateTime.UtcNow,
-            Temperature = dto.Value,
-            Humidity = dto.Value,
-            Pressure = dto.Value,
-            Airquality = dto.Value,
+            Id = Guid.NewGuid().ToString(),
             Deviceid = dto.DeviceId,
-            Unit = dto.Unit,
-            Id = Guid.NewGuid()
-                .ToString()
+            Timestamp = DateTime.UtcNow,
+            Temperature = (decimal)dto.Temperature,
+            Humidity = (decimal)dto.Humidity,
+            Pressure = (decimal)dto.Pressure,
+            Airquality = (int)dto.AirQuality,
+            Unit = "Celsius"
         };
-        weatherStationRepository.AddDeviceLog(deviceLog);
-        var recentLogs = weatherStationRepository.GetRecentLogs();
-        var broadcast = new ServerBroadcastsLiveDataToDashboard
+        logger.LogInformation("CleanAirService: AddToDbAndBroadcast, Added DeviceLog to Database");
+        cleanAirRepository.AddDeviceLog(deviceLog);
+        var recentLogs = cleanAirRepository.GetLatestLogs();
+        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
         {
-            Logs = recentLogs
+            LatestMeasurement = recentLogs
         };
         connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
         return Task.CompletedTask;
@@ -46,9 +53,16 @@ public class WeatherStationService(
 
     public List<Devicelog> GetDeviceFeed(JwtClaims client)
     {
-        return weatherStationRepository.GetRecentLogs();
+        return cleanAirRepository.GetRecentLogs();
     }
-    
+
+    public Devicelog GetLatestDeviceLog()
+    {
+        var latestLog = cleanAirRepository.GetLatestLogs();
+
+        return latestLog;
+    }
+
 
     public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
     {
@@ -59,7 +73,7 @@ public class WeatherStationService(
 
             logger.LogInformation($"[Service] GetDailyAverages called with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}");
 
-            var result = weatherStationRepository.GetDailyAverages(dto);
+            var result = cleanAirRepository.GetDailyAverages(dto);
 
             logger.LogInformation($"[Service] GetDailyAverages returned {result.Count} records.");
             return result;
@@ -81,7 +95,7 @@ public class WeatherStationService(
 
             logger.LogInformation($"[Service] GetLogsForToday called with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}");
 
-            var logs = weatherStationRepository.GetLogsForToday(dto);
+            var logs = cleanAirRepository.GetLogsForToday(dto);
 
             logger.LogInformation($"[Service] GetLogsForToday returned {logs.Count} records.");
             return logs;
@@ -103,13 +117,20 @@ public class WeatherStationService(
 
     public async Task DeleteDataAndBroadcast(JwtClaims jwt)
     {
-        await weatherStationRepository.DeleteAllData();
+        await cleanAirRepository.DeleteAllData();
         await connectionManager.BroadcastToTopic(StringConstants.Dashboard, new AdminHasDeletedData());
     }
 
     public async Task GetMeasurementNowAndBroadcast()
     {
         await mqttPublisher.Publish("1", "cleanair/measurement/now");
+
+        var recentLogs = cleanAirRepository.GetLatestLogs();
+        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
+        {
+            LatestMeasurement = recentLogs
+        };
+        await connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
     }
 }
 

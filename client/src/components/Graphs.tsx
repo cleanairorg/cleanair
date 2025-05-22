@@ -1,13 +1,14 @@
 ﻿import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useAtom } from 'jotai';
-import { DeviceLogsAtom, JwtAtom } from '../atoms';
-import { weatherStationClient } from '../apiControllerClients';
+import { DeviceLogsAtom, JwtAtom, DeviceIdAtom } from '../atoms';
 import GraphFilter from './GraphFilter';
 import type { Devicelog, TimeRangeDto } from '../generated-client';
 import ChartCard from './ChartCard';
+import { cleanAirClient } from '../apiControllerClients';
 
 export default function Graphs() {
     const [logs, setLogs] = useAtom(DeviceLogsAtom);
+    const [deviceId] = useAtom(DeviceIdAtom);
     const [jwt] = useAtom(JwtAtom);
     const [filter, setFilter] = useState<{ type: 'today' | 'weekly' | 'monthly'; month?: number; year?: number }>({
         type: 'today',
@@ -38,14 +39,14 @@ export default function Graphs() {
             return;
         }
 
-        const dto: TimeRangeDto = { startDate, endDate };
+        const dto: TimeRangeDto = { startDate, endDate, deviceId };
 
         let result: any[] = [];
 
         if (filter.type === 'today') {
-            result = await weatherStationClient.getLogsForToday(dto);
+            result = await cleanAirClient.getLogsForToday(dto);
         } else {
-            result = await weatherStationClient.getDailyAverages(dto);
+            result = await cleanAirClient.getDailyAverages(dto);
         }
 
         const transformed: Devicelog[] = result.map((r) => ({

@@ -3,9 +3,10 @@ using Core.Domain.Entities;
 
 namespace Application.Interfaces.Infrastructure.Postgres;
 
-public interface IWeatherStationRepository
+public interface ICleanAirRepository
 {
     List<Devicelog> GetRecentLogs();
+    Devicelog GetLatestLogs();
     Devicelog AddDeviceLog(Devicelog deviceLog);
     Task DeleteAllData();
     List<AggregatedLogDto> GetDailyAverages(TimeRangeDto timeRangeDto);

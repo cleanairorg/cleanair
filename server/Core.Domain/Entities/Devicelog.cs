@@ -5,9 +5,9 @@ namespace Core.Domain.Entities;
 
 public partial class Devicelog
 {
-    public string Deviceid { get; set; } = null!;
-
     public string Id { get; set; } = null!;
+
+    public string Deviceid { get; set; } = null!;
 
     public string Unit { get; set; } = null!;
 
