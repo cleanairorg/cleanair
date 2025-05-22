@@ -69,23 +69,43 @@ public class WeatherStationController(
     [HttpPost("api/GetDailyAverages")]
     public ActionResult<List<AggregatedLogDto>> GetDailyAverages([FromBody] TimeRangeDto timeRangeDto)
     {
-        /*Console.WriteLine("------------");
-        Console.WriteLine($"[Console] GetDailyAverages DTO: {JsonSerializer.Serialize(timeRangeDto)}");
-        Console.WriteLine("------------");*/
-        logger.LogInformation($"[Console] GetDailyAverages DTO: {timeRangeDto}");
-
-        var result = weatherStationService.GetDailyAverages(timeRangeDto);
-        
-        return Ok(result);
+        try
+        {
+            logger.LogInformation($"[Controller]GetDailyAverages called with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}");
+            
+            var result = weatherStationService.GetDailyAverages(timeRangeDto);
+            
+            logger.LogInformation($"[Controller]GetDailyAverages succeeded. Returned {result.Count} entries.");
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"[Controller] Error in GetDailyAverages with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}", ex);
+            return StatusCode(500, "An error occurred while retrieving daily averages.");
+        }
     }
-    
-    
+
+
     [HttpPost("api/GetLogsForToday")]
     public ActionResult<List<Devicelog>> GetLogsForToday([FromBody] TimeRangeDto timeRangeDto)
     {
-        var logs = weatherStationService.GetLogsForToday(timeRangeDto);
-        return Ok(logs);
+        try
+        {
+            logger.LogInformation($"[Controller]GetLogsForToday called with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}");
+
+            var logs = weatherStationService.GetLogsForToday(timeRangeDto);
+
+            logger.LogInformation($"[Controller]GetLogsForToday succeeded. Returned {logs.Count} logs.");
+            return Ok(logs);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"[Controller]Error in GetLogsForToday with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}", ex);
+            return StatusCode(500, "An error occurred while retrieving today's logs.");
+        }
     }
+
+
     
     
 

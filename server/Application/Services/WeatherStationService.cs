@@ -52,19 +52,47 @@ public class WeatherStationService(
 
     public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
     {
-        if (dto.StartDate > dto.EndDate)
-            throw new ArgumentException("StartDate cannot be after EndDate.");
+        try
+        {
+            if (dto.StartDate > dto.EndDate)
+                throw new ArgumentException("StartDate cannot be after EndDate.");
 
-        return weatherStationRepository.GetDailyAverages(dto);
+            logger.LogInformation($"[Service] GetDailyAverages called with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}");
+
+            var result = weatherStationRepository.GetDailyAverages(dto);
+
+            logger.LogInformation($"[Service] GetDailyAverages returned {result.Count} records.");
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"[Service] Error in GetDailyAverages with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}", ex);
+            throw;
+        }
     }
+
 
     public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
     {
-        if (dto.StartDate > dto.EndDate)
-            throw new ArgumentException("StartDate cannot be after EndDate.");
-        
-        return weatherStationRepository.GetLogsForToday(dto);
+        try
+        {
+            if (dto.StartDate > dto.EndDate)
+                throw new ArgumentException("StartDate cannot be after EndDate.");
+
+            logger.LogInformation($"[Service] GetLogsForToday called with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}");
+
+            var logs = weatherStationRepository.GetLogsForToday(dto);
+
+            logger.LogInformation($"[Service] GetLogsForToday returned {logs.Count} records.");
+            return logs;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"[Service] Error in GetLogsForToday with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}", ex);
+            throw;
+        }
     }
+
     
 
     public Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims)
