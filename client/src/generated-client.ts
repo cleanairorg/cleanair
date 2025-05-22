@@ -19,7 +19,7 @@ export class AuthClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    login(dto: AuthRequestDto): Promise<AuthResponseDto> {
+    login(dto: AuthLoginRequestDto): Promise<AuthResponseDto> {
         let url_ = this.baseUrl + "/auth/Login";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -56,7 +56,7 @@ export class AuthClient {
         return Promise.resolve<AuthResponseDto>(null as any);
     }
 
-    register(dto: AuthRequestDto): Promise<AuthResponseDto> {
+    register(dto: AuthRegisterRequestDto): Promise<AuthResponseDto> {
         let url_ = this.baseUrl + "/auth/Register";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -93,6 +93,43 @@ export class AuthClient {
         return Promise.resolve<AuthResponseDto>(null as any);
     }
 
+    getUserInfo(email: string | undefined): Promise<AuthGetUserInfoDto> {
+        let url_ = this.baseUrl + "/auth/GetUserInfo?";
+        if (email === null)
+            throw new Error("The parameter 'email' cannot be null.");
+        else if (email !== undefined)
+            url_ += "email=" + encodeURIComponent("" + email) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetUserInfo(_response);
+        });
+    }
+
+    protected processGetUserInfo(response: Response): Promise<AuthGetUserInfoDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthGetUserInfoDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<AuthGetUserInfoDto>(null as any);
+    }
+
     secured(): Promise<FileResponse> {
         let url_ = this.baseUrl + "/auth/Secured";
         url_ = url_.replace(/[?&]$/, "");
@@ -110,133 +147,6 @@ export class AuthClient {
     }
 
     protected processSecured(response: Response): Promise<FileResponse> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<FileResponse>(null as any);
-    }
-}
-
-export class CleanAirClient {
-    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
-        this.http = http ? http : window as any;
-        this.baseUrl = baseUrl ?? "";
-    }
-
-    getLogs(authorization: string | undefined): Promise<Devicelog[]> {
-        let url_ = this.baseUrl + "/GetLogs";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            headers: {
-                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetLogs(_response);
-        });
-    }
-
-    protected processGetLogs(response: Response): Promise<Devicelog[]> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Devicelog[];
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<Devicelog[]>(null as any);
-    }
-
-    adminChangesPreferences(dto: AdminChangesPreferencesDto, authorization: string | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/AdminChangesPreferences";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(dto);
-
-        let options_: RequestInit = {
-            body: content_,
-            method: "POST",
-            headers: {
-                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processAdminChangesPreferences(_response);
-        });
-    }
-
-    protected processAdminChangesPreferences(response: Response): Promise<FileResponse> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<FileResponse>(null as any);
-    }
-
-    deleteData(authorization: string | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/DeleteData";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "DELETE",
-            headers: {
-                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
-                "Accept": "application/octet-stream"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processDeleteData(_response);
-        });
-    }
-
-    protected processDeleteData(response: Response): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200 || status === 206) {
@@ -398,13 +308,162 @@ export class SubscriptionClient {
     }
 }
 
+export class WeatherStationClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getLogs(authorization: string | undefined): Promise<Devicelog[]> {
+        let url_ = this.baseUrl + "/GetLogs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetLogs(_response);
+        });
+    }
+
+    protected processGetLogs(response: Response): Promise<Devicelog[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Devicelog[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Devicelog[]>(null as any);
+    }
+
+    adminChangesPreferences(dto: AdminChangesPreferencesDto, authorization: string | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/AdminChangesPreferences";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processAdminChangesPreferences(_response);
+        });
+    }
+
+    protected processAdminChangesPreferences(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    deleteData(authorization: string | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/DeleteData";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "DELETE",
+            headers: {
+                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processDeleteData(_response);
+        });
+    }
+
+    protected processDeleteData(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+}
+
 export interface AuthResponseDto {
     jwt: string;
 }
 
-export interface AuthRequestDto {
+export interface AuthLoginRequestDto {
     email: string;
     password: string;
+}
+
+export interface AuthRegisterRequestDto {
+    email: string;
+    password: string;
+    role: string;
+}
+
+export interface AuthGetUserInfoDto {
+    id?: string;
+    email?: string;
+    role?: string;
+}
+
+export interface ChangeSubscriptionDto {
+    clientId?: string;
+    topicIds?: string[];
+}
+
+export interface ExampleBroadcastDto {
+    eventType?: string;
+    message?: string;
 }
 
 export interface Devicelog {
@@ -422,16 +481,6 @@ export interface AdminChangesPreferencesDto {
     deviceId?: string;
     unit?: string;
     interval?: string;
-}
-
-export interface ChangeSubscriptionDto {
-    clientId?: string;
-    topicIds?: string[];
-}
-
-export interface ExampleBroadcastDto {
-    eventType?: string;
-    message?: string;
 }
 
 export interface ApplicationBaseDto {

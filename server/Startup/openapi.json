@@ -17,7 +17,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AuthRequestDto"
+                "$ref": "#/components/schemas/AuthLoginRequestDto"
               }
             }
           },
@@ -49,7 +49,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AuthRequestDto"
+                "$ref": "#/components/schemas/AuthRegisterRequestDto"
               }
             }
           },
@@ -70,37 +70,16 @@
         }
       }
     },
-    "/api/auth/Secured": {
+    "/api/auth/GetUserInfo": {
       "get": {
         "tags": [
           "Auth"
         ],
-        "operationId": "Auth_Secured",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/GetLogs": {
-      "get": {
-        "tags": [
-          "CleanAir"
-        ],
-        "operationId": "CleanAir_GetLogs",
+        "operationId": "Auth_GetUserInfo",
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
+            "name": "email",
+            "in": "query",
             "schema": {
               "type": "string"
             },
@@ -113,10 +92,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Devicelog"
-                  }
+                  "$ref": "#/components/schemas/AuthGetUserInfoDto"
                 }
               }
             }
@@ -124,65 +100,12 @@
         }
       }
     },
-    "/api/AdminChangesPreferences": {
-      "post": {
+    "/api/auth/Secured": {
+      "get": {
         "tags": [
-          "CleanAir"
+          "Auth"
         ],
-        "operationId": "CleanAir_AdminChangesPreferences",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminChangesPreferencesDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/DeleteData": {
-      "delete": {
-        "tags": [
-          "CleanAir"
-        ],
-        "operationId": "CleanAir_DeleteData",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
+        "operationId": "Auth_Secured",
         "responses": {
           "200": {
             "description": "",
@@ -316,6 +239,113 @@
           }
         }
       }
+    },
+    "/api/GetLogs": {
+      "get": {
+        "tags": [
+          "WeatherStation"
+        ],
+        "operationId": "WeatherStation_GetLogs",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Devicelog"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/AdminChangesPreferences": {
+      "post": {
+        "tags": [
+          "WeatherStation"
+        ],
+        "operationId": "WeatherStation_AdminChangesPreferences",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminChangesPreferencesDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/DeleteData": {
+      "delete": {
+        "tags": [
+          "WeatherStation"
+        ],
+        "operationId": "WeatherStation_DeleteData",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -333,7 +363,7 @@
           }
         }
       },
-      "AuthRequestDto": {
+      "AuthLoginRequestDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -348,6 +378,71 @@
           "password": {
             "type": "string",
             "minLength": 4
+          }
+        }
+      },
+      "AuthRegisterRequestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "password",
+          "role"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "minLength": 3
+          },
+          "password": {
+            "type": "string",
+            "minLength": 4
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "AuthGetUserInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangeSubscriptionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "topicIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ExampleBroadcastDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eventType": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
           }
         }
       },
@@ -397,33 +492,6 @@
             "type": "string"
           },
           "interval": {
-            "type": "string"
-          }
-        }
-      },
-      "ChangeSubscriptionDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "clientId": {
-            "type": "string"
-          },
-          "topicIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "ExampleBroadcastDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "eventType": {
-            "type": "string"
-          },
-          "message": {
             "type": "string"
           }
         }

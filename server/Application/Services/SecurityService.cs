@@ -18,7 +18,7 @@ namespace Application.Services;
 
 public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IUserRepository repository) : ISecurityService
 {
-    public AuthResponseDto Login(AuthRequestDto dto)
+    public AuthResponseDto Login(AuthLoginRequestDto dto)
     {
         var player = repository.GetUserOrNull(dto.Email) ?? throw new ValidationException("Username not found");
         VerifyPasswordOrThrow(dto.Password + player.Salt, player.Hash);
@@ -36,17 +36,18 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IUserRe
         };
     }
 
-    public AuthResponseDto Register(AuthRequestDto dto)
+    public AuthResponseDto Register(AuthRegisterRequestDto dto)
     {
         var player = repository.GetUserOrNull(dto.Email);
         if (player is not null) throw new ValidationException("User already exists");
         var salt = GenerateSalt();
         var hash = HashPassword(dto.Password + salt);
+        var role = dto.Role == "admin" ? Constants.AdminRole : Constants.UserRole;
         var insertedPlayer = repository.AddUser(new User
         {
             Id = Guid.NewGuid().ToString(),
             Email = dto.Email,
-            Role = Constants.UserRole,
+            Role = role,
             Salt = salt,
             Hash = hash
         });
@@ -59,6 +60,18 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IUserRe
                 Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString(),
                 Email = insertedPlayer.Email
             })
+        };
+    }
+
+    public AuthGetUserInfoDto GetUserInfo(string email)
+    {
+        var player = repository.GetUserOrNull(email);
+        if (player is null) throw new ValidationException("User not found");
+        return new AuthGetUserInfoDto
+        {
+            Id = player.Id,
+            Email = player.Email,
+            Role = player.Role
         };
     }
 
