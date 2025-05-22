@@ -5,7 +5,7 @@ using Core.Domain.Entities;
 
 namespace Application.Interfaces;
 
-public interface IWeatherStationService
+public interface ICleanAirService
 {
     List<Devicelog> GetDeviceFeed(JwtClaims client);
     Devicelog GetLatestDeviceLog();

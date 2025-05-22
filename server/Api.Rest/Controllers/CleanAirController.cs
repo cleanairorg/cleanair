@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Rest.Controllers;
 
 [ApiController]
-public class WeatherStationController(
-    IWeatherStationService weatherStationService,
+public class CleanAirController(
+    ICleanAirService cleanAirService,
     IConnectionManager connectionManager,
     ISecurityService securityService) : ControllerBase
 {
@@ -28,7 +28,7 @@ public class WeatherStationController(
     public async Task<ActionResult<IEnumerable<Devicelog>>> GetLogs([FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        var feed = weatherStationService.GetDeviceFeed(claims);
+        var feed = cleanAirService.GetDeviceFeed(claims);
         return Ok(feed);
     }
 
@@ -38,7 +38,7 @@ public class WeatherStationController(
         [FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        await weatherStationService.UpdateDeviceFeed(dto, claims);
+        await cleanAirService.UpdateDeviceFeed(dto, claims);
         return Ok();
     }
 
@@ -48,7 +48,7 @@ public class WeatherStationController(
     {
         var jwt = securityService.VerifyJwtOrThrow(authorization);
 
-        await weatherStationService.DeleteDataAndBroadcast(jwt);
+        await cleanAirService.DeleteDataAndBroadcast(jwt);
 
         return Ok();
     }
@@ -62,7 +62,7 @@ public class WeatherStationController(
             return Unauthorized("You are not authorized to access this route");
         }
         
-        await weatherStationService.GetMeasurementNowAndBroadcast();
+        await cleanAirService.GetMeasurementNowAndBroadcast();
         
         return Ok();
     }
@@ -72,7 +72,7 @@ public class WeatherStationController(
     public async Task<ActionResult<Devicelog>> GetLatestMeasurement()
     {
         
-        var latestLog = weatherStationService.GetLatestDeviceLog();
+        var latestLog = cleanAirService.GetLatestDeviceLog();
         return Ok(latestLog);
         
     }

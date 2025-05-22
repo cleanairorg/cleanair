@@ -4,7 +4,7 @@ using Infrastructure.Postgres.Scaffolding;
 
 namespace Infrastructure.Postgres.Postgresql.Data;
 
-public class WeatherStationRepository(MyDbContext ctx) : IWeatherStationRepository
+public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
 {
     public List<Devicelog> GetRecentLogs()
     {

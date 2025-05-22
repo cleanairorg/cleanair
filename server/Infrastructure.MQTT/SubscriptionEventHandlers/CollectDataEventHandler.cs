@@ -7,7 +7,7 @@ using HiveMQtt.MQTT5.Types;
 
 namespace Infrastructure.MQTT.SubscriptionEventHandlers;
 
-public class CollectDataEventHandler(IWeatherStationService weatherStationService) : IMqttMessageHandler
+public class CollectDataEventHandler(ICleanAirService cleanAirService) : IMqttMessageHandler
 {
     public string TopicFilter { get; } = "cleanair/data";
     public QualityOfService QoS { get; } = QualityOfService.AtLeastOnceDelivery;
@@ -31,6 +31,6 @@ public class CollectDataEventHandler(IWeatherStationService weatherStationServic
         Console.WriteLine($"Air Quality: {dto.AirQuality}");
         Console.WriteLine("-------------------------");
 
-        weatherStationService.AddToDbAndBroadcast(dto);
+        cleanAirService.AddToDbAndBroadcast(dto);
     }
 }
