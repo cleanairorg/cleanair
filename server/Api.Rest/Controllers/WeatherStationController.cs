@@ -71,7 +71,7 @@ public class WeatherStationController(
     {
         try
         {
-            logger.LogInformation($"[Controller]GetDailyAverages called with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}");
+            logger.LogInformation($"[Controller]GetDailyAverages called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
             
             var result = weatherStationService.GetDailyAverages(timeRangeDto);
             
@@ -80,7 +80,7 @@ public class WeatherStationController(
         }
         catch (Exception ex)
         {
-            logger.LogError($"[Controller] Error in GetDailyAverages with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}", ex);
+            logger.LogError($"[Controller] Error in GetDailyAverages with DTO: {JsonSerializer.Serialize(timeRangeDto)}", ex);
             return StatusCode(500, "An error occurred while retrieving daily averages.");
         }
     }
@@ -91,7 +91,7 @@ public class WeatherStationController(
     {
         try
         {
-            logger.LogInformation($"[Controller]GetLogsForToday called with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}");
+            logger.LogInformation($"[Controller]GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
 
             var logs = weatherStationService.GetLogsForToday(timeRangeDto);
 
@@ -100,7 +100,7 @@ public class WeatherStationController(
         }
         catch (Exception ex)
         {
-            logger.LogError($"[Controller]Error in GetLogsForToday with DTO: {System.Text.Json.JsonSerializer.Serialize(timeRangeDto)}", ex);
+            logger.LogError($"[Controller]Error in GetLogsForToday with DTO: {JsonSerializer.Serialize(timeRangeDto)}", ex);
             return StatusCode(500, "An error occurred while retrieving today's logs.");
         }
     }

@@ -90,7 +90,10 @@ export default function Graphs() {
     return (
         <div className="px-4 py-6">
             <div className="flex justify-center">
-                <GraphFilter onSelect={(type, month, year) => setFilter({ type, month, year })} />
+                <GraphFilter
+                    onSelect={(type, month, year) => setFilter({ type, month, year })}
+                    activeType={filter.type}
+                />
             </div>
             <div className="graphs-container flex flex-wrap gap-6">
                 <ChartCard title="Temperature (°C)" color="#f87171" dataKey="temperature" data={formatChartData} />
