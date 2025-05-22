@@ -20,6 +20,8 @@ public class WeatherStationController(
     public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
     
     public const string GetMeasurementNowRoute = ControllerRoute + nameof(GetMeasurementNow);
+    
+    public const string GetLatestMeasurementRoute = ControllerRoute + nameof(GetLatestMeasurement);
 
     [HttpGet]
     [Route(GetLogsRoute)]
@@ -53,13 +55,27 @@ public class WeatherStationController(
 
     [HttpGet]
     [Route(GetMeasurementNowRoute)]
-    public async Task<ActionResult> GetMeasurementNow()
+    public async Task<ActionResult> GetMeasurementNow(String authorization)
     {
-        //securityService.VerifyJwtOrThrow(authorization);
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+        if (claims.Role != "admin") {
+            return Unauthorized("You are not authorized to access this route");
+        }
         
         await weatherStationService.GetMeasurementNowAndBroadcast();
         
         return Ok();
     }
+    
+    [HttpGet]
+    [Route(GetLatestMeasurementRoute)]
+    public async Task<ActionResult<Devicelog>> GetLatestMeasurement()
+    {
+        
+        var latestLog = weatherStationService.GetLatestDeviceLog();
+        return Ok(latestLog);
+        
+    }
+    
 
 }

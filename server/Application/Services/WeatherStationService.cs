@@ -20,21 +20,24 @@ public class WeatherStationService(
     IMqttPublisher mqttPublisher,
     IConnectionManager connectionManager) : IWeatherStationService
 {
-    public Task AddToDbAndBroadcast(DeviceLogDto? dto)
+    public Task AddToDbAndBroadcast(CollectDataDto? dto)
     {
         var deviceLog = new Devicelog
         {
-            Timestamp = DateTime.UtcNow,
+            Id = Guid.NewGuid().ToString(),
             Deviceid = dto.DeviceId,
-            Unit = dto.Unit,
-            //Value = dto.Value,
-            Id = Guid.NewGuid().ToString()
+            Timestamp = DateTime.UtcNow,
+            Temperature = (decimal)dto.Temperature,
+            Humidity = (decimal)dto.Humidity,
+            Pressure = (decimal)dto.Pressure,
+            Airquality = (int)dto.AirQuality,
+            Unit = "Celsius"
         };
         weatherStationRepository.AddDeviceLog(deviceLog);
-        var recentLogs = weatherStationRepository.GetRecentLogs();
-        var broadcast = new ServerBroadcastsLiveDataToDashboard
+        var recentLogs = weatherStationRepository.GetLatestLogs();
+        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
         {
-            Logs = recentLogs
+            LatestMeasurement = recentLogs
         };
         connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
         return Task.CompletedTask;
@@ -43,6 +46,13 @@ public class WeatherStationService(
     public List<Devicelog> GetDeviceFeed(JwtClaims client)
     {
         return weatherStationRepository.GetRecentLogs();
+    }
+
+    public Devicelog GetLatestDeviceLog()
+    {
+        var latestLog = weatherStationRepository.GetLatestLogs();
+
+        return latestLog;
     }
 
 
@@ -61,6 +71,13 @@ public class WeatherStationService(
     public async Task GetMeasurementNowAndBroadcast()
     {
         await mqttPublisher.Publish("1", "cleanair/measurement/now");
+
+        var recentLogs = weatherStationRepository.GetLatestLogs();
+        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
+        {
+            LatestMeasurement = recentLogs
+        };
+        await connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
     }
 }
 

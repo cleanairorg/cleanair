@@ -353,6 +353,16 @@
           "WeatherStation"
         ],
         "operationId": "WeatherStation_GetMeasurementNow",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -361,6 +371,26 @@
                 "schema": {
                   "type": "string",
                   "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GetLatestMeasurement": {
+      "get": {
+        "tags": [
+          "WeatherStation"
+        ],
+        "operationId": "WeatherStation_GetLatestMeasurement",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Devicelog"
                 }
               }
             }
@@ -543,6 +573,25 @@
           }
         }
       },
+      "ServerBroadcastsLatestReqestedMeasurement": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationBaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "latestMeasurement": {
+                "$ref": "#/components/schemas/Devicelog"
+              },
+              "eventType": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
       "ServerBroadcastsLiveDataToDashboard": {
         "allOf": [
           {
@@ -671,6 +720,7 @@
         "description": "Available eventType and string constants",
         "enum": [
           "AdminHasDeletedData",
+          "ServerBroadcastsLatestReqestedMeasurement",
           "ServerBroadcastsLiveDataToDashboard",
           "MemberLeftNotification",
           "ExampleClientDto",

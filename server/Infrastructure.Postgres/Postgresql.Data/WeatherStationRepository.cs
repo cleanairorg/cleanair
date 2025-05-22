@@ -11,6 +11,11 @@ public class WeatherStationRepository(MyDbContext ctx) : IWeatherStationReposito
         return ctx.Devicelogs.ToList();
     }
 
+    public Devicelog GetLatestLogs()
+    {
+        return ctx.Devicelogs.OrderByDescending(x => x.Timestamp).FirstOrDefault()!;
+    }
+
     public Devicelog AddDeviceLog(Devicelog deviceLog)
     {
         ctx.Devicelogs.Add(deviceLog);

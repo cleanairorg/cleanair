@@ -8,7 +8,8 @@ namespace Application.Interfaces;
 public interface IWeatherStationService
 {
     List<Devicelog> GetDeviceFeed(JwtClaims client);
-    Task AddToDbAndBroadcast(DeviceLogDto? dto);
+    Devicelog GetLatestDeviceLog();
+    Task AddToDbAndBroadcast(CollectDataDto? dto);
     Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims);
     Task DeleteDataAndBroadcast(JwtClaims jwt);
     Task GetMeasurementNowAndBroadcast();

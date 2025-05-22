@@ -5,4 +5,6 @@ export const JwtAtom = atom<string>(localStorage.getItem('jwt') || '')
 
 export const DeviceLogsAtom = atom<Devicelog[]>([]);
 
+export const CurrentValueAtom = atom<Devicelog>();
+
 export const UserInfoAtom = atom<AuthGetUserInfoDto | null>(null);

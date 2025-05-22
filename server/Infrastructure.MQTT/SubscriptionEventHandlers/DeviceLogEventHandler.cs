@@ -23,6 +23,6 @@ public class DeviceLogEventHandler(IWeatherStationService weatherStationService)
                                       args.PublishMessage.PayloadAsString);
         var context = new ValidationContext(dto);
         Validator.ValidateObject(dto, context);
-        weatherStationService.AddToDbAndBroadcast(dto);
+        //weatherStationService.AddToDbAndBroadcast(dto);
     }
 }
