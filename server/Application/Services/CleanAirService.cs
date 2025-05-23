@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.Text.Json;
+using Application.Interfaces;
 using Application.Interfaces.Infrastructure.MQTT;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
@@ -63,6 +64,44 @@ public class CleanAirService(
         return latestLog;
     }
 
+
+    public List<Devicelog> GetDailyAverages(TimeRangeDto dto)
+    {
+        if (dto.StartDate > dto.EndDate)
+            throw new ArgumentException("StartDate cannot be after EndDate.");
+
+        logger.LogInformation($"[Service] GetDailyAverages with DTO: {JsonSerializer.Serialize(dto)}");
+
+        var result = cleanAirRepository.GetDailyAverages(dto);
+
+        logger.LogInformation($"[Service] GetDailyAverages returned {result.Count} records.");
+        return result;
+    }
+
+
+
+    public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
+    {
+        try
+        {
+            if (dto.StartDate > dto.EndDate)
+                throw new ArgumentException("StartDate cannot be after EndDate.");
+
+            logger.LogInformation($"[Service] GetLogsForToday called with DTO: {JsonSerializer.Serialize(dto)}");
+
+            var logs = cleanAirRepository.GetLogsForToday(dto);
+
+            logger.LogInformation($"[Service] GetLogsForToday returned {logs.Count} records.");
+            return logs;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"[Service] Error in GetLogsForToday with DTO: {JsonSerializer.Serialize(dto)}", ex);
+            throw;
+        }
+    }
+
+    
 
     public Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims)
     {

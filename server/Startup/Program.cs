@@ -45,11 +45,14 @@ public class Program
     {
         var appOptions = services.AddAppOptions(configuration);
 
+
+        services.RegisterFeatureHub();
+
         services.RegisterApplicationServices();
         services.RegisterLoggingService();
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
-
+        
         services.RegisterWebsocketApiServices();
         services.RegisterRestApiServices();
         if (!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST))

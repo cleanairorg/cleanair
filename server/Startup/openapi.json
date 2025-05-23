@@ -6,6 +6,27 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/test/feature": {
+      "get": {
+        "tags": [
+          "FeatureFlag"
+        ],
+        "operationId": "FeatureFlag_Check",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/Login": {
       "post": {
         "tags": [
@@ -272,6 +293,98 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Devicelog"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GetDailyAverages": {
+      "post": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_GetDailyAverages",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "x-originalName": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeRangeDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Devicelog"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GetLogsForToday": {
+      "post": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_GetLogsForToday",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "x-originalName": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "timeRangeDto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeRangeDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Devicelog"
+                  }
                 }
               }
             }
@@ -581,8 +694,8 @@
             "format": "decimal"
           },
           "airquality": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -598,6 +711,20 @@
           },
           "interval": {
             "type": "string"
+          }
+        }
+      },
+      "TimeRangeDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },

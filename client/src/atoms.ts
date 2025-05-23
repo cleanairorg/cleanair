@@ -10,6 +10,7 @@ export const CurrentValueAtom = atom<Devicelog>();
 
 export const UserInfoAtom = atom<AuthGetUserInfoDto | null>(null);
 
+
 // To use for updated threshold ranges
 export const ThresholdsAtom = atom<ThresholdDto[]>([]);
 
