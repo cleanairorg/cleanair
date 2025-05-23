@@ -306,8 +306,19 @@
           "CleanAir"
         ],
         "operationId": "CleanAir_GetDailyAverages",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "x-originalName": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
         "requestBody": {
-          "x-name": "timeRangeDto",
+          "x-name": "dto",
           "content": {
             "application/json": {
               "schema": {
@@ -326,7 +337,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AggregatedLogDto"
+                    "$ref": "#/components/schemas/Devicelog"
                   }
                 }
               }
@@ -341,6 +352,17 @@
           "CleanAir"
         ],
         "operationId": "CleanAir_GetLogsForToday",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "x-originalName": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
         "requestBody": {
           "x-name": "timeRangeDto",
           "content": {
@@ -591,8 +613,8 @@
             "format": "decimal"
           },
           "airquality": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -611,32 +633,6 @@
           }
         }
       },
-      "AggregatedLogDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "avgTemperature": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "avgHumidity": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "avgPressure": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "avgAirQuality": {
-            "type": "number",
-            "format": "double"
-          }
-        }
-      },
       "TimeRangeDto": {
         "type": "object",
         "additionalProperties": false,
@@ -648,9 +644,6 @@
           "endDate": {
             "type": "string",
             "format": "date-time"
-          },
-          "deviceId": {
-            "type": "string"
           }
         }
       },

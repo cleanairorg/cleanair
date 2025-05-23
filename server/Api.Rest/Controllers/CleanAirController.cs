@@ -25,6 +25,10 @@ public class CleanAirController(
     public const string GetMeasurementNowRoute = ControllerRoute + nameof(GetMeasurementNow);
     
     public const string GetLatestMeasurementRoute = ControllerRoute + nameof(GetLatestMeasurement);
+    
+    public const string GetDailyAveragesRoute = ControllerRoute + nameof(GetDailyAverages);
+    
+    public const string GetLogsForTodayRoute = ControllerRoute + nameof(GetLogsForToday);
 
     [HttpGet]
     [Route(GetLogsRoute)]
@@ -80,51 +84,49 @@ public class CleanAirController(
         
     }
     
-
-
-    [HttpPost("api/GetDailyAverages")]
-    public ActionResult<List<AggregatedLogDto>> GetDailyAverages([FromBody] TimeRangeDto timeRangeDto)
+    [HttpPost]
+    [Route(GetDailyAveragesRoute)]
+    public ActionResult<List<Devicelog>> GetDailyAverages(
+        [FromBody] TimeRangeDto dto,
+        [FromHeader(Name = "Authorization")] string authorization)
     {
         try
         {
-            logger.LogInformation($"[Controller]GetDailyAverages called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
-            
-            var result = cleanAirService.GetDailyAverages(timeRangeDto);
-            
-            logger.LogInformation($"[Controller]GetDailyAverages succeeded. Returned {result.Count} entries.");
+            var claims = securityService.VerifyJwtOrThrow(authorization);
+            logger.LogInformation($"[Controller] GetDailyAverages called with DTO: {JsonSerializer.Serialize(dto)}");
+            var result = cleanAirService.GetDailyAverages(dto);
+            logger.LogInformation($"[Controller] GetDailyAverages succeeded. Returned {result.Count} entries.");
             return Ok(result);
         }
         catch (Exception ex)
         {
-            logger.LogError($"[Controller] Error in GetDailyAverages with DTO: {JsonSerializer.Serialize(timeRangeDto)}", ex);
+            logger.LogError($"[Controller] Error in GetDailyAverages: {JsonSerializer.Serialize(dto)}", ex);
             return StatusCode(500, "An error occurred while retrieving daily averages.");
         }
     }
 
+    
 
-    [HttpPost("api/GetLogsForToday")]
-    public ActionResult<List<Devicelog>> GetLogsForToday([FromBody] TimeRangeDto timeRangeDto)
+    [HttpPost]
+    [Route(GetLogsForTodayRoute)]
+    public ActionResult<List<Devicelog>> GetLogsForToday(
+        [FromBody] TimeRangeDto timeRangeDto,
+        [FromHeader(Name = "Authorization")] string authorization)
     {
         try
         {
-            logger.LogInformation($"[Controller]GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
-
+            var claims = securityService.VerifyJwtOrThrow(authorization);
+            logger.LogInformation($"[Controller] GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
             var logs = cleanAirService.GetLogsForToday(timeRangeDto);
-
-            logger.LogInformation($"[Controller]GetLogsForToday succeeded. Returned {logs.Count} logs.");
+            logger.LogInformation($"[Controller] GetLogsForToday succeeded. Returned {logs.Count} logs.");
             return Ok(logs);
         }
         catch (Exception ex)
         {
-            logger.LogError($"[Controller]Error in GetLogsForToday with DTO: {JsonSerializer.Serialize(timeRangeDto)}", ex);
+            logger.LogError($"[Controller] Error in GetLogsForToday with DTO: {JsonSerializer.Serialize(timeRangeDto)}", ex);
             return StatusCode(500, "An error occurred while retrieving today's logs.");
         }
     }
 
-
     
-    
-
-
-
 }

@@ -13,6 +13,6 @@ public interface ICleanAirService
     Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims);
     Task DeleteDataAndBroadcast(JwtClaims jwt);
     Task GetMeasurementNowAndBroadcast();
-    List<AggregatedLogDto> GetDailyAverages(TimeRangeDto timeRangeDto);
+    List<Devicelog> GetDailyAverages(TimeRangeDto dto);
     List<Devicelog> GetLogsForToday(TimeRangeDto timeRangeDto);
 }

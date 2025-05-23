@@ -1,92 +1,137 @@
-﻿import { useEffect, useMemo, useState, useCallback } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
-import { DeviceLogsAtom, JwtAtom, DeviceIdAtom } from '../atoms';
+import { DeviceLogsAtom, JwtAtom } from '../atoms';
 import GraphFilter from './GraphFilter';
-import type { Devicelog, TimeRangeDto } from '../generated-client';
 import ChartCard from './ChartCard';
 import { cleanAirClient } from '../apiControllerClients';
+import type { Devicelog, TimeRangeDto } from '../generated-client';
+import { useWsClient } from 'ws-request-hook';
+import {
+    ServerBroadcastsLatestReqestedMeasurement,
+    StringConstants
+} from '../generated-client';
+
+
+type TimeType = 'today' | 'weekly' | 'monthly';
+type Filter = { type: TimeType; month?: number; year?: number };
+
+const getTimeRange = (filter: Filter): { startDate: Date; endDate: Date } | null => {
+    const now = new Date();
+    let start: Date, end: Date;
+
+    switch (filter.type) {
+        case 'today':
+            start = new Date(now);
+            start.setHours(0, 0, 0, 0);
+            end = new Date(now);
+            end.setHours(23, 59, 59, 999);
+            break;
+        case 'weekly':
+            end = new Date();
+            start = new Date();
+            start.setDate(end.getDate() - 6);
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+            break;
+        case 'monthly':
+            if (!filter.month || !filter.year) return null;
+            start = new Date(Date.UTC(filter.year, filter.month - 1, 1));
+            end = new Date(Date.UTC(filter.year, filter.month, 0, 23, 59, 59));
+            break;
+        default:
+            return null;
+    }
+
+    return { startDate: start, endDate: end };
+};
 
 export default function Graphs() {
     const [logs, setLogs] = useAtom(DeviceLogsAtom);
-    const [deviceId] = useAtom(DeviceIdAtom);
     const [jwt] = useAtom(JwtAtom);
-    const [filter, setFilter] = useState<{ type: 'today' | 'weekly' | 'monthly'; month?: number; year?: number }>({
-        type: 'today',
-    });
+    const [filter, setFilter] = useState<Filter>({ type: 'today' });
+
+    const { onMessage, readyState } = useWsClient();
+    const allowGraphUpdate = useRef(false);
 
     const fetchGraphData = useCallback(async () => {
         if (!jwt) return;
 
-        let startDate: Date;
-        let endDate: Date;
-        const now = new Date();
+        const range = getTimeRange(filter);
+        if (!range) return;
 
-        if (filter.type === 'today') {
-            startDate = new Date(now);
-            startDate.setHours(0, 0, 0, 0);
-            endDate = new Date(now);
-            endDate.setHours(23, 59, 59, 999);
-        } else if (filter.type === 'weekly') {
-            endDate = new Date();
-            startDate = new Date();
-            startDate.setDate(endDate.getDate() - 6);
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(23, 59, 59, 999);
-        } else if (filter.type === 'monthly' && filter.month && filter.year) {
-            startDate = new Date(Date.UTC(filter.year, filter.month - 1, 1));
-            endDate = new Date(Date.UTC(filter.year, filter.month, 0, 23, 59, 59));
-        } else {
-            return;
-        }
+        const dto: TimeRangeDto = { ...range };
 
-        const dto: TimeRangeDto = { startDate, endDate, deviceId };
+        const data = filter.type === 'today'
+            ? await cleanAirClient.getLogsForToday(dto,jwt)
+            : await cleanAirClient.getDailyAverages(dto,jwt);
 
-        let result: any[] = [];
-
-        if (filter.type === 'today') {
-            result = await cleanAirClient.getLogsForToday(dto);
-        } else {
-            result = await cleanAirClient.getDailyAverages(dto);
-        }
-
-        const transformed: Devicelog[] = result.map((r) => ({
-            timestamp: r.timestamp
-                ? new Date(r.timestamp)
-                : r.date
-                    ? new Date(r.date)
-                    : undefined,
-            temperature: r.temperature ?? r.avgTemperature,
-            humidity: r.humidity ?? r.avgHumidity,
-            pressure: r.pressure ?? r.avgPressure,
-            airquality: r.airquality ?? r.avgAirQuality,
-            id: r.id || crypto.randomUUID(),
-            unit: r.unit || '',
-            deviceid: r.deviceid || ''
+        const logs: Devicelog[] = data.map((log: Devicelog) => ({
+            ...log,
+            timestamp: log.timestamp ? new Date(log.timestamp) : undefined,
+            id: log.id || crypto.randomUUID(),
         }));
 
-        setLogs(transformed);
+        setLogs(logs);
     }, [jwt, filter]);
 
+    // Initial fetch and refetch on filter change
     useEffect(() => {
         fetchGraphData();
     }, [fetchGraphData]);
 
+    // Set flag for live update based on selected filter
+    useEffect(() => {
+        allowGraphUpdate.current = filter.type === 'today';
+    }, [filter.type]);
+
+    // Listen to WebSocket and refetch if "today" is active
+    useEffect(() => {
+        if (!readyState) return;
+
+        onMessage<ServerBroadcastsLatestReqestedMeasurement>(
+            StringConstants.ServerBroadcastsLatestReqestedMeasurement,
+            () => {
+                if (allowGraphUpdate.current) {
+                    fetchGraphData();
+                }
+            }
+        );
+    }, [readyState, fetchGraphData]);
+
     const formatChartData = useMemo(() => {
-        return logs.map((log) => ({
-            time: log.timestamp
-                ? new Date(log.timestamp).toLocaleDateString([], {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                })
-                : '',
-            temperature: Number(log.temperature),
-            humidity: Number(log.humidity),
-            pressure: Number(log.pressure),
-            airquality: Number(log.airquality),
-        }));
-    }, [logs]);
+        return logs.map(log => {
+            const timestamp = log.timestamp ? new Date(log.timestamp) : null;
+            let time = '';
+
+            if (timestamp) {
+                switch (filter.type) {
+                    case 'today':
+                        time = timestamp.toLocaleTimeString(undefined, {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        });
+                        break;
+                    case 'weekly':
+                    case 'monthly':
+                        time = timestamp.toLocaleDateString(undefined, {
+                            day: 'numeric',
+                            month: 'short',
+                        });
+                        break;
+                    default:
+                        time = timestamp.toISOString();
+                }
+            }
+
+            return {
+                time,
+                temperature: Number(log.temperature),
+                humidity: Number(log.humidity),
+                pressure: Number(log.pressure),
+                airquality: Number(log.airquality),
+            };
+        });
+    }, [logs, filter.type]);
 
     return (
         <div className="px-4 py-6">

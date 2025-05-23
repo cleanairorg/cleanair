@@ -15,7 +15,7 @@ CREATE TABLE weatherstation.devicelog (
     temperature numeric(4,2) NOT NULL,
     humidity numeric(4,2) NOT NULL,
     pressure numeric(6,2) NOT NULL,
-    airquality integer NOT NULL,
+    airquality double precision NOT NULL,
     CONSTRAINT devicelog_pkey PRIMARY KEY (id)
 );
 

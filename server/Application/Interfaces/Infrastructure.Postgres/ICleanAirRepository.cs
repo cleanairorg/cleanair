@@ -9,6 +9,6 @@ public interface ICleanAirRepository
     Devicelog GetLatestLogs();
     Devicelog AddDeviceLog(Devicelog deviceLog);
     Task DeleteAllData();
-    List<AggregatedLogDto> GetDailyAverages(TimeRangeDto timeRangeDto);
+    List<Devicelog> GetDailyAverages(TimeRangeDto dto);
     List<Devicelog> GetLogsForToday(TimeRangeDto timeRangeDto);
 }

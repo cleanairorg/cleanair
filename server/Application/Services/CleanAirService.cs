@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.Text.Json;
+using Application.Interfaces;
 using Application.Interfaces.Infrastructure.MQTT;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
@@ -64,26 +65,19 @@ public class CleanAirService(
     }
 
 
-    public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
+    public List<Devicelog> GetDailyAverages(TimeRangeDto dto)
     {
-        try
-        {
-            if (dto.StartDate > dto.EndDate)
-                throw new ArgumentException("StartDate cannot be after EndDate.");
+        if (dto.StartDate > dto.EndDate)
+            throw new ArgumentException("StartDate cannot be after EndDate.");
 
-            logger.LogInformation($"[Service] GetDailyAverages called with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}");
+        logger.LogInformation($"[Service] GetDailyAverages with DTO: {JsonSerializer.Serialize(dto)}");
 
-            var result = cleanAirRepository.GetDailyAverages(dto);
+        var result = cleanAirRepository.GetDailyAverages(dto);
 
-            logger.LogInformation($"[Service] GetDailyAverages returned {result.Count} records.");
-            return result;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"[Service] Error in GetDailyAverages with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}", ex);
-            throw;
-        }
+        logger.LogInformation($"[Service] GetDailyAverages returned {result.Count} records.");
+        return result;
     }
+
 
 
     public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
@@ -93,7 +87,7 @@ public class CleanAirService(
             if (dto.StartDate > dto.EndDate)
                 throw new ArgumentException("StartDate cannot be after EndDate.");
 
-            logger.LogInformation($"[Service] GetLogsForToday called with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}");
+            logger.LogInformation($"[Service] GetLogsForToday called with DTO: {JsonSerializer.Serialize(dto)}");
 
             var logs = cleanAirRepository.GetLogsForToday(dto);
 
@@ -102,7 +96,7 @@ public class CleanAirService(
         }
         catch (Exception ex)
         {
-            logger.LogError($"[Service] Error in GetLogsForToday with DTO: {System.Text.Json.JsonSerializer.Serialize(dto)}", ex);
+            logger.LogError($"[Service] Error in GetLogsForToday with DTO: {JsonSerializer.Serialize(dto)}", ex);
             throw;
         }
     }

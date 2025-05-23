@@ -21,6 +21,21 @@ type ChartCardProps = {
     }[];
 };
 
+const CustomTooltip = ({ active, payload }: any) => {
+    if (!active || !payload || !payload.length) return null;
+
+    const { time, [payload[0].dataKey]: value } = payload[0].payload;
+
+    return (
+        <div className="bg-white dark:bg-gray-800 text-black dark:text-white p-2 border rounded shadow">
+            <div className="text-sm font-semibold">Time: {time}</div>
+            <div className="text-sm">
+                {`${payload[0].name}: ${value}`}
+            </div>
+        </div>
+    );
+};
+
 export default function ChartCard({ title, dataKey, color, data }: ChartCardProps) {
     const gradientId = `${dataKey}-gradient`;
 
@@ -38,7 +53,7 @@ export default function ChartCard({ title, dataKey, color, data }: ChartCardProp
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `${value}`} />
+                    <Tooltip content={<CustomTooltip />} />
                     <Area
                         type="monotone"
                         dataKey={dataKey}

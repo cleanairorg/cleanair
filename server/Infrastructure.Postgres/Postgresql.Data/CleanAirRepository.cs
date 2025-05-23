@@ -2,7 +2,6 @@ using Application.Interfaces.Infrastructure.Postgres;
 using Application.Models.Dtos.RestDtos;
 using Core.Domain.Entities;
 using Infrastructure.Postgres.Scaffolding;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Postgresql.Data;
 
@@ -38,33 +37,33 @@ public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
       
         var from = dto.StartDate.ToUniversalTime();
         var to = dto.EndDate.ToUniversalTime();
-        var deviceId = dto.DeviceId;
 
         return ctx.Devicelogs
-            .Where(x => x.Deviceid == deviceId && x.Timestamp >= from && x.Timestamp <= to)
+            .Where(x => x.Timestamp >= from && x.Timestamp <= to)
             .OrderBy(x => x.Timestamp)
             .ToList();
     }
 
-    public List<AggregatedLogDto> GetDailyAverages(TimeRangeDto dto)
+    public List<Devicelog> GetDailyAverages(TimeRangeDto dto)
     {
-        
         var from = dto.StartDate.ToUniversalTime();
         var to = dto.EndDate.ToUniversalTime();
-        var deviceId = dto.DeviceId;
+
 
         return ctx.Devicelogs
-            .Where(x => x.Deviceid == deviceId && x.Timestamp >= from && x.Timestamp <= to)
+            .Where(x =>  x.Timestamp >= from && x.Timestamp <= to)
             .AsEnumerable()
             .GroupBy(x => x.Timestamp.Date)
-            .Select(g => new AggregatedLogDto {
-                Date = g.Key,
-                AvgTemperature = g.Average(x => x.Temperature),
-                AvgHumidity = g.Average(x => x.Humidity),
-                AvgPressure = g.Average(x => x.Pressure),
-                AvgAirQuality = g.Average(x => x.Airquality)
+            .Select(g => new Devicelog
+            {
+                Id = Guid.NewGuid().ToString(),
+                Timestamp = g.Key,
+                Temperature = g.Average(x => x.Temperature),
+                Humidity = g.Average(x => x.Humidity),
+                Pressure = g.Average(x => x.Pressure),
+                Airquality = g.Average(x => x.Airquality),
+                Unit = "Celsius"
             }).ToList();
     }
-
-
+    
 }

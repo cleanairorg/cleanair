@@ -8,5 +8,3 @@ export const DeviceLogsAtom = atom<Devicelog[]>([]);
 export const CurrentValueAtom = atom<Devicelog>();
 
 export const UserInfoAtom = atom<AuthGetUserInfoDto | null>(null);
-
-export const DeviceIdAtom = atom<string>('CleanAir-08A6F764A724');
