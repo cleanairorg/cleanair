@@ -4,13 +4,12 @@ import { DeviceLogsAtom, JwtAtom } from '../atoms';
 import GraphFilter from './GraphFilter';
 import ChartCard from './ChartCard';
 import { cleanAirClient } from '../apiControllerClients';
-import type { Devicelog, TimeRangeDto } from '../generated-client';
+import type { TimeRangeDto } from '../generated-client';
 import { useWsClient } from 'ws-request-hook';
 import {
     ServerBroadcastsLatestReqestedMeasurement,
     StringConstants
 } from '../generated-client';
-
 
 type TimeType = 'today' | 'weekly' | 'monthly';
 type Filter = { type: TimeType; month?: number; year?: number };
@@ -53,50 +52,70 @@ export default function Graphs() {
     const { onMessage, readyState } = useWsClient();
     const allowGraphUpdate = useRef(false);
 
-    const fetchGraphData = useCallback(async () => {
+    const fetchTodayLogs = useCallback(async () => {
         if (!jwt) return;
 
-        const range = getTimeRange(filter);
-        if (!range) return;
+        const now = new Date();
+        const localMidnight = new Date(now);
+        localMidnight.setHours(0, 0, 0, 0);
+        const localEnd = new Date(now);
+        localEnd.setHours(23, 59, 59, 999);
 
-        const dto: TimeRangeDto = { ...range };
+        // Convert to UTC by subtracting timezone offset
+        const timezoneOffsetMs = localMidnight.getTimezoneOffset() * 60000;
+        const startDate = new Date(localMidnight.getTime() - timezoneOffsetMs);
+        const endDate = new Date(localEnd.getTime() - timezoneOffsetMs);
 
-        const data = filter.type === 'today'
-            ? await cleanAirClient.getLogsForToday(dto,jwt)
-            : await cleanAirClient.getDailyAverages(dto,jwt);
+        const dto: TimeRangeDto = { startDate, endDate };
+        const data = await cleanAirClient.getLogsForToday(dto, jwt);
 
-        const logs: Devicelog[] = data.map((log: Devicelog) => ({
+        const parsed = data.map(log => ({
             ...log,
             timestamp: log.timestamp ? new Date(log.timestamp) : undefined,
             id: log.id || crypto.randomUUID(),
         }));
+        setLogs(parsed);
+    }, [jwt]);
 
-        setLogs(logs);
+    const fetchAverages = useCallback(async () => {
+        if (!jwt) return;
+        const range = getTimeRange(filter);
+        if (!range) return;
+
+        const dto: TimeRangeDto = { ...range };
+        const data = await cleanAirClient.getDailyAverages(dto, jwt);
+
+        const parsed = data.map(log => ({
+            ...log,
+            timestamp: log.timestamp ? new Date(log.timestamp) : undefined,
+            id: log.id || crypto.randomUUID(),
+        }));
+        setLogs(parsed);
     }, [jwt, filter]);
 
-    // Initial fetch and refetch on filter change
     useEffect(() => {
-        fetchGraphData();
-    }, [fetchGraphData]);
+        if (filter.type === 'today') {
+            fetchTodayLogs();
+        } else {
+            fetchAverages();
+        }
+    }, [filter, fetchTodayLogs, fetchAverages]);
 
-    // Set flag for live update based on selected filter
     useEffect(() => {
         allowGraphUpdate.current = filter.type === 'today';
     }, [filter.type]);
 
-    // Listen to WebSocket and refetch if "today" is active
     useEffect(() => {
         if (!readyState) return;
-
         onMessage<ServerBroadcastsLatestReqestedMeasurement>(
             StringConstants.ServerBroadcastsLatestReqestedMeasurement,
             () => {
                 if (allowGraphUpdate.current) {
-                    fetchGraphData();
+                    fetchTodayLogs();
                 }
             }
         );
-    }, [readyState, fetchGraphData]);
+    }, [readyState, fetchTodayLogs]);
 
     const formatChartData = useMemo(() => {
         return logs.map(log => {
@@ -104,23 +123,16 @@ export default function Graphs() {
             let time = '';
 
             if (timestamp) {
-                switch (filter.type) {
-                    case 'today':
-                        time = timestamp.toLocaleTimeString(undefined, {
+                time =
+                    filter.type === 'today'
+                        ? timestamp.toLocaleTimeString(undefined, {
                             hour: '2-digit',
                             minute: '2-digit',
-                        });
-                        break;
-                    case 'weekly':
-                    case 'monthly':
-                        time = timestamp.toLocaleDateString(undefined, {
+                        })
+                        : timestamp.toLocaleDateString(undefined, {
                             day: 'numeric',
                             month: 'short',
                         });
-                        break;
-                    default:
-                        time = timestamp.toISOString();
-                }
             }
 
             return {
