@@ -12,6 +12,7 @@ public static class Extensions
         services.AddScoped<IWeatherStationService, WeatherStationService>();
         services.AddScoped<IWebsocketSubscriptionService, WebsocketSubscriptionService>();
         services.AddScoped<IThresholdService, ThresholdService>();
+        services.AddScoped<IThresholdEvaluator, ThresholdEvaluator>();
         return services;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Websocket;
+using Application.Models.Dtos.BroadcastModels;
 using Application.Models.Dtos.RestDtos;
 using Application.Models.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,6 +15,7 @@ public class ThresholdController(
 {
     public const string ControllerRoute = "api/";
     public const string UpdateThresholdsRoute = ControllerRoute + nameof(UpdateThresholds);
+    public const string GetThresholdsRoute = ControllerRoute + nameof(GetThresholds);
     
     [HttpPost]
     [Route(UpdateThresholdsRoute)]
@@ -28,7 +30,19 @@ public class ThresholdController(
             return Forbid();
         }*/
         
-        await thresholdService.UpdateThresholdAndBroadcastAsync(updateThresholdsDto);
+        await thresholdService.UpdateThresholdsAndBroadcastAsync(updateThresholdsDto);
         return Ok();
+    }
+
+    [HttpGet]
+    [Route(GetThresholdsRoute)]
+    public async Task<ActionResult<ThresholdsBroadcastDto>> GetThresholds(
+        [FromQuery] string deviceId,
+        [FromHeader] string authorization)
+    {
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+    
+        var result = await thresholdService.GetThresholdsWithEvaluationAsync(deviceId);
+        return Ok(result);
     }
 }

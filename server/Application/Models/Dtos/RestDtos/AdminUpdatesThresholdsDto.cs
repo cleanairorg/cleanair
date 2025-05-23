@@ -1,4 +1,6 @@
-﻿namespace Application.Models.Dtos.RestDtos;
+﻿using Application.Models.Dtos.SharedDtos;
+
+namespace Application.Models.Dtos.RestDtos;
 
 public class AdminUpdatesThresholdsDto
 {

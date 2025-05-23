@@ -1,4 +1,4 @@
-﻿namespace Application.Models.Dtos.RestDtos;
+﻿namespace Application.Models.Dtos.SharedDtos;
 
 public class ThresholdDto
 {

@@ -283,6 +283,44 @@
         }
       }
     },
+    "/api/GetThresholds": {
+      "get": {
+        "tags": [
+          "Threshold"
+        ],
+        "operationId": "Threshold_GetThresholds",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThresholdsBroadcastDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/GetLogs": {
       "get": {
         "tags": [
@@ -529,6 +567,81 @@
           }
         }
       },
+      "ThresholdsBroadcastDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationBaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "eventType": {
+                "type": "string"
+              },
+              "deviceId": {
+                "type": "string"
+              },
+              "updatedThresholds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThresholdDto"
+                }
+              },
+              "evaluations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThresholdEvaluationResult"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ThresholdEvaluationResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ThresholdStates"
+          }
+        }
+      },
+      "ThresholdStates": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "CriticalLow",
+          "WarningLow",
+          "Good",
+          "WarningHigh",
+          "CriticalHigh"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "ApplicationBaseDto": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "eventType": {
+            "type": "string"
+          }
+        }
+      },
       "Devicelog": {
         "type": "object",
         "additionalProperties": false,
@@ -595,16 +708,6 @@
           }
         ]
       },
-      "ApplicationBaseDto": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "eventType": {
-            "type": "string"
-          }
-        }
-      },
       "ServerBroadcastsLiveDataToDashboard": {
         "allOf": [
           {
@@ -622,31 +725,6 @@
               },
               "eventType": {
                 "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "UpdatedThresholdsDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApplicationBaseDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "eventType": {
-                "type": "string"
-              },
-              "deviceId": {
-                "type": "string"
-              },
-              "updatedThresholds": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ThresholdDto"
-                }
               }
             }
           }
@@ -759,7 +837,7 @@
         "enum": [
           "AdminHasDeletedData",
           "ServerBroadcastsLiveDataToDashboard",
-          "UpdatedThresholdsDto",
+          "ThresholdsBroadcastDto",
           "MemberLeftNotification",
           "ExampleClientDto",
           "ExampleServerResponse",

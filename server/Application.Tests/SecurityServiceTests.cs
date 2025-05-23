@@ -1,17 +1,11 @@
 ﻿using Application.Interfaces.Infrastructure.Postgres;
 using Application.Models;
-using Application.Models.Dtos.RestDtos;
 using Application.Services;
-using Core.Domain.Entities;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Authentication;
 
-namespace Application.Tests.Services
+namespace Application.Tests
 {
     [TestFixture]
     public class SecurityServiceTests

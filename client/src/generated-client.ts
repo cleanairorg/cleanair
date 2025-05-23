@@ -360,6 +360,44 @@ export class ThresholdClient {
         }
         return Promise.resolve<FileResponse>(null as any);
     }
+
+    getThresholds(deviceId: string | undefined, authorization: string | undefined): Promise<ThresholdsBroadcastDto> {
+        let url_ = this.baseUrl + "/GetThresholds?";
+        if (deviceId === null)
+            throw new Error("The parameter 'deviceId' cannot be null.");
+        else if (deviceId !== undefined)
+            url_ += "deviceId=" + encodeURIComponent("" + deviceId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetThresholds(_response);
+        });
+    }
+
+    protected processGetThresholds(response: Response): Promise<ThresholdsBroadcastDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as ThresholdsBroadcastDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ThresholdsBroadcastDto>(null as any);
+    }
 }
 
 export class WeatherStationClient {
@@ -533,6 +571,31 @@ export interface ThresholdDto {
     warnMax?: number;
 }
 
+export interface ApplicationBaseDto {
+    eventType?: string;
+}
+
+export interface ThresholdsBroadcastDto extends ApplicationBaseDto {
+    eventType?: string;
+    deviceId?: string;
+    updatedThresholds?: ThresholdDto[];
+    evaluations?: ThresholdEvaluationResult[];
+}
+
+export interface ThresholdEvaluationResult {
+    metric?: string;
+    value?: number;
+    state?: ThresholdStates;
+}
+
+export enum ThresholdStates {
+    CriticalLow = 0,
+    WarningLow = 1,
+    Good = 2,
+    WarningHigh = 3,
+    CriticalHigh = 4,
+}
+
 export interface Devicelog {
     id?: string;
     deviceid?: string;
@@ -550,10 +613,6 @@ export interface AdminChangesPreferencesDto {
     interval?: string;
 }
 
-export interface ApplicationBaseDto {
-    eventType?: string;
-}
-
 export interface AdminHasDeletedData extends ApplicationBaseDto {
     eventType?: string;
 }
@@ -561,12 +620,6 @@ export interface AdminHasDeletedData extends ApplicationBaseDto {
 export interface ServerBroadcastsLiveDataToDashboard extends ApplicationBaseDto {
     logs?: Devicelog[];
     eventType?: string;
-}
-
-export interface UpdatedThresholdsDto extends ApplicationBaseDto {
-    eventType?: string;
-    deviceId?: string;
-    updatedThresholds?: ThresholdDto[];
 }
 
 
@@ -598,7 +651,7 @@ export interface ServerSendsErrorMessage extends BaseDto {
 export enum StringConstants {
     AdminHasDeletedData = "AdminHasDeletedData",
     ServerBroadcastsLiveDataToDashboard = "ServerBroadcastsLiveDataToDashboard",
-    UpdatedThresholdsDto = "UpdatedThresholdsDto",
+    ThresholdsBroadcastDto = "ThresholdsBroadcastDto",
     MemberLeftNotification = "MemberLeftNotification",
     ExampleClientDto = "ExampleClientDto",
     ExampleServerResponse = "ExampleServerResponse",
