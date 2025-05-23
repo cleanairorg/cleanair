@@ -121,6 +121,164 @@
         }
       }
     },
+    "/api/GetLogs": {
+      "get": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_GetLogs",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Devicelog"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/AdminChangesPreferences": {
+      "post": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_AdminChangesPreferences",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminChangesPreferencesDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/DeleteData": {
+      "delete": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_DeleteData",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GetMeasurementNow": {
+      "get": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_GetMeasurementNow",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GetLatestMeasurement": {
+      "get": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_GetLatestMeasurement",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Devicelog"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Subscribe": {
       "post": {
         "tags": [
@@ -239,194 +397,6 @@
           }
         }
       }
-    },
-    "/api/UpdateThresholds": {
-      "post": {
-        "tags": [
-          "Threshold"
-        ],
-        "operationId": "Threshold_UpdateThresholds",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "updateThresholdsDto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminUpdatesThresholdsDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/GetThresholds": {
-      "get": {
-        "tags": [
-          "Threshold"
-        ],
-        "operationId": "Threshold_GetThresholds",
-        "parameters": [
-          {
-            "name": "deviceId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ThresholdsBroadcastDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/GetLogs": {
-      "get": {
-        "tags": [
-          "WeatherStation"
-        ],
-        "operationId": "WeatherStation_GetLogs",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Devicelog"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/AdminChangesPreferences": {
-      "post": {
-        "tags": [
-          "WeatherStation"
-        ],
-        "operationId": "WeatherStation_AdminChangesPreferences",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminChangesPreferencesDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/DeleteData": {
-      "delete": {
-        "tags": [
-          "WeatherStation"
-        ],
-        "operationId": "WeatherStation_DeleteData",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -500,148 +470,6 @@
           }
         }
       },
-      "ChangeSubscriptionDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "clientId": {
-            "type": "string"
-          },
-          "topicIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "ExampleBroadcastDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "eventType": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      },
-      "AdminUpdatesThresholdsDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "deviceId": {
-            "type": "string"
-          },
-          "thresholds": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ThresholdDto"
-            }
-          }
-        }
-      },
-      "ThresholdDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "metric": {
-            "type": "string"
-          },
-          "warnMin": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "goodMin": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "goodMax": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "warnMax": {
-            "type": "number",
-            "format": "decimal"
-          }
-        }
-      },
-      "ThresholdsBroadcastDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApplicationBaseDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "eventType": {
-                "type": "string"
-              },
-              "deviceId": {
-                "type": "string"
-              },
-              "updatedThresholds": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ThresholdDto"
-                }
-              },
-              "evaluations": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ThresholdEvaluationResult"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "ThresholdEvaluationResult": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "metric": {
-            "type": "string"
-          },
-          "value": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "state": {
-            "$ref": "#/components/schemas/ThresholdStates"
-          }
-        }
-      },
-      "ThresholdStates": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "CriticalLow",
-          "WarningLow",
-          "Good",
-          "WarningHigh",
-          "CriticalHigh"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ]
-      },
-      "ApplicationBaseDto": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "eventType": {
-            "type": "string"
-          }
-        }
-      },
       "Devicelog": {
         "type": "object",
         "additionalProperties": false,
@@ -692,6 +520,33 @@
           }
         }
       },
+      "ChangeSubscriptionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "topicIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ExampleBroadcastDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eventType": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
       "AdminHasDeletedData": {
         "allOf": [
           {
@@ -701,6 +556,35 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+              "eventType": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ApplicationBaseDto": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "eventType": {
+            "type": "string"
+          }
+        }
+      },
+      "ServerBroadcastsLatestReqestedMeasurement": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationBaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "latestMeasurement": {
+                "$ref": "#/components/schemas/Devicelog"
+              },
               "eventType": {
                 "type": "string"
               }
@@ -836,8 +720,8 @@
         "description": "Available eventType and string constants",
         "enum": [
           "AdminHasDeletedData",
+          "ServerBroadcastsLatestReqestedMeasurement",
           "ServerBroadcastsLiveDataToDashboard",
-          "ThresholdsBroadcastDto",
           "MemberLeftNotification",
           "ExampleClientDto",
           "ExampleServerResponse",

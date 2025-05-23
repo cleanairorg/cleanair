@@ -8,7 +8,7 @@ using HiveMQtt.MQTT5.Types;
 
 namespace Infrastructure.MQTT.SubscriptionEventHandlers;
 
-public class DeviceLogEventHandler(IWeatherStationService weatherStationService) : IMqttMessageHandler
+public class DeviceLogEventHandler(ICleanAirService cleanAirService) : IMqttMessageHandler
 {
     public string TopicFilter { get; } = StringConstants.Device + "/+/" + StringConstants.Log;
     public QualityOfService QoS { get; } = QualityOfService.AtLeastOnceDelivery;
@@ -23,6 +23,5 @@ public class DeviceLogEventHandler(IWeatherStationService weatherStationService)
                                       args.PublishMessage.PayloadAsString);
         var context = new ValidationContext(dto);
         Validator.ValidateObject(dto, context);
-        weatherStationService.AddToDbAndBroadcast(dto);
     }
 }

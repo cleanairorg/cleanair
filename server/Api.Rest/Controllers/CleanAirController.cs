@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Rest.Controllers;
 
 [ApiController]
-public class WeatherStationController(
-    IWeatherStationService weatherStationService,
+public class CleanAirController(
+    ICleanAirService cleanAirService,
     IConnectionManager connectionManager,
     ISecurityService securityService) : ControllerBase
 {
@@ -18,13 +18,17 @@ public class WeatherStationController(
     public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);
     
     public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
+    
+    public const string GetMeasurementNowRoute = ControllerRoute + nameof(GetMeasurementNow);
+    
+    public const string GetLatestMeasurementRoute = ControllerRoute + nameof(GetLatestMeasurement);
 
     [HttpGet]
     [Route(GetLogsRoute)]
     public async Task<ActionResult<IEnumerable<Devicelog>>> GetLogs([FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        var feed = weatherStationService.GetDeviceFeed(claims);
+        var feed = cleanAirService.GetDeviceFeed(claims);
         return Ok(feed);
     }
 
@@ -34,7 +38,7 @@ public class WeatherStationController(
         [FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        await weatherStationService.UpdateDeviceFeed(dto, claims);
+        await cleanAirService.UpdateDeviceFeed(dto, claims);
         return Ok();
     }
     
@@ -43,10 +47,35 @@ public class WeatherStationController(
     public async Task<ActionResult> DeleteData([FromHeader]string authorization)
     {
         var jwt = securityService.VerifyJwtOrThrow(authorization);
+        
+        await cleanAirService.DeleteDataAndBroadcast(jwt);
 
-        await weatherStationService.DeleteDataAndBroadcast(jwt);
+        return Ok();
+    }
+
+    [HttpGet]
+    [Route(GetMeasurementNowRoute)]
+    public async Task<ActionResult> GetMeasurementNow(String authorization)
+    {
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+        if (claims.Role != "admin") {
+            return Unauthorized("You are not authorized to access this route");
+        }
+        
+        await cleanAirService.GetMeasurementNowAndBroadcast();
         
         return Ok();
     }
     
+    [HttpGet]
+    [Route(GetLatestMeasurementRoute)]
+    public async Task<ActionResult<Devicelog>> GetLatestMeasurement()
+    {
+        
+        var latestLog = cleanAirService.GetLatestDeviceLog();
+        return Ok(latestLog);
+        
+    }
+    
+
 }

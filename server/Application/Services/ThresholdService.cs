@@ -11,14 +11,14 @@ namespace Application.Services;
 
 public class ThresholdService(
     IDeviceThresholdRepository thresholdRepository,
-    IWeatherStationRepository weatherStationRepository,
+    ICleanAirRepository cleanairRepository,
     IConnectionManager connectionManager,
     IThresholdEvaluator evaluator) : IThresholdService
 {
     public async Task UpdateThresholdsAndBroadcastAsync(AdminUpdatesThresholdsDto adminUpdatesThresholdsDto)
     {
         var currentLog =
-            await weatherStationRepository.GetCurrentLogByDeviceIdAsync(adminUpdatesThresholdsDto.DeviceId);
+            await cleanairRepository.GetCurrentLogByDeviceIdAsync(adminUpdatesThresholdsDto.DeviceId);
         if (currentLog == null) throw new Exception("No current log found for device");
 
         var updatedThresholds = new List<DeviceThreshold>();
@@ -53,7 +53,7 @@ public class ThresholdService(
     public async Task<ThresholdsBroadcastDto> GetThresholdsWithEvaluationAsync(string deviceId)
     {
         var thresholds = await thresholdRepository.GetByDeviceIdAsync(deviceId);
-        var log = await weatherStationRepository.GetCurrentLogByDeviceIdAsync(deviceId);
+        var log = await cleanairRepository.GetCurrentLogByDeviceIdAsync(deviceId);
         if (log is null) throw new Exception("No current log found for device");
         
         var evaluations = EvaluateThresholdsAgainstLog(log, thresholds);
