@@ -14,6 +14,7 @@ using Application.Models.Enums;
 using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
+using JWT.Exceptions;
 using JWT.Serializers;
 
 namespace Application.Tests.Services
@@ -241,7 +242,7 @@ namespace Application.Tests.Services
             var invalidJwt = "this.is.not.a.valid.token";
 
             // Act & Assert
-            var ex = Assert.Throws<Exception>(() => _securityService.VerifyJwtOrThrow(invalidJwt));
+            var ex = Assert.Throws<InvalidTokenPartsException>(() => _securityService.VerifyJwtOrThrow(invalidJwt));
             ex.Message.Should().Contain("Token must consist of 3 delimited by dot parts.");
         }
         
