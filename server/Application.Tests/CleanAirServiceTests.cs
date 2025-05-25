@@ -102,6 +102,9 @@ namespace Application.Tests.Services
             // Verify logging
             _loggerMock.Verify(x => x.LogInformation(
                 It.Is<string>(msg => msg.Contains("Added DeviceLog to Database"))), Times.Once);
+            _repositoryMock.Verify(r => r.AddDeviceLog(It.Is<Devicelog>(log =>
+                log.Unit == "Celsius"
+            )), Times.Once);
 
         }
         
@@ -129,6 +132,8 @@ namespace Application.Tests.Services
             // Assert
             Assert.That(result, Is.EqualTo(expectedLogs));
             _repositoryMock.Verify(r => r.GetLogsForToday(dto), Times.Once);
+            _loggerMock.Verify(x => x.LogInformation(
+                It.Is<string>(msg => msg.Contains("returned"))), Times.Once);
         }
 
         [Test]
@@ -150,17 +155,14 @@ namespace Application.Tests.Services
         [Test]
         public void GetDailyAverages_InvalidRange_ShouldThrowArgumentException()
         {
-            // Arrange
-            var dto = new TimeRangeDto
-            {
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(-1)
-            };
+            var now = DateTime.UtcNow;
+            var invalid = new TimeRangeDto { StartDate = now.AddDays(1), EndDate = now };
+            var equal = new TimeRangeDto { StartDate = now, EndDate = now };
 
-            // Act & Assert
-            var ex = Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(dto));
-            Assert.That(ex.Message, Is.EqualTo("StartDate cannot be after EndDate."));
+            Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(invalid));
+            Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(equal));
         }
+
         
         [Test]
         public void GetLogsForToday_NoLogs_ShouldReturnEmptyList()

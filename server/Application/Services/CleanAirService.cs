@@ -80,9 +80,7 @@ public class CleanAirService(
         return result;
     }
 
-
-
-
+    
     public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
     {
         try
