@@ -256,6 +256,128 @@ namespace Application.Tests.Services
         {
             Assert.That(Constants.UserRole, Is.EqualTo("user"));
         }
+        
+        [Test]
+        public void Register_RoleIsAdmin_ShouldAssignAdminRole()
+        {
+            // Arrange
+            var dto = new AuthRegisterRequestDto { Email = "admin@test.com", Password = "pass123", Role = "admin" };
+
+            _userRepositoryMock.Setup(x => x.GetUserOrNull(dto.Email)).Returns((User)null!);
+            _userRepositoryMock.Setup(x => x.AddUser(It.IsAny<User>()))
+                .Callback<User>(user =>
+                {
+                    user.Role.Should().Be(Constants.AdminRole);
+                })
+                .Returns((User u) => u);
+
+            // Act
+            var result = _securityService.Register(dto);
+
+            // Assert
+            result.Jwt.Should().NotBeNullOrEmpty();
+        }
+
+        [Test]
+        public void Register_RoleIsEmpty_ShouldAssignUserRole()
+        {
+            // Arrange
+            var dto = new AuthRegisterRequestDto { Email = "empty@test.com", Password = "pass123", Role = "" };
+
+            _userRepositoryMock.Setup(x => x.GetUserOrNull(dto.Email)).Returns((User)null!);
+            _userRepositoryMock.Setup(x => x.AddUser(It.IsAny<User>()))
+                .Callback<User>(user =>
+                {
+                    user.Role.Should().Be(Constants.UserRole);
+                })
+                .Returns((User u) => u);
+
+            // Act
+            var result = _securityService.Register(dto);
+
+            // Assert
+            result.Jwt.Should().NotBeNullOrEmpty();
+        }
+
+        [Test]
+        public void Register_RoleIsNotAdmin_ShouldAssignUserRole()
+        {
+            // Arrange
+            var dto = new AuthRegisterRequestDto { Email = "guest@test.com", Password = "pass123", Role = "guest" };
+
+            _userRepositoryMock.Setup(x => x.GetUserOrNull(dto.Email)).Returns((User)null!);
+            _userRepositoryMock.Setup(x => x.AddUser(It.IsAny<User>()))
+                .Callback<User>(user =>
+                {
+                    user.Role.Should().Be(Constants.UserRole);
+                })
+                .Returns((User u) => u);
+
+            // Act
+            var result = _securityService.Register(dto);
+
+            // Assert
+            result.Jwt.Should().NotBeNullOrEmpty();
+        }
+        
+        
+        [Test]
+        public void Register_UnknownRole_ShouldDefaultToUserRole()
+        {
+            // Arrange
+            var dto = new AuthRegisterRequestDto { Email = "user@test.com", Password = "pass", Role = "guest" }; // not "admin"
+
+            _userRepositoryMock.Setup(x => x.GetUserOrNull(dto.Email)).Returns((User)null!);
+            _userRepositoryMock.Setup(x => x.AddUser(It.IsAny<User>()))
+                .Callback<User>(user => user.Role.Should().Be(Constants.UserRole))
+                .Returns((User u) => u);
+
+            // Act
+            var result = _securityService.Register(dto);
+
+            // Assert
+            result.Jwt.Should().NotBeNullOrEmpty();
+        }
+        
+        
+        [Test]
+        public void HashPassword_ShouldNotContainAnyNonHexCharacters()
+        {
+            // Arrange
+            var password = "samplePassword";
+
+            // Act
+            var hash = _securityService.HashPassword(password);
+
+            // Assert
+            hash.Should().NotContain("-"); // original `.Replace("-", "")` is expected
+            hash.Should().MatchRegex("^[a-f0-9]+$"); // should only contain lowercase hex digits
+            hash.Length.Should().Be(128); // SHA-512 -> 64 bytes => 128 hex characters
+        }
+
+        [Test]
+        public void GenerateJwt_ShouldContainAllClaims()
+        {
+            // Arrange
+            var claims = new JwtClaims
+            {
+                Id = "test-id",
+                Role = "admin",
+                Exp = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds().ToString(),
+                Email = "admin@test.com"
+            };
+
+            // Act
+            var jwt = _securityService.GenerateJwt(claims);
+            var parsed = _securityService.VerifyJwtOrThrow(jwt);
+
+            // Assert
+            parsed.Id.Should().Be(claims.Id);
+            parsed.Role.Should().Be(claims.Role);
+            parsed.Email.Should().Be(claims.Email);
+            parsed.Exp.Should().Be(claims.Exp);
+        }
+
     }
-    
+  
 }
