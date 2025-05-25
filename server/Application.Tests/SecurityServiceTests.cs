@@ -6,8 +6,6 @@ using Core.Domain.Entities;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Authentication;
 using Application.Models.Enums;
