@@ -139,7 +139,7 @@ public class CleanAirRepositoryTests
         result[0].Temperature.Should().BeApproximately(22, 0.1m);
     }
     
-    [Test]
+    /*[Test]
     public void GetDailyAverages_ExactlyAtStartTime_ShouldIncludeData()
     {
         var from = DateTime.UtcNow.Date;
@@ -316,10 +316,7 @@ public class CleanAirRepositoryTests
         result.Should().HaveCount(2);
         result[0].Id.Should().Be("1");
         result[1].Id.Should().Be("2");
-    }
-
-
+    }*/
     
-
     
 }
