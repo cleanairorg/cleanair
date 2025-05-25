@@ -139,7 +139,7 @@ public class CleanAirRepositoryTests
         result[0].Temperature.Should().BeApproximately(22, 0.1m);
     }
     
-    /*[Test]
+    [Test]
     public void GetDailyAverages_ExactlyAtStartTime_ShouldIncludeData()
     {
         var from = DateTime.UtcNow.Date;
@@ -316,7 +316,76 @@ public class CleanAirRepositoryTests
         result.Should().HaveCount(2);
         result[0].Id.Should().Be("1");
         result[1].Id.Should().Be("2");
-    }*/
+    }
     
+    [Test]
+    public void GetDailyAverages_ReverseShouldNotAffectGroupingOrAverages()
+    {
+        var today = DateTime.UtcNow.Date;
+        _context.Devicelogs.AddRange(
+            new Devicelog { Id = "1", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(1), Airquality = 2 },
+            new Devicelog { Id = "2", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(2), Airquality = 4 }
+        );
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = today, EndDate = today.AddDays(1) };
+
+        var result = _repository.GetDailyAverages(dto);
+
+        result.Should().ContainSingle()
+            .Which.Airquality.Should().BeApproximately(3.0, 0.01); // average of 2 and 4
+    }
+    
+    [Test]
+    public void GetDailyAverages_ShouldUseAverageNotMinForAirquality()
+    {
+        var today = DateTime.UtcNow.Date;
+        _context.Devicelogs.AddRange(
+            new Devicelog { Id = "low", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(1), Airquality = 1.0 },
+            new Devicelog { Id = "high", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(2), Airquality = 5.0 }
+        );
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = today, EndDate = today.AddDays(1) };
+
+        var result = _repository.GetDailyAverages(dto);
+
+        result.Should().ContainSingle()
+            .Which.Airquality.Should().BeApproximately(3.0, 0.01); // avg of 1.0 and 5.0
+    }
+    
+    [Test]
+    public void AddDeviceLog_ShouldPersistAndReturnSameEntity()
+    {
+        var log = new Devicelog
+        {
+            Id = "test-id",
+            Deviceid = "devX",
+            Unit = "Celsius",
+            Timestamp = DateTime.UtcNow,
+            Temperature = 20,
+            Humidity = 40,
+            Pressure = 1000,
+            Airquality = 1.1
+        };
+
+        var result = _repository.AddDeviceLog(log);
+
+        result.Should().BeSameAs(log);
+        _context.Devicelogs.Find("test-id").Should().NotBeNull();
+    }
+    
+    [Test]
+    public void GetLatestLogs_WhenNoLogsExist_ShouldReturnNull()
+    {
+        // Act
+        var result = _repository.GetLatestLogs();
+
+        // Assert
+        result.Should().BeNull(); // This will fail if First() is used instead of FirstOrDefault()
+    }
+    
+    
+
     
 }
