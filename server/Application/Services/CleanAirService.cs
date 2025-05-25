@@ -67,16 +67,18 @@ public class CleanAirService(
 
     public List<Devicelog> GetDailyAverages(TimeRangeDto dto)
     {
-        if (dto.StartDate > dto.EndDate)
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
+        if (dto.StartDate >= dto.EndDate)
             throw new ArgumentException("StartDate cannot be after EndDate.");
-
+    
         logger.LogInformation($"[Service] GetDailyAverages with DTO: {JsonSerializer.Serialize(dto)}");
-
         var result = cleanAirRepository.GetDailyAverages(dto);
-
         logger.LogInformation($"[Service] GetDailyAverages returned {result.Count} records.");
         return result;
     }
+
 
 
 

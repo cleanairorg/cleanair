@@ -260,7 +260,24 @@ namespace Application.Tests.Services
 
             Assert.That(result, Is.EqualTo(resultList));
         }
+        
+        [Test]
+        public void GetDailyAverages_StartDateEqualsEndDate_ShouldThrowArgumentException()
+        {
+            // Arrange
+            var now = DateTime.UtcNow;
+            var dto = new TimeRangeDto
+            {
+                StartDate = now,
+                EndDate = now
+            };
 
+            // Act & Assert
+            var ex = Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(dto));
+            Assert.That(ex.Message, Is.EqualTo("StartDate cannot be after EndDate."));
+        }
+
+        
 
     }
  }
