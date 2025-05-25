@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Logging;
 using Application.Interfaces.Infrastructure.MQTT;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
@@ -9,14 +10,14 @@ using Application.Models.Dtos.BroadcastModels;
 using Application.Models.Dtos.MqttSubscriptionDto;
 using Application.Models.Dtos.RestDtos;
 using Core.Domain.Entities;
-using Microsoft.Extensions.Logging;
+
 using Microsoft.Extensions.Options;
 
 namespace Application.Services;
 
 public class CleanAirService(
     IOptionsMonitor<AppOptions> optionsMonitor,
-    ILogger<CleanAirService> logger,
+    ILoggingService logger,
     ICleanAirRepository cleanAirRepository,
     IMqttPublisher mqttPublisher,
     IConnectionManager connectionManager) : ICleanAirService

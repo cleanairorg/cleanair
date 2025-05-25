@@ -14,6 +14,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Application.Interfaces.Infrastructure.Logging;
 using Application.Models.Dtos.RestDtos;
 
 namespace Application.Tests.Services
@@ -22,7 +23,7 @@ namespace Application.Tests.Services
     public class CleanAirServiceTests
     {
 		private Mock<IOptionsMonitor<AppOptions>> _optionsMonitorMock;
-		private Mock<ILogger<CleanAirService>> _loggerMock;
+        private Mock<ILoggingService> _loggerMock;
 		private Mock<ICleanAirRepository> _repositoryMock;
 		private Mock<IMqttPublisher> _mqttPublisherMock;
 		private Mock<IConnectionManager> _connectionManagerMock;
@@ -34,7 +35,7 @@ namespace Application.Tests.Services
 			_optionsMonitorMock = new Mock<IOptionsMonitor<AppOptions>>();
             _repositoryMock = new Mock<ICleanAirRepository>();
             _connectionManagerMock = new Mock<IConnectionManager>();
-            _loggerMock = new Mock<ILogger<CleanAirService>>();
+            _loggerMock = new Mock<ILoggingService>();
 			_mqttPublisherMock = new Mock<IMqttPublisher>();
 
             _service = new CleanAirService(
@@ -51,20 +52,17 @@ namespace Application.Tests.Services
             // Act
             await _service.AddToDbAndBroadcast(null);
 
-            // Assert - Verifying that the logWarning is being triggered/logged
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("dto is null")),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-            //verifying nothing is being saved in the database
+            // Assert - Verifying that the warning log is triggered
+            _loggerMock.Verify(x => x.LogWarning(
+                It.Is<string>(msg => msg.Contains("AddToDbAndBroadcast, dto is null"))), Times.Once);
+
+            // Ensure nothing was saved to the database
             _repositoryMock.Verify(r => r.AddDeviceLog(It.IsAny<Devicelog>()), Times.Never);
-            //verifying that nothing is broadcasted
+
+            // Ensure nothing was broadcasted
             _connectionManagerMock.Verify(c => c.BroadcastToTopic(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
+        
         
         [Test]
         public async Task AddToDbAndBroadcast_ValidDto_ShouldAddToRepoAndBroadcast()
@@ -102,12 +100,9 @@ namespace Application.Tests.Services
             ), Times.Once);
         
             // Verify logging
-            _loggerMock.Verify(x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Added DeviceLog to Database")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            _loggerMock.Verify(x => x.LogInformation(
+                It.Is<string>(msg => msg.Contains("Added DeviceLog to Database"))), Times.Once);
+
         }
         
         [Test]
@@ -197,20 +192,20 @@ namespace Application.Tests.Services
                 EndDate = DateTime.UtcNow
             };
 
-            _repositoryMock.Setup(r => r.GetLogsForToday(dto)).Throws(new InvalidOperationException("Repo error"));
+            _repositoryMock
+                .Setup(r => r.GetLogsForToday(dto))
+                .Throws(new InvalidOperationException("Repo error"));
 
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() => _service.GetLogsForToday(dto));
             Assert.That(ex.Message, Is.EqualTo("Repo error"));
 
-            // Ensure logger captured the error
-            _loggerMock.Verify(x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Error in GetLogsForToday")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            // ✅ Verify the logger was called with both arguments
+            _loggerMock.Verify(x => x.LogError(
+                It.Is<string>(msg => msg.Contains("Error in GetLogsForToday")),
+                It.IsAny<Exception?>()), Times.Once);
         }
+
 
         [Test]
         public void GetDailyAverages_NoData_ShouldReturnEmptyList()
@@ -251,12 +246,9 @@ namespace Application.Tests.Services
             var result = _service.GetDailyAverages(dto);
 
             // Assert
-            _loggerMock.Verify(x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("GetDailyAverages with DTO")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            _loggerMock.Verify(x => x.LogInformation(
+                It.Is<string>(msg => msg.Contains("GetDailyAverages with DTO"))), Times.Once);
+
 
             Assert.That(result, Is.EqualTo(resultList));
         }

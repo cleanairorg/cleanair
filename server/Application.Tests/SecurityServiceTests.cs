@@ -10,6 +10,11 @@ using NUnit.Framework;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Authentication;
+using Application.Models.Enums;
+using JWT;
+using JWT.Algorithms;
+using JWT.Builder;
+using JWT.Serializers;
 
 namespace Application.Tests.Services
 {
@@ -195,9 +200,63 @@ namespace Application.Tests.Services
             result.Email.Should().Be(user.Email);
             result.Role.Should().Be(user.Role);
         }
-
-
-
         
+        [Test]
+        public void VerifyJwtOrThrow_ValidToken_ReturnsExpectedClaims()
+        {
+            // Arrange
+            var expectedClaims = new JwtClaims
+            {
+                Id = "abc123",
+                Role = "admin",
+                Exp = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds().ToString(),
+                Email = "jwt@test.com"
+            };
+
+            var jwt = new JwtBuilder()
+                .WithAlgorithm(new HMACSHA512Algorithm())
+                .WithSecret(_appOptions.JwtSecret)
+                .WithUrlEncoder(new JwtBase64UrlEncoder())
+                .WithJsonSerializer(new JsonNetSerializer())
+                .AddClaim(nameof(JwtClaims.Id), expectedClaims.Id)
+                .AddClaim(nameof(JwtClaims.Role), expectedClaims.Role)
+                .AddClaim(nameof(JwtClaims.Exp), expectedClaims.Exp)
+                .AddClaim(nameof(JwtClaims.Email), expectedClaims.Email)
+                .Encode();
+
+            // Act
+            var result = _securityService.VerifyJwtOrThrow(jwt);
+
+            // Assert
+            result.Id.Should().Be(expectedClaims.Id);
+            result.Role.Should().Be(expectedClaims.Role);
+            result.Email.Should().Be(expectedClaims.Email);
+            result.Exp.Should().Be(expectedClaims.Exp);
+        }
+
+        [Test]
+        public void VerifyJwtOrThrow_InvalidToken_ShouldThrowException()
+        {
+            // Arrange
+            var invalidJwt = "this.is.not.a.valid.token";
+
+            // Act & Assert
+            var ex = Assert.Throws<Exception>(() => _securityService.VerifyJwtOrThrow(invalidJwt));
+            ex.Message.Should().Contain("Token must consist of 3 delimited by dot parts.");
+        }
+        
+
+        [Test]
+        public void AdminRole_ShouldBeAdmin()
+        {
+            Assert.That(Constants.AdminRole, Is.EqualTo("admin"));
+        }
+
+        [Test]
+        public void UserRole_ShouldBeUser()
+        {
+            Assert.That(Constants.UserRole, Is.EqualTo("user"));
+        }
     }
+    
 }
