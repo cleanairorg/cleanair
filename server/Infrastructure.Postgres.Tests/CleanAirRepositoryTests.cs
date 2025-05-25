@@ -121,4 +121,128 @@ public class CleanAirRepositoryTests
 
         _context.Devicelogs.Should().BeEmpty();
     }
+    
+    [Test]
+    public void GetDailyAverages_OrderShouldNotAffectGrouping()
+    {
+        var today = DateTime.UtcNow.Date;
+        _context.Devicelogs.AddRange(
+            new Devicelog { Deviceid = "dev1", Unit = "Celsius", Id = "1", Timestamp = today.AddHours(3), Temperature = 24, Humidity = 60, Pressure = 1012, Airquality = 3 },
+            new Devicelog { Deviceid = "dev1", Unit = "Celsius", Id = "2", Timestamp = today.AddHours(1), Temperature = 20, Humidity = 40, Pressure = 1008, Airquality = 2 }
+        );
+        _context.SaveChanges();
+
+        var range = new TimeRangeDto { StartDate = today, EndDate = today.AddDays(1) };
+        var result = _repository.GetDailyAverages(range);
+
+        result.Should().HaveCount(1);
+        result[0].Temperature.Should().BeApproximately(22, 0.1m);
+    }
+    
+    [Test]
+    public void GetDailyAverages_ExactlyAtStartTime_ShouldIncludeData()
+    {
+        var from = DateTime.UtcNow.Date;
+        _context.Devicelogs.Add(new Devicelog
+        {
+            Id = "start-included",
+            Deviceid = "dev123",
+            Unit = "Celsius",
+            Timestamp = from,
+            Temperature = 21,
+            Humidity = 40,
+            Pressure = 1005,
+            Airquality = 1
+        });
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = from, EndDate = from.AddHours(1) };
+        var result = _repository.GetDailyAverages(dto);
+
+        result.Should().NotBeEmpty();
+    }
+    
+    [Test]
+    public void GetDailyAverages_DataOutsideRange_ShouldBeExcluded()
+    {
+        var from = DateTime.UtcNow.Date;
+        var before = from.AddDays(-1);
+        var after = from.AddDays(2);
+
+        _context.Devicelogs.AddRange(
+            new Devicelog { Id = "before", Deviceid = "dev1", Unit = "Celsius", Timestamp = before, Temperature = 10 },
+            new Devicelog { Id = "after", Deviceid = "dev1", Unit = "Celsius", Timestamp = after, Temperature = 30 }
+        );
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = from, EndDate = from.AddDays(1) };
+        var result = _repository.GetDailyAverages(dto);
+
+        result.Should().BeEmpty();
+    }
+    
+    [Test]
+    public void GetDailyAverages_ExactlyAtEndDate_ShouldBeIncluded()
+    {
+        var start = DateTime.UtcNow.Date;
+        var end = start.AddDays(1).AddTicks(-1); // one tick before midnight
+
+        _context.Devicelogs.Add(new Devicelog
+        {
+            Id = "end-edge",
+            Deviceid = "dev1",
+            Unit = "Celsius",
+            Timestamp = end,
+            Temperature = 25
+        });
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = start, EndDate = end };
+        var result = _repository.GetDailyAverages(dto);
+
+        result.Should().NotBeEmpty();
+    }
+
+    [Test]
+    public void GetDailyAverages_ShouldUseAverageNotMin()
+    {
+        var today = DateTime.UtcNow.Date;
+        _context.Devicelogs.AddRange(
+            new Devicelog { Id = "1", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(1), Humidity = 40 },
+            new Devicelog { Id = "2", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(2), Humidity = 60 }
+        );
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = today, EndDate = today.AddDays(1) };
+        var result = _repository.GetDailyAverages(dto);
+
+        result.Should().ContainSingle()
+            .Which.Humidity.Should().BeApproximately(50, 0.1m);
+    }
+
+    [Test]
+    public void GetDailyAverages_UnitShouldBeCelsius()
+    {
+        var today = DateTime.UtcNow.Date;
+        _context.Devicelogs.Add(new Devicelog
+        {
+            Id = "1",
+            Deviceid = "dev1",
+            Unit = "Celsius",
+            Timestamp = today,
+            Temperature = 20,
+            Humidity = 50,
+            Pressure = 1010,
+            Airquality = 2
+        });
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = today, EndDate = today.AddDays(1) };
+        var result = _repository.GetDailyAverages(dto);
+
+        result.Should().ContainSingle().Which.Unit.Should().Be("Celsius");
+    }
+
+
+    
 }
