@@ -243,6 +243,83 @@ public class CleanAirRepositoryTests
         result.Should().ContainSingle().Which.Unit.Should().Be("Celsius");
     }
 
+    [Test]
+    public void GetDailyAverages_OrderShouldNotAffectAverages()
+    {
+        var today = DateTime.UtcNow.Date;
+        _context.Devicelogs.AddRange(
+            new Devicelog { Id = "1", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(2), Temperature = 20, Humidity = 40, Pressure = 1010, Airquality = 1 },
+            new Devicelog { Id = "2", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(1), Temperature = 30, Humidity = 60, Pressure = 1020, Airquality = 3 }
+        );
+        _context.SaveChanges();
+
+        var range = new TimeRangeDto { StartDate = today, EndDate = today.AddDays(1) };
+
+        var result = _repository.GetDailyAverages(range);
+
+        result.Should().HaveCount(1);
+
+        // Average of 20 and 30 = 25
+        result[0].Temperature.Should().BeInRange(24.9m, 25.1m);
+    }
+
+    
+    [Test]
+    public void GetDailyAverages_PressureShouldUseAverage_NotMin()
+    {
+        var today = DateTime.UtcNow.Date;
+        _context.Devicelogs.AddRange(
+            new Devicelog { Id = "1", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(1), Pressure = 1000 },
+            new Devicelog { Id = "2", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(2), Pressure = 1020 }
+        );
+        _context.SaveChanges();
+
+        var range = new TimeRangeDto { StartDate = today, EndDate = today.AddDays(1) };
+
+        var result = _repository.GetDailyAverages(range);
+
+        result.Should().ContainSingle()
+            .Which.Pressure.Should().BeApproximately(1010, 0.1m);
+    }
+
+
+    [Test]
+    public void GetLogsForToday_OutOfRangeTimestamps_ShouldNotBeIncluded()
+    {
+        var now = DateTime.UtcNow;
+        var log = new Devicelog { Id = "1", Deviceid = "dev", Unit = "C", Timestamp = now.AddHours(-2) };
+        _context.Devicelogs.Add(log);
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = now.AddHours(-1), EndDate = now };
+
+        var result = _repository.GetLogsForToday(dto);
+
+        result.Should().BeEmpty(); 
+    }
+
+    [Test]
+    public void GetLogsForToday_BoundariesAndOrder_ShouldBeCorrect()
+    {
+        var now = DateTime.UtcNow;
+        var logs = new[]
+        {
+            new Devicelog { Id = "1", Deviceid = "dev", Unit = "C", Timestamp = now.AddHours(-1) },
+            new Devicelog { Id = "2", Deviceid = "dev", Unit = "C", Timestamp = now }
+        };
+        _context.Devicelogs.AddRange(logs);
+        _context.SaveChanges();
+
+        var dto = new TimeRangeDto { StartDate = now.AddHours(-1), EndDate = now };
+        var result = _repository.GetLogsForToday(dto);
+
+        result.Should().HaveCount(2);
+        result[0].Id.Should().Be("1");
+        result[1].Id.Should().Be("2");
+    }
+
+
+    
 
     
 }
