@@ -8,7 +8,11 @@
     ],
     "mutate": [
       "**/*.cs",
-      "!../Infrastructure.Postgres.Scaffolding/*.cs"
+      "!../Infrastructure.Postgres.Scaffolding/*.cs",
+      "!**/Interfaces",
+      "!**/Models",
+      "!AppOptionsExtensions.cs",
+      "!Extensions.cs"
     ],
     "thresholds": {
       "high": 80,
