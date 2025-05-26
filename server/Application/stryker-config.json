@@ -8,9 +8,9 @@
     ],
     "mutate": [
       "**/*.cs",
-      "!../Infrastructure.Postgres.Scaffolding/*.cs",
-      "!**/Interfaces",
-      "!**/Models",
+      "!../../Infrastructure.Postgres.Scaffolding/*.cs",
+      "!**/Interfaces/*.cs",
+      "!**/Models/*.cs",
       "!AppOptionsExtensions.cs",
       "!Extensions.cs"
     ],
