@@ -330,9 +330,23 @@ public async Task BroadcastToTopic_ShouldSendCamelCaseJsonAndLogDebug()
     StringAssert.DoesNotContain("AlertLevel", capturedJson);
     StringAssert.DoesNotContain("SensorId", capturedJson);
 
-    // Assert debug log happened (kills mutant #2 and #3)
+    // Assert debug log happened
     Assert.IsTrue(logCalled, "Expected LogDebug to be called after sending message.");
 }
 
-    
+[Test]
+public void GetSocketFromClientId_ShouldThrow_WithDetailedMessage_IfClientNotFound()
+{
+    // Arrange
+    var missingClientId = "ghost-client";
+
+    // Act
+    var ex = Assert.Throws<Exception>(() => _manager.GetSocketFromClientId(missingClientId));
+
+    // Assert
+    StringAssert.Contains("Could not find socket for clientId", ex!.Message);
+    StringAssert.Contains(missingClientId, ex.Message);
+}
+
+
 }

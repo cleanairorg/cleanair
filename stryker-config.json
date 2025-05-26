@@ -1,0 +1,16 @@
+﻿{
+  "mutate": [
+    "!**/Infrastructure/Postgres/Scaffolding/*.cs",
+    "!**/Infrastructure/Migrations/*.cs"
+  ],
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 80
+  },
+  "reporters": [
+    "html",
+    "progress"
+  ],
+  "coverageAnalysis": "perTest"
+}
