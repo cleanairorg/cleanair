@@ -1,5 +1,4 @@
-﻿using Application.Interfaces;
-using Application.Services;
+﻿using Application.Services;
 using Application.Models.Dtos.MqttSubscriptionDto;
 using Application.Models.Dtos.BroadcastModels;
 using Application.Models;
@@ -7,13 +6,8 @@ using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.MQTT;
 using Application.Interfaces.Infrastructure.Websocket;
 using Core.Domain.Entities;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Application.Interfaces.Infrastructure.Logging;
 using Application.Models.Dtos.RestDtos;
 
@@ -202,7 +196,7 @@ namespace Application.Tests.Services
             var ex = Assert.Throws<InvalidOperationException>(() => _service.GetLogsForToday(dto));
             Assert.That(ex.Message, Is.EqualTo("Repo error"));
 
-            // ✅ Verify the logger was called with both arguments
+            // Verify the logger was called with both arguments
             _loggerMock.Verify(x => x.LogError(
                 It.Is<string>(msg => msg.Contains("Error in GetLogsForToday")),
                 It.IsAny<Exception?>()), Times.Once);
@@ -270,8 +264,6 @@ namespace Application.Tests.Services
             var ex = Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(dto));
             Assert.That(ex.Message, Is.EqualTo("StartDate cannot be after EndDate."));
         }
-
-        
 
     }
  }
