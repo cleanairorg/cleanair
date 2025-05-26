@@ -16,30 +16,30 @@ namespace Application.Tests.Services
     [TestFixture]
     public class CleanAirServiceTests
     {
-		private Mock<IOptionsMonitor<AppOptions>> _optionsMonitorMock;
+        private Mock<IOptionsMonitor<AppOptions>> _optionsMonitorMock;
         private Mock<ILoggingService> _loggerMock;
-		private Mock<ICleanAirRepository> _repositoryMock;
-		private Mock<IMqttPublisher> _mqttPublisherMock;
-		private Mock<IConnectionManager> _connectionManagerMock;
-		private CleanAirService _service;
+        private Mock<ICleanAirRepository> _repositoryMock;
+        private Mock<IMqttPublisher> _mqttPublisherMock;
+        private Mock<IConnectionManager> _connectionManagerMock;
+        private CleanAirService _service;
 
         [SetUp]
         public void Setup()
         {
-			_optionsMonitorMock = new Mock<IOptionsMonitor<AppOptions>>();
+            _optionsMonitorMock = new Mock<IOptionsMonitor<AppOptions>>();
             _repositoryMock = new Mock<ICleanAirRepository>();
             _connectionManagerMock = new Mock<IConnectionManager>();
             _loggerMock = new Mock<ILoggingService>();
-			_mqttPublisherMock = new Mock<IMqttPublisher>();
+            _mqttPublisherMock = new Mock<IMqttPublisher>();
 
             _service = new CleanAirService(
-				_optionsMonitorMock.Object,
-				_loggerMock.Object,
+                _optionsMonitorMock.Object,
+                _loggerMock.Object,
                 _repositoryMock.Object,
-				_mqttPublisherMock.Object,
+                _mqttPublisherMock.Object,
                 _connectionManagerMock.Object);
         }
-        
+
         [Test]
         public async Task AddToDbAndBroadcast_DtoIsNull_ShouldLogWarningAndDoNothing()
         {
@@ -56,8 +56,8 @@ namespace Application.Tests.Services
             // Ensure nothing was broadcasted
             _connectionManagerMock.Verify(c => c.BroadcastToTopic(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
-        
-        
+
+
         [Test]
         public async Task AddToDbAndBroadcast_ValidDto_ShouldAddToRepoAndBroadcast()
         {
@@ -70,14 +70,14 @@ namespace Application.Tests.Services
                 Pressure = 1013.3f,
                 AirQuality = 1
             };
-        
+
             var recentLog = new Devicelog { Id = "log1" };
-        
+
             _repositoryMock.Setup(r => r.GetLatestLogs()).Returns(recentLog);
-        
+
             // Act
             await _service.AddToDbAndBroadcast(dto);
-        
+
             // Assert - Verify data is added to db
             _repositoryMock.Verify(r => r.AddDeviceLog(It.Is<Devicelog>(log =>
                 log.Deviceid == dto.DeviceId &&
@@ -86,13 +86,13 @@ namespace Application.Tests.Services
                 log.Pressure == (decimal)dto.Pressure &&
                 log.Airquality == (int)dto.AirQuality
             )), Times.Once);
-        
+
             // Verify broadcast of latest measurement
             _connectionManagerMock.Verify(c => c.BroadcastToTopic(
                 StringConstants.Dashboard,
                 It.Is<ServerBroadcastsLatestReqestedMeasurement>(b => b.LatestMeasurement == recentLog)
             ), Times.Once);
-        
+
             // Verify logging
             _loggerMock.Verify(x => x.LogInformation(
                 It.Is<string>(msg => msg.Contains("Added DeviceLog to Database"))), Times.Once);
@@ -101,7 +101,7 @@ namespace Application.Tests.Services
             )), Times.Once);
 
         }
-        
+
         [Test]
         public void GetLogsForToday_ValidRange_ShouldReturnLogs()
         {
@@ -144,8 +144,8 @@ namespace Application.Tests.Services
             var ex = Assert.Throws<ArgumentException>(() => _service.GetLogsForToday(dto));
             Assert.That(ex.Message, Is.EqualTo("StartDate cannot be after EndDate."));
         }
-        
-        
+
+
         [Test]
         public void GetDailyAverages_InvalidRange_ShouldThrowArgumentException()
         {
@@ -157,7 +157,7 @@ namespace Application.Tests.Services
             Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(equal));
         }
 
-        
+
         [Test]
         public void GetLogsForToday_NoLogs_ShouldReturnEmptyList()
         {
@@ -222,8 +222,8 @@ namespace Application.Tests.Services
             Assert.That(result, Is.Empty);
             _repositoryMock.Verify(r => r.GetDailyAverages(dto), Times.Once);
         }
-        
-        
+
+
         [Test]
         public void GetDailyAverages_ValidRange_ShouldLogDto()
         {
@@ -248,7 +248,7 @@ namespace Application.Tests.Services
 
             Assert.That(result, Is.EqualTo(resultList));
         }
-        
+
         [Test]
         public void GetDailyAverages_StartDateEqualsEndDate_ShouldThrowArgumentException()
         {
@@ -264,7 +264,7 @@ namespace Application.Tests.Services
             var ex = Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(dto));
             Assert.That(ex.Message, Is.EqualTo("StartDate cannot be after EndDate."));
         }
-        
+
         [Test]
         public void GetDailyAverages_ShouldLogReturnedRecordCount()
         {
@@ -313,7 +313,7 @@ namespace Application.Tests.Services
             // Act & Assert
             Assert.DoesNotThrow(() => _service.GetLogsForToday(dto));
         }
-        
+
         [Test]
         public void GetLogsForToday_ShouldLogInputDto()
         {
@@ -340,5 +340,52 @@ namespace Application.Tests.Services
             StringAssert.Contains("StartDate", inputLog); // confirms serialized DTO content
         }
         
+
+        [Test]
+        public async Task GetMeasurementNowAndBroadcast_ShouldPublishAndBroadcastLatestMeasurement()
+        {
+            // Arrange
+            var latestLog = new Devicelog { Id = "log123" };
+            _repositoryMock.Setup(r => r.GetLatestLogs()).Returns(latestLog);
+
+            object? publishedDto = null;
+            string? publishedTopic = null;
+
+            _mqttPublisherMock
+                .Setup(p => p.Publish(It.IsAny<object>(), It.IsAny<string>()))
+                .Callback<object, string>((dto, topic) =>
+                {
+                    publishedDto = dto;
+                    publishedTopic = topic;
+                })
+                .Returns(Task.CompletedTask);
+
+            ServerBroadcastsLatestReqestedMeasurement? broadcastSent = null;
+
+            _connectionManagerMock
+                .Setup(c => c.BroadcastToTopic(
+                    It.Is<string>(s => s == StringConstants.Dashboard),
+                    It.IsAny<ServerBroadcastsLatestReqestedMeasurement>()))
+                .Callback<string, object>((_, msg) =>
+                {
+                    broadcastSent = msg as ServerBroadcastsLatestReqestedMeasurement;
+                })
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await _service.GetMeasurementNowAndBroadcast();
+
+            // Assert: MQTT publish call
+            Assert.That(publishedTopic, Is.EqualTo("cleanair/measurement/now"));
+            Assert.That(publishedDto, Is.EqualTo("1"));
+            _mqttPublisherMock.Verify(p => p.Publish("1", "cleanair/measurement/now"), Times.Once);
+
+            // Assert: WebSocket broadcast
+            Assert.IsNotNull(broadcastSent, "Expected broadcast to be sent");
+            Assert.That(broadcastSent!.LatestMeasurement, Is.EqualTo(latestLog));
+            _connectionManagerMock.Verify(c => c.BroadcastToTopic(StringConstants.Dashboard,
+                It.Is<ServerBroadcastsLatestReqestedMeasurement>(b => b.LatestMeasurement == latestLog)), Times.Once);
+        }
+
+        }
     }
- }
