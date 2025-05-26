@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+
 namespace Infrastructure.Postgres.Scaffolding;
 
 public partial class MyDbContext : DbContext
@@ -29,7 +30,6 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Humidity)
                 .HasPrecision(4, 2)
                 .HasColumnName("humidity");
-            entity.Property(e => e.Interval).HasColumnName("interval");
             entity.Property(e => e.Pressure)
                 .HasPrecision(6, 2)
                 .HasColumnName("pressure");
