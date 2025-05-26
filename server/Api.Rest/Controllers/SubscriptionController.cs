@@ -16,8 +16,7 @@ public class SubscriptionController(
     public const string SubscriptionRoute = ControllerRoute + nameof(Subscribe);
 
     public const string UnsubscribeRoute = ControllerRoute + nameof(Unsubscribe);
-
-    public const string ExampleBroadcastRoute = ControllerRoute + nameof(ExampleBroadcast);
+    
 
     [HttpPost]
     [Route(SubscriptionRoute)]
@@ -37,17 +36,4 @@ public class SubscriptionController(
         return Ok();
     }
 
-    [HttpPost]
-    [Route(ExampleBroadcastRoute)]
-    public async Task<ActionResult> ExampleBroadcast([FromBody] ExampleBroadcastDto dto)
-    {
-        await connectionManager.BroadcastToTopic("ExampleTopic", dto);
-        return Ok();
-    }
-}
-
-public class ExampleBroadcastDto
-{
-    public string eventType { get; set; } = nameof(ExampleBroadcastDto);
-    public string Message { get; set; }
 }
