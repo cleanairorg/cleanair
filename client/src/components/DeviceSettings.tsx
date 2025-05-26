@@ -74,7 +74,19 @@ export default function DeviceSettings() {
         return `${min} minute(s)`;
     }
 
-
+    const handleDeleteData = () => {
+        if (!window.confirm("Are you sure you want to delete all data? This cannot be undone.")) {
+            return;
+        }
+        cleanAirClient.deleteData(jwt).then(() => {
+            toast.success("All data deleted successfully");
+        }).catch(err => {
+            toast.error("Error deleting data");
+            console.error(err);
+        });
+    };
+    
+    
     return (
         <section className="app device-settings">
             <h2 className="section-title">DEVICE SETTINGS</h2>
@@ -112,7 +124,7 @@ export default function DeviceSettings() {
                 }}>
                     New Evaluation Now
                 </button>
-                <button className="app delete-button">DELETE DATA</button>
+                <button className="app delete-button" onClick={handleDeleteData}>DELETE DATA</button>
             </>
             )}
         </section>

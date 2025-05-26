@@ -70,11 +70,16 @@ public class CleanAirController(
     
     [HttpDelete]
     [Route(DeleteDataRoute)]
-    public async Task<ActionResult> DeleteData([FromHeader]string authorization)
+    public async Task<ActionResult> DeleteData([FromHeader] string authorization)
     {
-        var jwt = securityService.VerifyJwtOrThrow(authorization);
-        
-        await cleanAirService.DeleteDataAndBroadcast(jwt);
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+
+        if (claims.Role != "admin")
+        {
+            return Unauthorized("You are not authorized to delete data");
+        }
+
+        await cleanAirService.DeleteDataAndBroadcast(claims);
 
         return Ok();
     }

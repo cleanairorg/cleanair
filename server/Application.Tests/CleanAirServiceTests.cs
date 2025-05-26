@@ -386,6 +386,30 @@ namespace Application.Tests.Services
             _connectionManagerMock.Verify(c => c.BroadcastToTopic(StringConstants.Dashboard,
                 It.Is<ServerBroadcastsLatestReqestedMeasurement>(b => b.LatestMeasurement == latestLog)), Times.Once);
         }
+        [Test]
+        public async Task DeleteDataAndBroadcast_ShouldDeleteDataAndBroadcast()
+        {
+            // Arrange
+            var jwt = new JwtClaims
+            {
+                Id = "admin123",
+                Role = "admin",
+                Email = "admin@example.com",
+                Exp = ((DateTimeOffset)DateTime.UtcNow.AddHours(1)).ToUnixTimeSeconds().ToString()
+            };
+
+            // Act
+            await _service.DeleteDataAndBroadcast(jwt);
+
+            // Assert
+            _repositoryMock.Verify(r => r.DeleteAllData(), Times.Once);
+
+            _connectionManagerMock.Verify(cm =>
+                cm.BroadcastToTopic(
+                    StringConstants.Dashboard,
+                    It.Is<AdminHasDeletedData>(data => data != null)), Times.Once);
+        }
 
         }
+    
     }
