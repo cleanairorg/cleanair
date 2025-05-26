@@ -45,3 +45,28 @@
     height: 40px;
     margin-top: auto;
 }
+
+.interval-container{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.interval-container .fieldset {
+    margin: 0;
+    flex: 1.5;
+}
+
+.interval-container .select {
+    width: 100%;
+    height: 40px;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.interval-button {
+    height: 40px;
+    white-space: nowrap;
+    flex: 1;
+}

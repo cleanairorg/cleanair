@@ -38,7 +38,8 @@ public class CleanAirService(
             Humidity = (decimal)dto.Humidity,
             Pressure = (decimal)dto.Pressure,
             Airquality = (int)dto.AirQuality,
-            Unit = "Celsius"
+            Unit = "Celsius",
+            Interval = dto.Interval
         };
         logger.LogInformation("CleanAirService: AddToDbAndBroadcast, Added DeviceLog to Database");
         cleanAirRepository.AddDeviceLog(deviceLog);
@@ -70,6 +71,18 @@ public class CleanAirService(
         return Task.CompletedTask;
     }
 
+    public Task UpdateDeviceIntervalAndBroadcast(AdminChangesDeviceIntervalDto dto)
+    {
+        mqttPublisher.Publish(dto.Interval, StringConstants.ChangeInterval);
+
+        var broadcast = new ServerBroadcastsIntervalChange()
+        {
+            Interval = dto.Interval
+        };
+        connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
+        return Task.CompletedTask;
+    }
+
     public async Task DeleteDataAndBroadcast(JwtClaims jwt)
     {
         await cleanAirRepository.DeleteAllData();
@@ -78,7 +91,7 @@ public class CleanAirService(
 
     public async Task GetMeasurementNowAndBroadcast()
     {
-        await mqttPublisher.Publish("1", "cleanair/measurement/now");
+        await mqttPublisher.Publish("1", StringConstants.GetMeasurementsNow);
 
         var recentLogs = cleanAirRepository.GetLatestLogs();
         var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
