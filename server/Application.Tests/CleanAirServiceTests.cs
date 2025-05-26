@@ -297,7 +297,49 @@ namespace Application.Tests.Services
             StringAssert.Contains("2", capturedLog);
         }
 
+        [Test]
+        public void GetLogsForToday_StartDateEqualsEndDate_ShouldNotThrow()
+        {
+            // Arrange
+            var now = DateTime.UtcNow;
+            var dto = new TimeRangeDto
+            {
+                StartDate = now,
+                EndDate = now
+            };
+
+            _repositoryMock.Setup(r => r.GetLogsForToday(dto)).Returns(new List<Devicelog>());
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _service.GetLogsForToday(dto));
+        }
         
+        [Test]
+        public void GetLogsForToday_ShouldLogInputDto()
+        {
+            // Arrange
+            var dto = new TimeRangeDto
+            {
+                StartDate = DateTime.UtcNow.AddHours(-2),
+                EndDate = DateTime.UtcNow
+            };
+
+            _repositoryMock.Setup(r => r.GetLogsForToday(dto)).Returns(new List<Devicelog>());
+
+            string? capturedLog = null;
+            _loggerMock.Setup(x => x.LogInformation(It.IsAny<string>()))
+                .Callback<string>(msg => capturedLog = msg);
+
+            // Act
+            _service.GetLogsForToday(dto);
+
+            // Assert
+            Assert.IsNotNull(capturedLog);
+            StringAssert.Contains("GetLogsForToday called with DTO", capturedLog);
+            StringAssert.Contains("StartDate", capturedLog); // confirms JSON content
+        }
+
+
 
     }
  }
