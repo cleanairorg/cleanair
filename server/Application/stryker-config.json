@@ -20,8 +20,6 @@
     "reporters": [
       "html",
       "progress"
-    ],
-    "coverage-analysis": "perTest",
-    "mutation-level": "Standard"
+    ]
   }
 }
