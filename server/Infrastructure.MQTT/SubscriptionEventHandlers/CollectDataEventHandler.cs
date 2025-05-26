@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using Application.Interfaces;
+using Application.Models;
 using Application.Models.Dtos.MqttSubscriptionDto;
 using HiveMQtt.Client.Events;
 using HiveMQtt.MQTT5.Types;
@@ -9,7 +10,7 @@ namespace Infrastructure.MQTT.SubscriptionEventHandlers;
 
 public class CollectDataEventHandler(ICleanAirService cleanAirService) : IMqttMessageHandler
 {
-    public string TopicFilter { get; } = "cleanair/data";
+    public string TopicFilter { get; } = StringConstants.CollectData;
     public QualityOfService QoS { get; } = QualityOfService.AtLeastOnceDelivery;
     public void Handle(object? sender, OnMessageReceivedEventArgs args)
     {
