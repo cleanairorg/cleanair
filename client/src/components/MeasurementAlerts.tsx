@@ -1,6 +1,9 @@
 ﻿import '../css/MeasurementAlerts.css';
 
 export default function MeasurementAlerts() {
+    
+    
+    
     return (
         <aside className="app measurement-alerts">
             <h2 className="section-title">MEASUREMENTS ALERTS</h2>

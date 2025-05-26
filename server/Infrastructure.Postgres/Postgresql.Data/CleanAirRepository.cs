@@ -18,10 +18,9 @@ public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
         return ctx.Devicelogs.OrderByDescending(x => x.Timestamp).FirstOrDefault()!;
     }
 
-    public async Task<Devicelog?> GetCurrentLogByDeviceIdAsync(string deviceId)
+    public async Task<Devicelog?> GetCurrentLogAsync()
     {
         return await ctx.Devicelogs
-            .Where(d => d.Deviceid == deviceId)
             .OrderByDescending(d => d.Timestamp)
             .FirstOrDefaultAsync();
     }

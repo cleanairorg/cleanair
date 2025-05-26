@@ -7,7 +7,7 @@ public interface ICleanAirRepository
 {
     List<Devicelog> GetRecentLogs();
     Devicelog GetLatestLogs();
-    Task<Devicelog?> GetCurrentLogByDeviceIdAsync(string deviceId);
+    Task<Devicelog?> GetCurrentLogAsync();
     Devicelog AddDeviceLog(Devicelog deviceLog);
     Task DeleteAllData();
     List<Devicelog> GetDailyAverages(TimeRangeDto dto);

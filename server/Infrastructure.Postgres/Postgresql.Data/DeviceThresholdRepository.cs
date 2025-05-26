@@ -7,19 +7,15 @@ namespace Infrastructure.Postgres.Postgresql.Data;
 
 public class DeviceThresholdRepository (MyDbContext context) : IDeviceThresholdRepository
 {
-    public async Task<List<DeviceThreshold>> GetByDeviceIdAsync(string deviceId)
+    public async Task<List<DeviceThreshold>> GetAllAsync()
     {
-        return await context.DeviceThresholds
-            .Where(t => t.Deviceid == deviceId)
-            .ToListAsync();
+        return await context.DeviceThresholds.ToListAsync();
     }
 
     public async Task UpdateThresholdAsync(DeviceThreshold threshold)
     {
         var existing = await context.DeviceThresholds
-            .FirstOrDefaultAsync(t => 
-                t.Deviceid == threshold.Deviceid && 
-                t.Metric == threshold.Metric);
+            .FirstOrDefaultAsync(t => t.Metric == threshold.Metric);
 
         if (existing is null)
         {
@@ -33,6 +29,7 @@ public class DeviceThresholdRepository (MyDbContext context) : IDeviceThresholdR
             existing.GoodMin = threshold.GoodMin;
             existing.GoodMax = threshold.GoodMax;
         }
+
         await context.SaveChangesAsync();
     }
 }

@@ -528,7 +528,7 @@
           }
         ],
         "requestBody": {
-          "x-name": "updateThresholdsDto",
+          "x-name": "dto",
           "content": {
             "application/json": {
               "schema": {
@@ -562,20 +562,12 @@
         "operationId": "Threshold_GetThresholds",
         "parameters": [
           {
-            "name": "deviceId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
             "name": "authorization",
             "in": "header",
             "schema": {
               "type": "string"
             },
-            "x-position": 2
+            "x-position": 1
           }
         ],
         "responses": {
@@ -759,9 +751,6 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "deviceId": {
-            "type": "string"
-          },
           "thresholds": {
             "type": "array",
             "items": {
@@ -805,9 +794,6 @@
             "additionalProperties": false,
             "properties": {
               "eventType": {
-                "type": "string"
-              },
-              "deviceId": {
                 "type": "string"
               },
               "updatedThresholds": {

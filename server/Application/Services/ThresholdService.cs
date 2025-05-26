@@ -11,24 +11,19 @@ namespace Application.Services;
 
 public class ThresholdService(
     IDeviceThresholdRepository thresholdRepository,
-    ICleanAirRepository cleanairRepository,
+    ICleanAirRepository cleanAirRepository,
     IConnectionManager connectionManager,
     IThresholdEvaluator evaluator) : IThresholdService
 {
-    public async Task UpdateThresholdsAndBroadcastAsync(AdminUpdatesThresholdsDto adminUpdatesThresholdsDto)
+    public async Task UpdateThresholdsAndBroadcastAsync(AdminUpdatesThresholdsDto dto)
     {
-        var currentLog =
-            await cleanairRepository.GetCurrentLogByDeviceIdAsync(adminUpdatesThresholdsDto.DeviceId);
-        if (currentLog == null) throw new Exception("No current log found for device");
+        var currentLog = await cleanAirRepository.GetCurrentLogAsync();
+        if (currentLog is null) throw new Exception("No current log for device");
 
-        var updatedThresholds = new List<DeviceThreshold>();
-
-
-        foreach (var t in adminUpdatesThresholdsDto.Thresholds)
+        foreach (var t in dto.Thresholds)
         {
             var threshold = new DeviceThreshold
             {
-                Deviceid = adminUpdatesThresholdsDto.DeviceId,
                 Metric = t.Metric,
                 WarnMin = t.WarnMin,
                 WarnMax = t.WarnMax,
@@ -37,49 +32,39 @@ public class ThresholdService(
             };
 
             await thresholdRepository.UpdateThresholdAsync(threshold);
-            updatedThresholds.Add(threshold);
         }
 
-        var evalations = EvaluateThresholdsAgainstLog(currentLog, updatedThresholds);
-
-        await connectionManager.BroadcastToTopic(StringConstants.Dashboard, new ThresholdsBroadcastDto
-        {
-            DeviceId = adminUpdatesThresholdsDto.DeviceId,
-            UpdatedThresholds = adminUpdatesThresholdsDto.Thresholds,
-            Evaluations = evalations
-        });
+        var updatedBroadcast = await GetThresholdsWithEvaluationsAsync();
+        await connectionManager.BroadcastToTopic(StringConstants.Dashboard, updatedBroadcast);
     }
 
-    public async Task<ThresholdsBroadcastDto> GetThresholdsWithEvaluationAsync(string deviceId)
+    public async Task<ThresholdsBroadcastDto> GetThresholdsWithEvaluationsAsync()
     {
-        var thresholds = await thresholdRepository.GetByDeviceIdAsync(deviceId);
-        var log = await cleanairRepository.GetCurrentLogByDeviceIdAsync(deviceId);
-        if (log is null) throw new Exception("No current log found for device");
-        
-        var evaluations = EvaluateThresholdsAgainstLog(log, thresholds);
+        var thresholds = await thresholdRepository.GetAllAsync();
+        var currentLog = await cleanAirRepository.GetCurrentLogAsync();
+        if (currentLog is null) throw new Exception("No log found for evaluation");
+
+        var evaluations = EvaluateThresholdsAgainstLog(currentLog, thresholds);
 
         return new ThresholdsBroadcastDto
         {
-            DeviceId = deviceId,
             UpdatedThresholds = thresholds.Select(t => new ThresholdDto
             {
                 Metric = t.Metric,
                 WarnMin = t.WarnMin,
                 WarnMax = t.WarnMax,
                 GoodMin = t.GoodMin,
-                GoodMax = t.GoodMax,
+                GoodMax = t.GoodMax
             }).ToList(),
             Evaluations = evaluations
         };
-
-
     }
 
     private List<ThresholdEvaluationResult> EvaluateThresholdsAgainstLog(
         Devicelog log,
         IEnumerable<DeviceThreshold> thresholds)
     {
-        var result = new List<ThresholdEvaluationResult>();
+        var results = new List<ThresholdEvaluationResult>();
 
         foreach (var threshold in thresholds)
         {
@@ -88,13 +73,13 @@ public class ThresholdService(
                 "temperature" => log.Temperature,
                 "humidity" => log.Humidity,
                 "pressure" => log.Pressure,
-                "airguality" => log.Airquality,
-                _ => throw new Exception("Unknown metric " + threshold.Metric)
+                "airquality" => (decimal)log.Airquality,
+                _ => throw new Exception("Unknown metric: " + threshold.Metric)
             };
-            
-            result.Add(evaluator.Evaluate(threshold.Metric, value, threshold));
+
+            results.Add(evaluator.Evaluate(threshold.Metric, value, threshold));
         }
-        return result;
+
+        return results;
     }
-    
 }

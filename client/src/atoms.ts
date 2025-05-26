@@ -15,4 +15,4 @@ export const UserInfoAtom = atom<AuthGetUserInfoDto | null>(null);
 export const ThresholdsAtom = atom<ThresholdDto[]>([]);
 
 // To use for evaluation, got current device values and current status
-export const ThresholdEvaluationsAtom = atom<ThresholdEvaluationResult[]>([]);
+export const EvaluationsAtom  = atom<ThresholdEvaluationResult[]>([]);

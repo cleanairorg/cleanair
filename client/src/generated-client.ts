@@ -645,11 +645,11 @@ export class ThresholdClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    updateThresholds(updateThresholdsDto: AdminUpdatesThresholdsDto, authorization: string | undefined): Promise<FileResponse> {
+    updateThresholds(dto: AdminUpdatesThresholdsDto, authorization: string | undefined): Promise<FileResponse> {
         let url_ = this.baseUrl + "/UpdateThresholds";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(updateThresholdsDto);
+        const content_ = JSON.stringify(dto);
 
         let options_: RequestInit = {
             body: content_,
@@ -688,12 +688,8 @@ export class ThresholdClient {
         return Promise.resolve<FileResponse>(null as any);
     }
 
-    getThresholds(deviceId: string | undefined, authorization: string | undefined): Promise<ThresholdsBroadcastDto> {
-        let url_ = this.baseUrl + "/GetThresholds?";
-        if (deviceId === null)
-            throw new Error("The parameter 'deviceId' cannot be null.");
-        else if (deviceId !== undefined)
-            url_ += "deviceId=" + encodeURIComponent("" + deviceId) + "&";
+    getThresholds(authorization: string | undefined): Promise<ThresholdsBroadcastDto> {
+        let url_ = this.baseUrl + "/GetThresholds";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -781,7 +777,6 @@ export interface ExampleBroadcastDto {
 }
 
 export interface AdminUpdatesThresholdsDto {
-    deviceId?: string;
     thresholds?: ThresholdDto[];
 }
 
@@ -799,7 +794,6 @@ export interface ApplicationBaseDto {
 
 export interface ThresholdsBroadcastDto extends ApplicationBaseDto {
     eventType?: string;
-    deviceId?: string;
     updatedThresholds?: ThresholdDto[];
     evaluations?: ThresholdEvaluationResult[];
 }

@@ -20,29 +20,26 @@ public class ThresholdController(
     [HttpPost]
     [Route(UpdateThresholdsRoute)]
     public async Task<IActionResult> UpdateThresholds(
-        [FromBody] AdminUpdatesThresholdsDto updateThresholdsDto, 
+        [FromBody] AdminUpdatesThresholdsDto dto,
         [FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-
-        /*if (claims.Role != Constants.AdminRole)
+        if (claims.Role != "admin")
         {
-            return Forbid();
-        }*/
-        
-        await thresholdService.UpdateThresholdsAndBroadcastAsync(updateThresholdsDto);
+            return Unauthorized("You are not authorized to access this route");
+        }
+
+        await thresholdService.UpdateThresholdsAndBroadcastAsync(dto);
         return Ok();
     }
 
     [HttpGet]
     [Route(GetThresholdsRoute)]
     public async Task<ActionResult<ThresholdsBroadcastDto>> GetThresholds(
-        [FromQuery] string deviceId,
         [FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-    
-        var result = await thresholdService.GetThresholdsWithEvaluationAsync(deviceId);
+        var result = await thresholdService.GetThresholdsWithEvaluationsAsync();
         return Ok(result);
     }
 }

@@ -4,6 +4,6 @@ namespace Application.Interfaces.Infrastructure.Postgres;
 
 public interface IDeviceThresholdRepository
 {
-    Task<List<DeviceThreshold>> GetByDeviceIdAsync(string deviceId);
+    Task<List<DeviceThreshold>> GetAllAsync();
     Task UpdateThresholdAsync(DeviceThreshold threshold);
 }

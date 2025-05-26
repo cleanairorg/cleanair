@@ -7,5 +7,5 @@ namespace Application.Interfaces;
 public interface IThresholdService
 {
     Task UpdateThresholdsAndBroadcastAsync(AdminUpdatesThresholdsDto adminUpdatesThresholdsDto);
-    Task<ThresholdsBroadcastDto> GetThresholdsWithEvaluationAsync(string deviceId);
+    Task<ThresholdsBroadcastDto> GetThresholdsWithEvaluationsAsync();
 }
