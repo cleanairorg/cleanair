@@ -46,9 +46,9 @@ jobs:
       - name: Mutation Tests with Stryker
         continue-on-error: true
         working-directory: ./server/Application
-        run: dotnet stryker
-    
-       
+        run: dotnet stryker --output ../TestResults/StrykerOutput
+
+
       - name: Complete Static Code Analysis
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           
