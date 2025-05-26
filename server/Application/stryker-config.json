@@ -23,8 +23,7 @@
       "html",
       "progress"
     ],
-    "coverageAnalysis": "perTest",
-    "mutation-level": "Standard",
-    "output": "../TestResults/StrykerOutput"
+    "coverage-analysis": "perTest",
+    "mutation-level": "Standard"
   }
 }
