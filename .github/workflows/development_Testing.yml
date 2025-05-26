@@ -45,7 +45,7 @@ jobs:
           
       - name: Mutation Tests with Stryker
         continue-on-error: true
-        run: dotnet stryker --output ./server/TestResults/StrykerOutput
+        run: dotnet stryker --break-at 80 --output ./server/TestResults/StrykerOutput
        
       - name: Complete Static Code Analysis
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

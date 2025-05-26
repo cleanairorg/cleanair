@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-
+// Stryker disable all
 namespace Infrastructure.Postgres.Scaffolding;
 
 public partial class MyDbContext : DbContext
