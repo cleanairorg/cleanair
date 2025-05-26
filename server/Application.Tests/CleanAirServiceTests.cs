@@ -264,6 +264,40 @@ namespace Application.Tests.Services
             var ex = Assert.Throws<ArgumentException>(() => _service.GetDailyAverages(dto));
             Assert.That(ex.Message, Is.EqualTo("StartDate cannot be after EndDate."));
         }
+        
+        [Test]
+        public void GetDailyAverages_ShouldLogReturnedRecordCount()
+        {
+            // Arrange
+            var dto = new TimeRangeDto
+            {
+                StartDate = DateTime.UtcNow.AddDays(-5),
+                EndDate = DateTime.UtcNow
+            };
+
+            var fakeLogs = new List<Devicelog>
+            {
+                new Devicelog { Id = "d1" },
+                new Devicelog { Id = "d2" }
+            };
+
+            _repositoryMock.Setup(r => r.GetDailyAverages(dto)).Returns(fakeLogs);
+
+            string? capturedLog = null;
+            _loggerMock.Setup(x => x.LogInformation(It.IsAny<string>()))
+                .Callback<string>(msg => capturedLog = msg);
+
+            // Act
+            var result = _service.GetDailyAverages(dto);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(fakeLogs));
+            Assert.IsNotNull(capturedLog);
+            StringAssert.Contains("returned", capturedLog);
+            StringAssert.Contains("2", capturedLog);
+        }
+
+        
 
     }
  }
