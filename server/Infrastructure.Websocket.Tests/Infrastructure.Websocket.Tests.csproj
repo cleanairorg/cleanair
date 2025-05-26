@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\server\Infrastructure.Websocket\Infrastructure.Websocket.csproj" />
+      <ProjectReference Include="..\Infrastructure.Websocket\Infrastructure.Websocket.csproj" />
     </ItemGroup>
 
 </Project>

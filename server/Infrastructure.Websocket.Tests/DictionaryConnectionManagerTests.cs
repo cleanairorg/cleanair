@@ -1,11 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using System.Text.Json;
-using Application.Interfaces.Infrastructure.Websocket;
 using Fleck;
-using Infrastructure.Websocket;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Infrastructure.Websocket.Tests;
