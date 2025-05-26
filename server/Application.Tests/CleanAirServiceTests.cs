@@ -326,20 +326,19 @@ namespace Application.Tests.Services
 
             _repositoryMock.Setup(r => r.GetLogsForToday(dto)).Returns(new List<Devicelog>());
 
-            string? capturedLog = null;
+            var logs = new List<string>();
             _loggerMock.Setup(x => x.LogInformation(It.IsAny<string>()))
-                .Callback<string>(msg => capturedLog = msg);
+                .Callback<string>(msg => logs.Add(msg));
 
             // Act
             _service.GetLogsForToday(dto);
 
             // Assert
-            Assert.IsNotNull(capturedLog);
-            StringAssert.Contains("GetLogsForToday called with DTO", capturedLog);
-            StringAssert.Contains("StartDate", capturedLog); // confirms JSON content
+            Assert.That(logs, Is.Not.Empty, "Expected at least one log message");
+            var inputLog = logs.FirstOrDefault(l => l.Contains("called with DTO"));
+            Assert.IsNotNull(inputLog, "Expected a log containing 'called with DTO'");
+            StringAssert.Contains("StartDate", inputLog); // confirms serialized DTO content
         }
-
-
-
+        
     }
  }
