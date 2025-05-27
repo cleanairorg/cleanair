@@ -6,8 +6,11 @@
     ],
     "mutate": [
       "**/*.cs",
-      "!**/Extensions.cs",
-      "!**/Middleware.cs"
+      "!**/Controllers/**",
+      "!**/Extensions/**",
+      "!**/Middleware/**",
+      "!**/*Extensions.cs",
+      "!**/*Middleware.cs"
     ],
     "thresholds": {
       "break": 80
