@@ -8,11 +8,18 @@
       "server/Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
     ],
     "mutate": [
-      "server/Application/**/*.cs",
-      "server/Infrastructure.Websocket/**/*.cs",
-      "server/Api.Rest/**/*.cs",
-      "server/Infrastructure.Postgres/**/*.cs"
+      "server/**/*.cs",
+      "!**/bin/**",
+      "!**/obj/**",
+      "!**/*.Designer.cs",
+      "!**/*Extensions.cs",
+      "!**/Scaffolding/**",
+      "!**/Dtos/**",
+      "!**/Interfaces/**",
+      "!**/Models/**",
+      "!server/Infrastructure.Websocket/DictionaryConnectionManager.cs"
     ],
+
     "coverage-analysis": "off",
     "thresholds": {
       "break": 80

@@ -57,6 +57,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: stryker-report
-          path: ./server/TestResults/StrykerOutput/
+          path: ./TestResults/StrykerOutput/
           
           
