@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Logging;
 using Application.Models.Dtos.SharedDtos;
 using Application.Models.Enums;
 using Core.Domain.Entities;
