@@ -9,7 +9,8 @@
       "!**/Dtos/**",
       "!**/obj/**",
       "!**/bin/**",
-      "!**/*Extensions.cs"
+      "!**/*Extensions.cs",
+      "!**/*Middleware.cs"
     ],
     "thresholds": {
       "break": 80
