@@ -1,2 +1,2 @@
 ﻿ALTER TABLE cleanair.devicelog
-    ADD COLUMN interval integer NOT NULL DEFAULT 15;
+    ADD COLUMN interval integer NOT NULL;
