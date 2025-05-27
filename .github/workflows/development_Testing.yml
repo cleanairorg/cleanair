@@ -46,7 +46,7 @@ jobs:
       - name: Mutation Tests with Stryker
         continue-on-error: true
         working-directory: ./server
-        run: dotnet stryker --output TestResults/StrykerOutput
+        run: dotnet stryker --config-file stryker-config.json --output TestResults/StrykerOutput
 
 
       - name: Complete Static Code Analysis
