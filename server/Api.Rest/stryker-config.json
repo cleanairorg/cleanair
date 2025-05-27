@@ -1,0 +1,18 @@
+﻿{
+  "stryker-config": {
+    "solution": "../../CleanAir.sln",
+    "test-projects": [
+      "Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
+    ],
+    "mutate": [
+      "../Api.Rest/**/*.cs"
+    ],
+    "thresholds": {
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ]
+  }
+}

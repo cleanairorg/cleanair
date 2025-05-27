@@ -1,0 +1,23 @@
+﻿{
+  "stryker-config": {
+    "solution": "../../CleanAir.sln",
+    "test-projects": [
+      "Application.Tests/Application.Tests.csproj"
+    ],
+    "mutate": [
+      "../Application/**/*.cs",
+      "!../Application/**/Interfaces/*.cs",
+      "!../Application/**/Models/*.cs",
+      "!../Application/**/Dtos/*.cs",
+      "!../Application/**/Scaffolding/*.cs",
+      "!../Application/**/*Extensions.cs"
+    ],
+    "thresholds": {
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ]
+  }
+}
