@@ -2,7 +2,7 @@
   "stryker-config": {
     "solution": "../../CleanAir.sln",
     "test-projects": [
-      "../Infrastructure.Websocket/Infrastructure.Websocket.Tests.csproj"
+      "../Infrastructure.Websocket.Tests/Infrastructure.Websocket.Tests.csproj"
     ],
     "mutate": [
       "**/*.cs",

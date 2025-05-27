@@ -2,7 +2,7 @@
   "stryker-config": {
     "solution": "../../CleanAir.sln",
     "test-projects": [
-      "../Infrastructure.Postgres/Infrastructure.Postgres.Tests.csproj"
+      "../Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj"
     ],
     "mutate": [
       "**/*.cs",
