@@ -34,8 +34,7 @@ public class CleanAirControllerTests
             _cleanAirServiceMock.Object,
             _connectionManagerMock.Object,
             _securityServiceMock.Object,
-            _loggerMock.Object,
-            _featureHubRepoMock.Object
+            _loggerMock.Object
         );
     }
 
