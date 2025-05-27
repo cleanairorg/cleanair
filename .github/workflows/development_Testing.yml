@@ -64,13 +64,15 @@ jobs:
       - name: Install Stryker
         run: dotnet tool install -g dotnet-stryker
 
-      - name: Run Mutation Tests for ${{ matrix.project }}
-        working-directory: ${{ matrix.project }}
+      - name: Run Mutation Tests
         continue-on-error: true
+        working-directory: ${{ matrix.project }}
         run: |
           dotnet stryker \
             --break-at 80 \
-            --reporters "['html','progress']"
+            --reporter html \
+            --reporter progress \
+            --output StrykerOutput
 
       - name: Upload Mutation Report
         if: always()
