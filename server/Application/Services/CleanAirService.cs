@@ -72,9 +72,27 @@ public class CleanAirService(
 
     public Devicelog GetLatestDeviceLog()
     {
-        var latestLog = cleanAirRepository.GetLatestLogs();
-
-        return latestLog;
+        try
+        {
+            logger.LogInformation("[CleanAirService] Attempting to get the latest device log");
+            var latestLog = cleanAirRepository.GetLatestLogs();
+            
+            if (latestLog == null)
+            {
+                logger.LogWarning("[CleanAirService] No device logs found");
+            }
+            else
+            {
+                logger.LogInformation($"[CleanAirService] got the latest device log found, LogID: {latestLog.Id}");
+            }
+            
+            return latestLog;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirService] Failed to get the latest log", ex);
+            throw;
+        }
     }
 
 
@@ -122,14 +140,25 @@ public class CleanAirService(
 
     public Task UpdateDeviceIntervalAndBroadcast(AdminChangesDeviceIntervalDto dto)
     {
-        mqttPublisher.Publish(dto.Interval, StringConstants.ChangeInterval);
-
-        var broadcast = new ServerBroadcastsIntervalChange()
+        try
         {
-            Interval = dto.Interval
-        };
-        connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
-        return Task.CompletedTask;
+            logger.LogInformation("[CleanAirService] Updating device interval");
+            mqttPublisher.Publish(dto.Interval, StringConstants.ChangeInterval);
+
+            var broadcast = new ServerBroadcastsIntervalChange()
+            {
+                Interval = dto.Interval
+            };
+            logger.LogInformation($"[CleanAirService] broadcasting interval changes to dashboard");
+            connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
+            logger.LogInformation("[CleanAirService] Updated interval");
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirService] An error occurred while updating device interval", ex);
+            throw;
+        }
     }
 
     public async Task DeleteDataAndBroadcast(JwtClaims jwt)
@@ -149,14 +178,26 @@ public class CleanAirService(
 
     public async Task GetMeasurementNowAndBroadcast()
     {
-        await mqttPublisher.Publish("1", StringConstants.GetMeasurementsNow);
-
-        var recentLogs = cleanAirRepository.GetLatestLogs();
-        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
+        try
         {
-            LatestMeasurement = recentLogs
-        };
-        await connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
+            logger.LogInformation("[CleanAirService] Publishing 'GetMeasurementNowAndBroadcast' message to device");
+            await mqttPublisher.Publish("1", StringConstants.GetMeasurementsNow);
+            
+            logger.LogInformation("[CleanAirService] Getting the latest device logs");
+            var recentLogs = cleanAirRepository.GetLatestLogs();
+            
+            var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
+            {
+                LatestMeasurement = recentLogs
+            };
+            
+            logger.LogInformation("[CleanAirService] Broadcasting the latest measurement to dashboard");
+            await connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirService] An error occured while executing GetMeasurementNowAndBroadcast", ex);
+        }
     }
 }
 

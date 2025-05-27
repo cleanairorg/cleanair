@@ -57,15 +57,29 @@ public class CleanAirController(
         [FromHeader] string authorization, 
         [FromBody] AdminChangesDeviceIntervalDto dto)
     {
-        var claims = securityService.VerifyJwtOrThrow(authorization);
-        if (claims.Role != "admin")
+        try
         {
-            return Unauthorized("You are not authorized to change intervals");
-        }
+            logger.LogInformation("[CleanAirController] AdminChangesDeviceInterval endpoint called");
+            var claims = securityService.VerifyJwtOrThrow(authorization);
+            logger.LogInformation($"[CleanAirController] JWT verified. User Role: {claims.Role}");
+            
+            if (claims.Role != "admin")
+            {
+                logger.LogWarning("[CleanAirController] Unauthorized User access attempt");
+                return Unauthorized("You are not authorized to change intervals");
+            }
 
-        await cleanAirService.UpdateDeviceIntervalAndBroadcast(dto);
-        
-        return Ok();
+            logger.LogInformation("[CleanAirController] Authorized User access attempt");
+            await cleanAirService.UpdateDeviceIntervalAndBroadcast(dto);
+            
+            logger.LogInformation("[CleanAirController] Device interval changed");
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirController] Error occurred in AdminChangesDeviceInterval");
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     [HttpDelete]
@@ -75,7 +89,7 @@ public class CleanAirController(
         logger.LogInformation("[CleanAirController] DeleteData endpoint called");
 
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        logger.LogInformation("[CleanAirController] JWT verified.");
+        logger.LogInformation($"[CleanAirController] JWT verified. User Role: {claims.Role}");
 
         if (claims.Role != "admin")
         {
@@ -92,7 +106,7 @@ public class CleanAirController(
         }
         catch (Exception ex)
         {
-            logger.LogError("[CleanAirController] Failed to delete data.");
+            logger.LogError("[CleanAirController] Failed to delete data.", ex);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -101,24 +115,50 @@ public class CleanAirController(
     [Route(GetMeasurementNowRoute)]
     public async Task<ActionResult> GetMeasurementNow([FromHeader] string authorization)
     {
-        var claims = securityService.VerifyJwtOrThrow(authorization);
-        if (claims.Role != "admin") {
-            return Unauthorized("You are not authorized to access this route");
+        try
+        {
+            logger.LogInformation("[CleanAirController] GetMeasurementNow endpoint called");
+            var claims = securityService.VerifyJwtOrThrow(authorization);
+            if (claims.Role != "admin")
+            {
+                logger.LogWarning("[CleanAirController] Unauthorized User access attempt");
+                return Unauthorized("You are not authorized to access this route");
+            }
+            logger.LogWarning("[CleanAirController] Authorized User access attempt, triggering GetMeasurementNow");
+            await cleanAirService.GetMeasurementNowAndBroadcast();
+            logger.LogWarning("[CleanAirController] Measurement successfully triggered");
+            return Ok();
         }
-        
-        await cleanAirService.GetMeasurementNowAndBroadcast();
-        
-        return Ok();
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirController] Error occurred in GetMeasurementNow", ex);
+            return StatusCode(500, "Internal server error");
+        }
     }
     
     [HttpGet]
     [Route(GetLatestMeasurementRoute)]
     public async Task<ActionResult<Devicelog>> GetLatestMeasurement()
     {
-        
-        var latestLog = cleanAirService.GetLatestDeviceLog();
-        return Ok(latestLog);
-        
+        try
+        {
+            logger.LogInformation("[CleanAirController] GetLatestMeasurement endpoint called");
+            var latestLog = cleanAirService.GetLatestDeviceLog();
+
+            if (latestLog == null)
+            {
+                logger.LogWarning("[CleanAirController] LatestLog is null");
+                return NotFound("No latest log found");
+            }
+
+            logger.LogInformation($"[CleanAirController] Latest log found and retrieved successfully, LogID: {latestLog.Id}");
+            return Ok(latestLog);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirController] Error occurred in GetLatestMeasurement", ex);
+            return StatusCode(500, "Internal server error");
+        }
     }
     
     [HttpPost]
