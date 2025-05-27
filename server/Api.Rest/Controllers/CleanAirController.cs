@@ -39,7 +39,7 @@ public class CleanAirController(
     public async Task<ActionResult<IEnumerable<Devicelog>>> GetLogs([FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
-        var feed = cleanAirService.GetDeviceFeed(claims);
+        var feed =  cleanAirService.GetDeviceFeed(claims);
         return Ok(feed);
     }
 
@@ -77,7 +77,7 @@ public class CleanAirController(
             logger.LogInformation("[CleanAirController] Device interval changed");
             return Ok();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             logger.LogError("[CleanAirController] Error occurred in AdminChangesDeviceInterval");
             return StatusCode(500, "Internal server error");
@@ -171,7 +171,7 @@ public class CleanAirController(
     {
         try
         {
-            var claims = securityService.VerifyJwtOrThrow(authorization);
+            securityService.VerifyJwtOrThrow(authorization);
             logger.LogInformation($"[Controller] GetDailyAverages called with DTO: {JsonSerializer.Serialize(dto)}");
             var result = cleanAirService.GetDailyAverages(dto);
             logger.LogInformation($"[Controller] GetDailyAverages succeeded. Returned {result.Count} entries.");
@@ -194,7 +194,7 @@ public class CleanAirController(
     {
         try
         {
-            var claims = securityService.VerifyJwtOrThrow(authorization);
+            securityService.VerifyJwtOrThrow(authorization);
             logger.LogInformation($"[Controller] GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
 
             // Feature flag check

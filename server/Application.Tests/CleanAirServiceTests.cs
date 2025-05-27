@@ -376,8 +376,12 @@ namespace Application.Tests.Services
             await _service.GetMeasurementNowAndBroadcast();
 
             // Assert: MQTT publish call
-            Assert.That(publishedTopic, Is.EqualTo("cleanair/measurement/now"));
-            Assert.That(publishedDto, Is.EqualTo("1"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(publishedTopic, Is.EqualTo("cleanair/measurement/now"));
+                Assert.That(publishedDto, Is.EqualTo("1"));
+            });
+
             _mqttPublisherMock.Verify(p => p.Publish("1", "cleanair/measurement/now"), Times.Once);
 
             // Assert: WebSocket broadcast

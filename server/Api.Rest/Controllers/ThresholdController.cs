@@ -38,7 +38,7 @@ public class ThresholdController(
     public async Task<ActionResult<ThresholdsBroadcastDto>> GetThresholds(
         [FromHeader] string authorization)
     {
-        var claims = securityService.VerifyJwtOrThrow(authorization);
+        securityService.VerifyJwtOrThrow(authorization);
         var result = await thresholdService.GetThresholdsWithEvaluationsAsync();
         return Ok(result);
     }

@@ -6,27 +6,6 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/test/feature": {
-      "get": {
-        "tags": [
-          "FeatureFlag"
-        ],
-        "operationId": "FeatureFlag_Check",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/auth/Login": {
       "post": {
         "tags": [

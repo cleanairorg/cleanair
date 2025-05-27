@@ -10,16 +10,9 @@ namespace Api.Rest.Controllers;
 public class AuthController(ISecurityService securityService, ILoggingService logger) : ControllerBase
 {
     public const string ControllerRoute = "api/auth/";
-
     public const string LoginRoute = ControllerRoute + nameof(Login);
-
-
     public const string RegisterRoute = ControllerRoute + nameof(Register);
-    
-    
     public const string GetUserInfoRoute = ControllerRoute + nameof(GetUserInfo);
-
-
     public const string SecuredRoute = ControllerRoute + nameof(Secured);
 
 

@@ -85,7 +85,6 @@ public class AuthControllerTests
     {
         var jwt = "valid.jwt.token";
         _controller.HttpContext.Request.Headers["Authorization"] = $"Bearer {jwt}";
-
         _securityServiceMock.Setup(s => s.VerifyJwtOrThrow(jwt));
 
         var result = _controller.Secured();
