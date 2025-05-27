@@ -96,38 +96,37 @@ public class CleanAirService(
     }
 
 
-    public List<Devicelog> GetDailyAverages(TimeRangeDto dto)
+    public List<Devicelog> GetDailyAverages(TimeRangeDto timeRangeDto)
     {
-        if (dto == null)
-            throw new ArgumentNullException(nameof(dto));
-
-        if (dto.StartDate >= dto.EndDate)
+        ArgumentNullException.ThrowIfNull(timeRangeDto);
+        
+        if (timeRangeDto.StartDate >= timeRangeDto.EndDate)
             throw new ArgumentException("StartDate cannot be after EndDate.");
     
-        logger.LogInformation($"[CleanAir Service] GetDailyAverages with DTO: {JsonSerializer.Serialize(dto)}");
-        var result = cleanAirRepository.GetDailyAverages(dto);
+        logger.LogInformation($"[CleanAir Service] GetDailyAverages with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
+        var result = cleanAirRepository.GetDailyAverages(timeRangeDto);
         logger.LogInformation($"[CleanAir Service] GetDailyAverages returned {result.Count} records.");
         return result;
     }
 
     
-    public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
+    public List<Devicelog> GetLogsForToday(TimeRangeDto timeRangeDto)
     {
         try
         {
-            if (dto.StartDate > dto.EndDate)
+            if (timeRangeDto.StartDate > timeRangeDto.EndDate)
                 throw new ArgumentException("StartDate cannot be after EndDate.");
 
-            logger.LogInformation($"[CleanAir Service] GetLogsForToday called with DTO: {JsonSerializer.Serialize(dto)}");
+            logger.LogInformation($"[CleanAir Service] GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
 
-            var logs = cleanAirRepository.GetLogsForToday(dto);
+            var logs = cleanAirRepository.GetLogsForToday(timeRangeDto);
 
             logger.LogInformation($"[CleanAir Service] GetLogsForToday returned {logs.Count} records.");
             return logs;
         }
         catch (Exception ex)
         {
-            logger.LogError($"[CleanAir Service] Error in GetLogsForToday with DTO: {JsonSerializer.Serialize(dto)}", ex);
+            logger.LogError($"[CleanAir Service] Error in GetLogsForToday with DTO: {JsonSerializer.Serialize(timeRangeDto)}", ex);
             throw;
         }
     }

@@ -37,7 +37,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    image: ghcr.io/${GITHUB_REPOSITORY}-backend:staging
+    image: ghcr.io/${GITHUB_REPOSITORY}-backend:${BACKEND_IMAGE}
     container_name: backend
     ports:
       - "8181:8181"
@@ -73,7 +73,7 @@ services:
   frontend:
     depends_on:
       - backend
-    image: ghcr.io/${GITHUB_REPOSITORY}-frontend:staging
+    image: ghcr.io/${GITHUB_REPOSITORY}-frontend:${FRONTEND_IMAGE}
     container_name: frontend
     ports:
       - "80:80"

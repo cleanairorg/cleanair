@@ -40,7 +40,7 @@ public class CleanAirControllerTests
     }
 
 
-    private JwtClaims CreateJwt(string role = "user") => new()
+    private static JwtClaims CreateJwt(string role = "user") => new()
     {
         Id = "mock-user-id",
         Email = "test@example.com",
@@ -75,8 +75,11 @@ public class CleanAirControllerTests
         var result = await _controller.GetMeasurementNow("user-token");
 
         var unauthorized = result as UnauthorizedObjectResult;
-        Assert.That(unauthorized, Is.Not.Null);
-        Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
+        Assert.Multiple(() =>
+        {
+            Assert.That(unauthorized, Is.Not.Null);
+            Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
+        });
         Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to access this route"));
     }
 
@@ -125,9 +128,14 @@ public class CleanAirControllerTests
         var result = _controller.GetLogsForToday(dto, "auth");
 
         var error = result.Result as ObjectResult;
-        Assert.That(error, Is.Not.Null);
-        Assert.That(error!.StatusCode, Is.EqualTo(500));
-        Assert.That(error.Value, Is.EqualTo("An error occurred while retrieving today's logs."));
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(error, Is.Not.Null);
+            Assert.That(error!.StatusCode, Is.EqualTo(500));
+            Assert.That(error.Value, Is.EqualTo("An error occurred while retrieving today's logs."));
+        });
+
     }
 
     [Test]
@@ -175,9 +183,14 @@ public class CleanAirControllerTests
         var result = _controller.GetDailyAverages(dto, "auth");
 
         var error = result.Result as ObjectResult;
-        Assert.That(error, Is.Not.Null);
-        Assert.That(error!.StatusCode, Is.EqualTo(500));
-        Assert.That(error.Value, Is.EqualTo("An error occurred while retrieving daily averages."));
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(error, Is.Not.Null);
+            Assert.That(error!.StatusCode, Is.EqualTo(500));
+            Assert.That(error.Value, Is.EqualTo("An error occurred while retrieving daily averages."));
+        });
+
     }
     [Test]
     public async Task AdminChangesDeviceInterval_AdminRole_ShouldReturnOk()
@@ -216,9 +229,14 @@ public class CleanAirControllerTests
         var result = await _controller.AdminChangesDeviceInterval("user-token", dto);
 
         var unauthorized = result as UnauthorizedObjectResult;
-        Assert.That(unauthorized, Is.Not.Null); 
-        Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
-        Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to change intervals"));
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(unauthorized, Is.Not.Null); 
+            Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
+            Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to change intervals"));
+        });
+
 
         _cleanAirServiceMock.Verify(s => s.UpdateDeviceIntervalAndBroadcast(It.IsAny<AdminChangesDeviceIntervalDto>()), Times.Never);
     }
@@ -242,9 +260,13 @@ public class CleanAirControllerTests
         var result = await _controller.AdminChangesDeviceInterval("admin-token", dto);
 
         var error = result as ObjectResult;
-        Assert.That(error, Is.Not.Null);
-        Assert.That(error!.StatusCode, Is.EqualTo(500));
-        Assert.That(error.Value, Is.EqualTo("Internal server error"));
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(error, Is.Not.Null);
+            Assert.That(error!.StatusCode, Is.EqualTo(500));
+            Assert.That(error.Value, Is.EqualTo("Internal server error"));
+        });
     }
     
     [Test]
@@ -274,10 +296,14 @@ public class CleanAirControllerTests
         var result = await _controller.DeleteData("user-token");
 
         var unauthorized = result as UnauthorizedObjectResult;
-        Assert.That(unauthorized, Is.Not.Null);
-        Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
-        Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to delete data"));
-
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(unauthorized, Is.Not.Null);
+            Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
+            Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to delete data"));
+        });
+        
         _cleanAirServiceMock.Verify(s => s.DeleteDataAndBroadcast(It.IsAny<JwtClaims>()), Times.Never);
     }
 
@@ -295,9 +321,14 @@ public class CleanAirControllerTests
         var result = await _controller.DeleteData("admin-token");
 
         var error = result as ObjectResult;
-        Assert.That(error, Is.Not.Null);
-        Assert.That(error!.StatusCode, Is.EqualTo(500));
-        Assert.That(error.Value, Is.EqualTo("Internal server error"));
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(error, Is.Not.Null);
+            Assert.That(error!.StatusCode, Is.EqualTo(500));
+            Assert.That(error.Value, Is.EqualTo("Internal server error"));
+        });
+
     }
     
 
