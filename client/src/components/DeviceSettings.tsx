@@ -66,7 +66,7 @@ export default function DeviceSettings() {
                 }
             }
         );
-    }, [readyState, jwt, intervals, onMessage, setSelectedInterval]);
+    }, [readyState, jwt, onMessage, setSelectedInterval]);
 
     const handleIntervalChange = () => {
         if (!selectedInterval){

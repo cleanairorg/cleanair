@@ -1,7 +1,7 @@
 ﻿import '../css/CurrentValues.css';
 import {cleanAirClient} from "../apiControllerClients.ts";
 import { useWsClient } from "ws-request-hook";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {
     ServerBroadcastsLatestReqestedMeasurement,
     StringConstants,
@@ -18,23 +18,39 @@ export default function CurrentValues() {
     const { onMessage, readyState } = useWsClient();
     const [currentValue, setCurrentValue] = useAtom(CurrentValueAtom);
     const [evaluations] = useAtom(EvaluationsAtom);
+    const [requestPending, setRequestPending] = useState(false);
 
 
     useEffect(() => {
-        if (readyState != 1 || jwt == null || jwt.length < 1){
+        if (readyState != 1 || !jwt || jwt.length < 1){
             return;
         }
-        try {
-            onMessage<ServerBroadcastsLatestReqestedMeasurement>(
-                StringConstants.ServerBroadcastsLatestReqestedMeasurement, (dto) => {
-                    toast.success("New measurements are now available");
-                    setCurrentValue(dto.latestMeasurement);
-                }
-            )
-        } catch (e){
-            toast.error("Error while getting measurements");
+
+        if (!requestPending) {
+            return;
         }
-    }, [readyState]);
+
+        const msg = onMessage<ServerBroadcastsLatestReqestedMeasurement>(
+            StringConstants.ServerBroadcastsLatestReqestedMeasurement, (dto) => {
+                toast.success("New measurements are now available");
+                setCurrentValue(dto.latestMeasurement);
+                setRequestPending(false);
+            }
+        );
+
+        return msg;
+    }, [readyState, requestPending]);
+
+    const handleNewEvaluation = () => {
+        cleanAirClient.getMeasurementNow(jwt).then(success => {
+            toast("Request sent for new measurements");
+            setRequestPending(true);
+        }).catch(error => {
+            setRequestPending(false);
+            toast.error("Error getting new measurements");
+            console.error(error);
+        });
+    };
 
     return (
         <section className="current-values">
@@ -78,14 +94,7 @@ export default function CurrentValues() {
             )}
             {userInfo?.role === "admin" && (
                 <>
-            <button className="app evaluate-button" onClick={() => {
-                cleanAirClient.getMeasurementNow(jwt).then(success => {
-                    toast.success("Request sent for new measurements");
-                }).catch(error => {
-                    toast.error("Error getting new measurements");
-                    console.error(error);
-                });
-            }}>
+            <button className="app evaluate-button" onClick={handleNewEvaluation}>
                 New Evaluation Now
             </button>
                 </>
