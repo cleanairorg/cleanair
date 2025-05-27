@@ -30,6 +30,8 @@ public class CleanAirController(
     
     public const string GetLogsForTodayRoute = ControllerRoute + nameof(GetLogsForToday);
 
+    public const string AdminChangesDeviceIntervalRoute = ControllerRoute + nameof(AdminChangesDeviceInterval);
+
     [HttpGet]
     [Route(GetLogsRoute)]
     public async Task<ActionResult<IEnumerable<Devicelog>>> GetLogs([FromHeader] string authorization)
@@ -49,20 +51,42 @@ public class CleanAirController(
         return Ok();
     }
     
+    [HttpPost]
+    [Route(AdminChangesDeviceIntervalRoute)]
+    public async Task<ActionResult> AdminChangesDeviceInterval(
+        [FromHeader] string authorization, 
+        [FromBody] AdminChangesDeviceIntervalDto dto)
+    {
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+        if (claims.Role != "admin")
+        {
+            return Unauthorized("You are not authorized to change intervals");
+        }
+
+        await cleanAirService.UpdateDeviceIntervalAndBroadcast(dto);
+        
+        return Ok();
+    }
+    
     [HttpDelete]
     [Route(DeleteDataRoute)]
-    public async Task<ActionResult> DeleteData([FromHeader]string authorization)
+    public async Task<ActionResult> DeleteData([FromHeader] string authorization)
     {
-        var jwt = securityService.VerifyJwtOrThrow(authorization);
-        
-        await cleanAirService.DeleteDataAndBroadcast(jwt);
+        var claims = securityService.VerifyJwtOrThrow(authorization);
+
+        if (claims.Role != "admin")
+        {
+            return Unauthorized("You are not authorized to delete data");
+        }
+
+        await cleanAirService.DeleteDataAndBroadcast(claims);
 
         return Ok();
     }
 
     [HttpGet]
     [Route(GetMeasurementNowRoute)]
-    public async Task<ActionResult> GetMeasurementNow(String authorization)
+    public async Task<ActionResult> GetMeasurementNow([FromHeader] string authorization)
     {
         var claims = securityService.VerifyJwtOrThrow(authorization);
         if (claims.Role != "admin") {

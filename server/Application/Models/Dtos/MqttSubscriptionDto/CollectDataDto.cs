@@ -20,4 +20,7 @@ public class CollectDataDto
     
     [Required]
     public float AirQuality { get; set; }
+    
+    [Required]
+    public int Interval { get; set; }
 }

@@ -6,19 +6,20 @@ import {
     StringConstants,
 } from "../generated-client.ts";
 import { useAtom } from "jotai";
-import {CurrentValueAtom, EvaluationsAtom} from "../atoms.ts";
+import {CurrentValueAtom, EvaluationsAtom, JwtAtom} from "../atoms.ts";
 import toast from "react-hot-toast";
 import {getColorForstate} from "../utils/thresholdUtils.ts";
 
 export default function CurrentValues() {
 
+    const [jwt] = useAtom(JwtAtom);
     const { onMessage, readyState } = useWsClient();
     const [currentValue, setCurrentValue] = useAtom(CurrentValueAtom);
     const [evaluations] = useAtom(EvaluationsAtom);
 
 
     useEffect(() => {
-        if (readyState){
+        if (readyState != 1 || jwt == null || jwt.length < 1){
             return;
         }
         try {

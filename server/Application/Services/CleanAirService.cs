@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Logging;
 using Application.Interfaces.Infrastructure.MQTT;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
@@ -9,14 +10,14 @@ using Application.Models.Dtos.BroadcastModels;
 using Application.Models.Dtos.MqttSubscriptionDto;
 using Application.Models.Dtos.RestDtos;
 using Core.Domain.Entities;
-using Microsoft.Extensions.Logging;
+
 using Microsoft.Extensions.Options;
 
 namespace Application.Services;
 
 public class CleanAirService(
     IOptionsMonitor<AppOptions> optionsMonitor,
-    ILogger<CleanAirService> logger,
+    ILoggingService logger,
     ICleanAirRepository cleanAirRepository,
     IMqttPublisher mqttPublisher,
     IConnectionManager connectionManager) : ICleanAirService
@@ -39,7 +40,8 @@ public class CleanAirService(
             Humidity = (decimal)dto.Humidity,
             Pressure = (decimal)dto.Pressure,
             Airquality = (int)dto.AirQuality,
-            Unit = "Celsius"
+            Unit = "Celsius",
+            Interval = dto.Interval
         };
         logger.LogInformation("CleanAirService: AddToDbAndBroadcast, Added DeviceLog to Database");
         cleanAirRepository.AddDeviceLog(deviceLog);
@@ -67,19 +69,19 @@ public class CleanAirService(
 
     public List<Devicelog> GetDailyAverages(TimeRangeDto dto)
     {
-        if (dto.StartDate > dto.EndDate)
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
+        if (dto.StartDate >= dto.EndDate)
             throw new ArgumentException("StartDate cannot be after EndDate.");
-
+    
         logger.LogInformation($"[Service] GetDailyAverages with DTO: {JsonSerializer.Serialize(dto)}");
-
         var result = cleanAirRepository.GetDailyAverages(dto);
-
         logger.LogInformation($"[Service] GetDailyAverages returned {result.Count} records.");
         return result;
     }
 
-
-
+    
     public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
     {
         try
@@ -101,11 +103,21 @@ public class CleanAirService(
         }
     }
 
-    
-
     public Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims)
     {
         mqttPublisher.Publish(dto, StringConstants.Device + $"/{dto.DeviceId}/" + StringConstants.ChangePreferences);
+        return Task.CompletedTask;
+    }
+
+    public Task UpdateDeviceIntervalAndBroadcast(AdminChangesDeviceIntervalDto dto)
+    {
+        mqttPublisher.Publish(dto.Interval, StringConstants.ChangeInterval);
+
+        var broadcast = new ServerBroadcastsIntervalChange()
+        {
+            Interval = dto.Interval
+        };
+        connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
         return Task.CompletedTask;
     }
 
@@ -117,7 +129,7 @@ public class CleanAirService(
 
     public async Task GetMeasurementNowAndBroadcast()
     {
-        await mqttPublisher.Publish("1", "cleanair/measurement/now");
+        await mqttPublisher.Publish("1", StringConstants.GetMeasurementsNow);
 
         var recentLogs = cleanAirRepository.GetLatestLogs();
         var broadcast = new ServerBroadcastsLatestReqestedMeasurement()

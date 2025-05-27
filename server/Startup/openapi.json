@@ -218,6 +218,49 @@
         }
       }
     },
+    "/api/AdminChangesDeviceInterval": {
+      "post": {
+        "tags": [
+          "CleanAir"
+        ],
+        "operationId": "CleanAir_AdminChangesDeviceInterval",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminChangesDeviceIntervalDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/DeleteData": {
       "delete": {
         "tags": [
@@ -258,7 +301,7 @@
         "parameters": [
           {
             "name": "authorization",
-            "in": "query",
+            "in": "header",
             "schema": {
               "type": "string"
             },
@@ -478,39 +521,6 @@
         }
       }
     },
-    "/api/ExampleBroadcast": {
-      "post": {
-        "tags": [
-          "Subscription"
-        ],
-        "operationId": "Subscription_ExampleBroadcast",
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExampleBroadcastDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/UpdateThresholds": {
       "post": {
         "tags": [
@@ -688,6 +698,10 @@
           "airquality": {
             "type": "number",
             "format": "double"
+          },
+          "interval": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -703,6 +717,16 @@
           },
           "interval": {
             "type": "string"
+          }
+        }
+      },
+      "AdminChangesDeviceIntervalDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "interval": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -732,18 +756,6 @@
             "items": {
               "type": "string"
             }
-          }
-        }
-      },
-      "ExampleBroadcastDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "eventType": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
           }
         }
       },
@@ -865,6 +877,26 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+              "eventType": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ServerBroadcastsIntervalChange": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationBaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "interval": {
+                "type": "integer",
+                "format": "int32"
+              },
               "eventType": {
                 "type": "string"
               }
@@ -1019,6 +1051,7 @@
         "description": "Available eventType and string constants",
         "enum": [
           "AdminHasDeletedData",
+          "ServerBroadcastsIntervalChange",
           "ServerBroadcastsLatestReqestedMeasurement",
           "ServerBroadcastsLiveDataToDashboard",
           "ThresholdsBroadcastDto",
@@ -1031,7 +1064,10 @@
           "Dashboard",
           "Device",
           "ChangePreferences",
-          "Log"
+          "Log",
+          "cleanair/data",
+          "cleanair/measurement/now",
+          "cleanair/intervals/set"
         ]
       }
     }

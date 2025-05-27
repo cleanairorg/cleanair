@@ -88,11 +88,15 @@ namespace Infrastructure.Postgres.Tests
 
             // Assert
             result.Should().Be(user);
-            
-            // Verify the user is in the database
-            var savedUser = _context.Users.Find(user.Id);
+
+            //Force read from database to detect missing SaveChanges()
+            var savedUser = _context.Users
+                .AsNoTracking()
+                .FirstOrDefault(u => u.Id == user.Id);
+
             savedUser.Should().NotBeNull();
-            savedUser.Email.Should().Be(user.Email);
+            savedUser!.Email.Should().Be(user.Email);
         }
+        
     }
 }

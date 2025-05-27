@@ -1,0 +1,177 @@
+﻿using Api.Rest.Controllers;
+using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Logging;
+using Application.Interfaces.Infrastructure.Websocket;
+using Application.Models.Dtos.RestDtos;
+using Application.Models;
+using Core.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+
+namespace Api.Rest.ControllerTests;
+
+[TestFixture]
+public class CleanAirControllerTests
+{
+    private Mock<ICleanAirService> _cleanAirServiceMock = null!;
+    private Mock<IConnectionManager> _connectionManagerMock = null!;
+    private Mock<ISecurityService> _securityServiceMock = null!;
+    private Mock<ILoggingService> _loggerMock = null!;
+    private CleanAirController _controller = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _cleanAirServiceMock = new Mock<ICleanAirService>();
+        _connectionManagerMock = new Mock<IConnectionManager>();
+        _securityServiceMock = new Mock<ISecurityService>();
+        _loggerMock = new Mock<ILoggingService>();
+
+        _controller = new CleanAirController(
+            _cleanAirServiceMock.Object,
+            _connectionManagerMock.Object,
+            _securityServiceMock.Object,
+            _loggerMock.Object
+        );
+    }
+
+    private JwtClaims CreateJwt(string role = "user") => new()
+    {
+        Id = "mock-user-id",
+        Email = "test@example.com",
+        Role = role,
+        Exp = DateTimeOffset.UtcNow.AddMinutes(5).ToUnixTimeSeconds().ToString()
+    };
+
+    [Test]
+    public async Task GetMeasurementNow_AdminRole_ShouldReturnOk()
+    {
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("valid-token"))
+            .Returns(CreateJwt("admin"));
+
+        _cleanAirServiceMock
+            .Setup(s => s.GetMeasurementNowAndBroadcast())
+            .Returns(Task.CompletedTask);
+
+        var result = await _controller.GetMeasurementNow("valid-token");
+
+        Assert.That(result, Is.InstanceOf<OkResult>());
+        _cleanAirServiceMock.Verify(s => s.GetMeasurementNowAndBroadcast(), Times.Once);
+    }
+
+    [Test]
+    public async Task GetMeasurementNow_NotAdmin_ShouldReturnUnauthorized()
+    {
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("user-token"))
+            .Returns(CreateJwt("user"));
+
+        var result = await _controller.GetMeasurementNow("user-token");
+
+        var unauthorized = result as UnauthorizedObjectResult;
+        Assert.That(unauthorized, Is.Not.Null);
+        Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
+        Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to access this route"));
+    }
+
+    [Test]
+    public void GetLogsForToday_ValidRequest_ShouldReturnLogs()
+    {
+        var dto = new TimeRangeDto
+        {
+            StartDate = DateTime.UtcNow.AddHours(-2),
+            EndDate = DateTime.UtcNow
+        };
+        var logs = new List<Devicelog> { new() { Id = "log1" } };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow(It.IsAny<string>()))
+            .Returns(CreateJwt());
+
+        _cleanAirServiceMock
+            .Setup(s => s.GetLogsForToday(dto))
+            .Returns(logs);
+
+        var result = _controller.GetLogsForToday(dto, "auth");
+
+        var ok = result.Result as OkObjectResult;
+        Assert.That(ok, Is.Not.Null);
+        Assert.That(ok!.Value, Is.EqualTo(logs));
+    }
+
+    [Test]
+    public void GetLogsForToday_ServiceThrows_ShouldReturn500()
+    {
+        var dto = new TimeRangeDto
+        {
+            StartDate = DateTime.UtcNow,
+            EndDate = DateTime.UtcNow
+        };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow(It.IsAny<string>()))
+            .Returns(CreateJwt());
+
+        _cleanAirServiceMock
+            .Setup(s => s.GetLogsForToday(dto))
+            .Throws(new Exception("fail"));
+
+        var result = _controller.GetLogsForToday(dto, "auth");
+
+        var error = result.Result as ObjectResult;
+        Assert.That(error, Is.Not.Null);
+        Assert.That(error!.StatusCode, Is.EqualTo(500));
+        Assert.That(error.Value, Is.EqualTo("An error occurred while retrieving today's logs."));
+    }
+
+    [Test]
+    public void GetDailyAverages_ValidRequest_ShouldReturnLogs()
+    {
+        var dto = new TimeRangeDto
+        {
+            StartDate = DateTime.UtcNow.AddDays(-1),
+            EndDate = DateTime.UtcNow
+        };
+        var logs = new List<Devicelog> { new() { Id = "log123" } };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow(It.IsAny<string>()))
+            .Returns(CreateJwt());
+
+        _cleanAirServiceMock
+            .Setup(s => s.GetDailyAverages(dto))
+            .Returns(logs);
+
+        var result = _controller.GetDailyAverages(dto, "auth");
+
+        var ok = result.Result as OkObjectResult;
+        Assert.That(ok, Is.Not.Null);
+        Assert.That(ok!.Value, Is.EqualTo(logs));
+    }
+
+    [Test]
+    public void GetDailyAverages_ServiceThrows_ShouldReturn500()
+    {
+        var dto = new TimeRangeDto
+        {
+            StartDate = DateTime.UtcNow,
+            EndDate = DateTime.UtcNow
+        };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow(It.IsAny<string>()))
+            .Returns(CreateJwt());
+
+        _cleanAirServiceMock
+            .Setup(s => s.GetDailyAverages(dto))
+            .Throws(new Exception("fail"));
+
+        var result = _controller.GetDailyAverages(dto, "auth");
+
+        var error = result.Result as ObjectResult;
+        Assert.That(error, Is.Not.Null);
+        Assert.That(error!.StatusCode, Is.EqualTo(500));
+        Assert.That(error.Value, Is.EqualTo("An error occurred while retrieving daily averages."));
+    }
+}
