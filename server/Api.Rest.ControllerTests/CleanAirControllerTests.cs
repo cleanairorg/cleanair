@@ -5,6 +5,7 @@ using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models.Dtos.RestDtos;
 using Application.Models;
 using Core.Domain.Entities;
+using FeatureHubSDK;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -18,6 +19,7 @@ public class CleanAirControllerTests
     private Mock<ISecurityService> _securityServiceMock = null!;
     private Mock<ILoggingService> _loggerMock = null!;
     private CleanAirController _controller = null!;
+    private Mock<IFeatureHubRepository> _featureHubRepoMock;
 
     [SetUp]
     public void SetUp()
@@ -26,14 +28,17 @@ public class CleanAirControllerTests
         _connectionManagerMock = new Mock<IConnectionManager>();
         _securityServiceMock = new Mock<ISecurityService>();
         _loggerMock = new Mock<ILoggingService>();
+        _featureHubRepoMock = new Mock<IFeatureHubRepository>();
 
         _controller = new CleanAirController(
             _cleanAirServiceMock.Object,
             _connectionManagerMock.Object,
             _securityServiceMock.Object,
-            _loggerMock.Object
+            _loggerMock.Object,
+            _featureHubRepoMock.Object
         );
     }
+
 
     private JwtClaims CreateJwt(string role = "user") => new()
     {

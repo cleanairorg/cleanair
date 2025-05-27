@@ -425,4 +425,40 @@ public class DictionaryConnectionManagerTests
 
         Assert.IsTrue(logCalled, "Expected warning log when broadcasting to a missing topic");
     }
+    
+    [Test]
+    public async Task GetConnectionIdToSocketDictionary_ShouldReturnExpectedValues()
+    {
+        var clientId = "client-dict-1";
+        var socketId = Guid.NewGuid().ToString();
+        var socket = BuildMockSocket(socketId);
+
+        await _manager.OnOpen(socket.Object, clientId);
+
+        var dict = _manager.GetConnectionIdToSocketDictionary();
+
+        Assert.IsTrue(dict.ContainsKey(clientId), "Expected dictionary to contain client ID");
+        Assert.AreEqual(socket.Object, dict[clientId]);
+    }
+
+    [Test]
+    public async Task GetSocketIdToClientIdDictionary_ShouldReturnExpectedValues()
+    {
+        var clientId = "client-dict-2";
+        var socketId = Guid.NewGuid().ToString();
+        var socket = BuildMockSocket(socketId);
+
+        await _manager.OnOpen(socket.Object, clientId);
+
+        var dict = _manager.GetSocketIdToClientIdDictionary();
+
+        Assert.IsTrue(dict.ContainsKey(socketId), "Expected dictionary to contain socket ID");
+        Assert.AreEqual(clientId, dict[socketId]);
+    }
+    
+    
+    
+    
+    
+    
 }
