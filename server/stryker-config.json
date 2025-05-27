@@ -1,0 +1,30 @@
+﻿{
+  "stryker-config": {
+    "solution": "../CleanAir.sln",
+    "test-projects": [
+      "Application.Tests/Application.Tests.csproj",
+      "Infrastructure.Websocket.Tests/Infrastructure.Websocket.Tests.csproj",
+      "Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj",
+      "Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
+    ],
+    "mutate": [
+      "**/*.cs",
+      "!**/Interfaces/*.cs",
+      "!**/Models/*.cs",
+      "!**/Dtos/*.cs",
+      "!**/Scaffolding/*.cs",
+      "!**/*Extensions.cs"
+    ],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ],
+    "coverage-analysis": "perTest",
+    "mutation-level": "Standard"
+  }
+}
