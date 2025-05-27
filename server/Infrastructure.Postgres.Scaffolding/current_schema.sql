@@ -9,7 +9,6 @@ END $EF$;
 
 CREATE TABLE weatherstation.device_threshold (
     id text NOT NULL,
-    deviceid text NOT NULL,
     metric text NOT NULL,
     warn_min numeric NOT NULL,
     good_min numeric NOT NULL,

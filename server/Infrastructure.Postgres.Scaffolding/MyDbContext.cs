@@ -27,7 +27,6 @@ public partial class MyDbContext : DbContext
             entity.ToTable("device_threshold", "weatherstation");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Deviceid).HasColumnName("deviceid");
             entity.Property(e => e.GoodMax).HasColumnName("good_max");
             entity.Property(e => e.GoodMin).HasColumnName("good_min");
             entity.Property(e => e.Metric).HasColumnName("metric");

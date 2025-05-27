@@ -874,6 +874,7 @@ export enum StringConstants {
     Cleanair_data = "cleanair/data",
     Cleanair_measurement_now = "cleanair/measurement/now",
     Cleanair_intervals_set = "cleanair/intervals/set",
+    Cleanair_thresholds_update = "cleanair/thresholds/update",
 }
 
 export interface FileResponse {

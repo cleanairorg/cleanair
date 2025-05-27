@@ -1067,7 +1067,8 @@
           "Log",
           "cleanair/data",
           "cleanair/measurement/now",
-          "cleanair/intervals/set"
+          "cleanair/intervals/set",
+          "cleanair/thresholds/update"
         ]
       }
     }
