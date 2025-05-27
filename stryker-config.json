@@ -11,12 +11,7 @@
       "server/Application/**/*.cs",
       "server/Infrastructure.Websocket/**/*.cs",
       "server/Api.Rest/**/*.cs",
-      "server/Infrastructure.Postgres/**/*.cs",
-      "!**/Interfaces/*.cs",
-      "!**/Models/*.cs",
-      "!**/Dtos/*.cs",
-      "!**/Scaffolding/*.cs",
-      "!**/*Extensions.cs"
+      "server/Infrastructure.Postgres/**/*.cs"
     ],
     "thresholds": {
       "break": 80
