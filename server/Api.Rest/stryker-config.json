@@ -6,7 +6,6 @@
     ],
     "mutate": [
       "**/*.cs",
-      "!**/Controllers/**",
       "!**/Extensions/**",
       "!**/Middleware/**",
       "!**/*Extensions.cs",
