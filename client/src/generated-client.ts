@@ -655,8 +655,8 @@ export interface AuthGetUserInfoDto {
 }
 
 export interface Devicelog {
-    id?: string;
     deviceid?: string;
+    id?: string;
     unit?: string;
     timestamp?: Date;
     temperature?: number;
@@ -744,14 +744,6 @@ export interface MemberLeftNotification extends BaseDto {
     topic?: string;
 }
 
-export interface ExampleClientDto extends BaseDto {
-    somethingTheClientSends?: string;
-}
-
-export interface ExampleServerResponse extends BaseDto {
-    somethingTheServerSends?: string;
-}
-
 export interface Ping extends BaseDto {
 }
 
@@ -792,8 +784,6 @@ export enum StringConstants {
     ServerBroadcastsLiveDataToDashboard = "ServerBroadcastsLiveDataToDashboard",
     ThresholdsBroadcastDto = "ThresholdsBroadcastDto",
     MemberLeftNotification = "MemberLeftNotification",
-    ExampleClientDto = "ExampleClientDto",
-    ExampleServerResponse = "ExampleServerResponse",
     Ping = "Ping",
     Pong = "Pong",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
@@ -808,6 +798,7 @@ export enum StringConstants {
     Cleanair_data = "cleanair/data",
     Cleanair_measurement_now = "cleanair/measurement/now",
     Cleanair_intervals_set = "cleanair/intervals/set",
+    Cleanair_thresholds_update = "cleanair/thresholds/update",
 }
 
 export interface FileResponse {

@@ -597,10 +597,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {
+          "deviceid": {
             "type": "string"
           },
-          "deviceid": {
+          "id": {
             "type": "string"
           },
           "unit": {
@@ -891,38 +891,6 @@
           }
         }
       },
-      "ExampleClientDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "somethingTheClientSends": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "ExampleServerResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "somethingTheServerSends": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
       "Ping": {
         "allOf": [
           {
@@ -1053,8 +1021,6 @@
           "ServerBroadcastsLiveDataToDashboard",
           "ThresholdsBroadcastDto",
           "MemberLeftNotification",
-          "ExampleClientDto",
-          "ExampleServerResponse",
           "Ping",
           "Pong",
           "ServerSendsErrorMessage",
@@ -1068,7 +1034,8 @@
           "Log",
           "cleanair/data",
           "cleanair/measurement/now",
-          "cleanair/intervals/set"
+          "cleanair/intervals/set",
+          "cleanair/thresholds/update"
         ]
       }
     }

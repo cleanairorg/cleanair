@@ -11,4 +11,5 @@ public static class StringConstants
     public const string CollectData = "cleanair/data";
     public const string GetMeasurementsNow = "cleanair/measurement/now";
     public const string ChangeInterval = "cleanair/intervals/set";
+    public const string UpdateDeviceThresholds = "cleanair/thresholds/update";
 }
