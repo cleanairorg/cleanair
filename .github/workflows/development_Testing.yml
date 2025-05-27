@@ -69,7 +69,7 @@ jobs:
         continue-on-error: true
         run: |
           dotnet stryker \
-            --threshold-break 80 \
+            --break-at 80 \
             --reporters "['html','progress']"
 
       - name: Upload Mutation Report
