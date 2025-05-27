@@ -2,12 +2,13 @@
   "stryker-config": {
     "solution": "../../CleanAir.sln",
     "test-projects": [
-      "../Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
+      "../Infrastructure.Postgres/Infrastructure.Postgres.Tests.csproj"
     ],
     "mutate": [
       "**/*.cs",
       "!**/*Extensions.cs",
-      "!**/*Middleware.cs"
+      "!**/*ISeeder.cs",
+      "!**/*Seeder.cs"
     ],
     "thresholds": {
       "break": 80

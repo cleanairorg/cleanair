@@ -2,12 +2,11 @@
   "stryker-config": {
     "solution": "../../CleanAir.sln",
     "test-projects": [
-      "../Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
+      "../Infrastructure.Websocket/Infrastructure.Websocket.Tests.csproj"
     ],
     "mutate": [
       "**/*.cs",
-      "!**/*Extensions.cs",
-      "!**/*Middleware.cs"
+      "!**/*Extensions.cs"
     ],
     "thresholds": {
       "break": 80
