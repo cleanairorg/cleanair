@@ -174,4 +174,71 @@ public class CleanAirControllerTests
         Assert.That(error!.StatusCode, Is.EqualTo(500));
         Assert.That(error.Value, Is.EqualTo("An error occurred while retrieving daily averages."));
     }
+    [Test]
+    public async Task AdminChangesDeviceInterval_AdminRole_ShouldReturnOk()
+    { 
+        var dto = new AdminChangesDeviceIntervalDto
+        {
+            Interval = 15
+        };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("admin-token"))
+            .Returns(CreateJwt("admin"));
+
+        _cleanAirServiceMock
+            .Setup(s => s.UpdateDeviceIntervalAndBroadcast(dto))
+            .Returns(Task.CompletedTask);
+
+        var result = await _controller.AdminChangesDeviceInterval("admin-token", dto);
+
+        Assert.That(result, Is.InstanceOf<OkResult>());
+        _cleanAirServiceMock.Verify(s => s.UpdateDeviceIntervalAndBroadcast(dto), Times.Once);
+    }
+
+    [Test]
+    public async Task AdminChangesDeviceInterval_NotAdmin_ShouldReturnUnauthorized()
+    {
+        var dto = new AdminChangesDeviceIntervalDto
+        {
+            Interval = 15
+        };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("user-token"))
+            .Returns(CreateJwt("user"));
+
+        var result = await _controller.AdminChangesDeviceInterval("user-token", dto);
+
+        var unauthorized = result as UnauthorizedObjectResult;
+        Assert.That(unauthorized, Is.Not.Null); 
+        Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
+        Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to change intervals"));
+
+        _cleanAirServiceMock.Verify(s => s.UpdateDeviceIntervalAndBroadcast(It.IsAny<AdminChangesDeviceIntervalDto>()), Times.Never);
+    }
+
+    [Test]
+    public async Task AdminChangesDeviceInterval_ServiceThrows_ShouldReturn500()
+    {
+        var dto = new AdminChangesDeviceIntervalDto
+        {
+            Interval = 15
+        };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("admin-token"))
+            .Returns(CreateJwt("admin"));
+
+        _cleanAirServiceMock
+            .Setup(s => s.UpdateDeviceIntervalAndBroadcast(dto))
+            .ThrowsAsync(new Exception("fail"));
+
+        var result = await _controller.AdminChangesDeviceInterval("admin-token", dto);
+
+        var error = result as ObjectResult;
+        Assert.That(error, Is.Not.Null);
+        Assert.That(error!.StatusCode, Is.EqualTo(500));
+        Assert.That(error.Value, Is.EqualTo("Internal server error"));
+    }
 }
