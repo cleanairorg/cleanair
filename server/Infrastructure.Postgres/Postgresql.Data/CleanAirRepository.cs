@@ -40,11 +40,11 @@ public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
     }
     
     
-    public List<Devicelog> GetLogsForToday(TimeRangeDto dto)
+    public List<Devicelog> GetLogsForToday(TimeRangeDto timeRangeDto)
     {
       
-        var from = dto.StartDate.ToUniversalTime();
-        var to = dto.EndDate.ToUniversalTime();
+        var from = timeRangeDto.StartDate.ToUniversalTime();
+        var to = timeRangeDto.EndDate.ToUniversalTime();
 
         return ctx.Devicelogs
             .Where(x => x.Timestamp >= from && x.Timestamp <= to)
