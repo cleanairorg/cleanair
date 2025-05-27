@@ -2,6 +2,7 @@ using Application.Interfaces.Infrastructure.Postgres;
 using Application.Models.Dtos.RestDtos;
 using Core.Domain.Entities;
 using Infrastructure.Postgres.Scaffolding;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Postgresql.Data;
 
@@ -11,10 +12,17 @@ public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
     {
         return ctx.Devicelogs.ToList();
     }
-
+    
     public Devicelog GetLatestLogs()
     {
         return ctx.Devicelogs.OrderByDescending(x => x.Timestamp).FirstOrDefault()!;
+    }
+
+    public async Task<Devicelog?> GetCurrentLogAsync()
+    {
+        return await ctx.Devicelogs
+            .OrderByDescending(d => d.Timestamp)
+            .FirstOrDefaultAsync();
     }
 
     public Devicelog AddDeviceLog(Devicelog deviceLog)

@@ -38,7 +38,7 @@ export default function Header() {
                 {/*<button className="app register-button">REGISTER</button>*/}
             </div>
             <div className="header-center">
-                <div className="app selected-device">SELECTED DEVICE ▼</div>
+                <div className="app selected-device">CLEANAIR DEVICE</div>
             </div>
             <div className="header-right">
                 <div className="app logo">CleanAir</div>

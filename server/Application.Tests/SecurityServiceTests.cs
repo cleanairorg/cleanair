@@ -15,7 +15,7 @@ using JWT.Builder;
 using JWT.Exceptions;
 using JWT.Serializers;
 
-namespace Application.Tests.Services
+namespace Application.Tests
 {
     [TestFixture]
     public class SecurityServiceTests

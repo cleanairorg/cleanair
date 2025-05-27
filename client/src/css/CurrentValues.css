@@ -17,17 +17,24 @@
     margin: 0.5rem 0;
     padding: 0.5rem;
     border-radius: 8px;
+    display: flex;
+    align-items: center;
 }
 
-.value.green { background-color: #2b3d4f; }
-.value.red { background-color: #2b3d4f; }
-.value.yellow { background-color: #2b3d4f; }
+.circle {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 0.5rem;
+    border-radius: 50%;
+    vertical-align: middle;
+}
 
-.last-week {
-    text-align: center;
-    background-color: green;
-    padding: 0.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: auto;
+.circle.green { background-color: #4CAF50; }
+.circle.yellow { background-color: #fcbf24; }
+.circle.red { background-color: #F44336; }
+.circle.gray { background-color: gray; }
+
+.value.green, .value.yellow, .value.red {
+    background-color: #2b3d4f;
 }

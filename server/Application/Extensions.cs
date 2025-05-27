@@ -11,6 +11,8 @@ public static class Extensions
         services.AddScoped<ISecurityService, SecurityService>();
         services.AddScoped<ICleanAirService, CleanAirService>();
         services.AddScoped<IWebsocketSubscriptionService, WebsocketSubscriptionService>();
+        services.AddScoped<IThresholdService, ThresholdService>();
+        services.AddScoped<IThresholdEvaluator, ThresholdEvaluator>();
         return services;
     }
 }

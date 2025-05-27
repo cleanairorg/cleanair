@@ -633,6 +633,94 @@ export class SubscriptionClient {
     }
 }
 
+export class ThresholdClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    updateThresholds(dto: AdminUpdatesThresholdsDto, authorization: string | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/UpdateThresholds";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateThresholds(_response);
+        });
+    }
+
+    protected processUpdateThresholds(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    getThresholds(authorization: string | undefined): Promise<ThresholdsBroadcastDto> {
+        let url_ = this.baseUrl + "/GetThresholds";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "authorization": authorization !== undefined && authorization !== null ? "" + authorization : "",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetThresholds(_response);
+        });
+    }
+
+    protected processGetThresholds(response: Response): Promise<ThresholdsBroadcastDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as ThresholdsBroadcastDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ThresholdsBroadcastDto>(null as any);
+    }
+}
+
 export interface AuthResponseDto {
     jwt: string;
 }
@@ -686,8 +774,40 @@ export interface ChangeSubscriptionDto {
     topicIds?: string[];
 }
 
+export interface AdminUpdatesThresholdsDto {
+    thresholds?: ThresholdDto[];
+}
+
+export interface ThresholdDto {
+    metric?: string;
+    warnMin?: number;
+    goodMin?: number;
+    goodMax?: number;
+    warnMax?: number;
+}
+
 export interface ApplicationBaseDto {
     eventType?: string;
+}
+
+export interface ThresholdsBroadcastDto extends ApplicationBaseDto {
+    eventType?: string;
+    updatedThresholds?: ThresholdDto[];
+    evaluations?: ThresholdEvaluationResult[];
+}
+
+export interface ThresholdEvaluationResult {
+    metric?: string;
+    value?: number;
+    state?: ThresholdStates;
+}
+
+export enum ThresholdStates {
+    CriticalLow = 0,
+    WarningLow = 1,
+    Good = 2,
+    WarningHigh = 3,
+    CriticalHigh = 4,
 }
 
 export interface AdminHasDeletedData extends ApplicationBaseDto {
@@ -740,6 +860,7 @@ export enum StringConstants {
     ServerBroadcastsIntervalChange = "ServerBroadcastsIntervalChange",
     ServerBroadcastsLatestReqestedMeasurement = "ServerBroadcastsLatestReqestedMeasurement",
     ServerBroadcastsLiveDataToDashboard = "ServerBroadcastsLiveDataToDashboard",
+    ThresholdsBroadcastDto = "ThresholdsBroadcastDto",
     MemberLeftNotification = "MemberLeftNotification",
     ExampleClientDto = "ExampleClientDto",
     ExampleServerResponse = "ExampleServerResponse",

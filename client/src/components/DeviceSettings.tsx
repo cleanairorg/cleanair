@@ -1,11 +1,12 @@
 ﻿import '../css/DeviceSettings.css';
-import {CurrentValueAtom, DeviceIntervalAtom, JwtAtom, UserInfoAtom} from "../atoms.ts";
+import {CurrentValueAtom, DeviceIntervalAtom, JwtAtom, UserInfoAtom, ThresholdsAtom} from "../atoms.ts";
 import {useAtom} from "jotai";
-import {cleanAirClient} from "../apiControllerClients.ts";
+import {cleanAirClient, thresholdClient} from "../apiControllerClients.ts";
 import toast from "react-hot-toast";
 import {useEffect, useState} from "react";
 import {useWsClient} from "ws-request-hook";
 import {ServerBroadcastsIntervalChange, StringConstants} from "../generated-client.ts";
+import ThresholdSlider from "../components/ThresholdSlider";
 
 export default function DeviceSettings() {
 
@@ -17,6 +18,11 @@ export default function DeviceSettings() {
     const [selectedInterval, setSelectedInterval] = useAtom(DeviceIntervalAtom);
 
     const [currentInterval, setCurrentInterval] = useState<number | null>(null);
+    
+    const [editing, setEditing] = useState(false);
+    const [thresholds, setThresholds] = useAtom(ThresholdsAtom);
+    const [getLocalThreshold, setLocalThreshold] = useState(thresholds);
+    const [thresholdsExpanded, setThresholdsExpanded] = useState(true);
 
 
     const intervals = [
@@ -28,6 +34,13 @@ export default function DeviceSettings() {
         { min: 45, ms: 2700000 },
         { min: 60, ms: 3600000 }
     ]
+
+    const metricRanges: Record<string, { min: number; max: number }> = {
+        temperature: { min: 10, max: 40 },
+        humidity: { min: 0, max: 100 },
+        airquality: { min: 0, max: 2000 },
+        pressure: { min: 990, max: 1030 },
+    };
 
     useEffect(() => {
         if (readyState != 1 || jwt == null || jwt.length < 1) {
@@ -87,16 +100,94 @@ export default function DeviceSettings() {
     };
     
     
+    const updateMetric = (metric: string, values: number[]) => {
+        setLocalThreshold(prev => prev.map(t =>
+            t.metric === metric ? { ...t, warnMin: values[0], goodMin: values[1], goodMax: values[2], warnMax: values[3] } : t
+        ));
+    };
+
+    const saveThresholds = () => {
+        thresholdClient.updateThresholds({ thresholds: getLocalThreshold }, jwt)
+            .then(() => {
+                toast.success("Thresholds updated");
+                setThresholds(getLocalThreshold);
+                setEditing(false);
+            })
+            .catch(err => {
+                toast.error("Error updating thresholds");
+                console.error(err);
+            });
+    };
+    
+    
     return (
         <section className="app device-settings">
             <h2 className="section-title">DEVICE SETTINGS</h2>
-            <div className="app setting">Temperature: </div>
-            <div className="app setting">Humidity:  </div>
-            <div className="app setting">CO2: </div>
-            <div className="app setting">Air pressure: </div>
-            <div className="app setting">Current Interval: {displayCurrentInterval(currentInterval)}</div>
-            {userInfo?.role === "admin" && (
-            <>
+
+            {/* Kollapsible Thresholds Section */}
+            <div className="thresholds-section">
+                <div
+                    className="thresholds-header"
+                    onClick={() => setThresholdsExpanded(!thresholdsExpanded)}
+                >
+                    <span className="thresholds-title">SENSOR THRESHOLDS</span>
+                    <span className={`expand-arrow ${thresholdsExpanded ? 'expanded' : ''}`}>
+                        ▼
+                    </span>
+                </div>
+
+                {/* HELE indholdet kollapser sammen - både sliders og edit knapper */}
+                {thresholdsExpanded && (
+                    <div className="thresholds-wrapper">
+                        {getLocalThreshold.map(t => (
+                            <ThresholdSlider
+                                key={t.metric}
+                                metric={t.metric}
+                                values={[t.warnMin, t.goodMin, t.goodMax, t.warnMax]}
+                                onChange={vals => updateMetric(t.metric, vals)}
+                                disabled={!editing}
+                                min={metricRanges[t.metric]?.min || 0}
+                                max={metricRanges[t.metric]?.max || 100}
+                            />
+                        ))}
+
+                        {/* Edit/Save buttons */}
+                        {userInfo?.role === "admin" && (
+                            <>
+                                {!editing && (
+                                    <button
+                                        className="app interval-button"
+                                        onClick={() => setEditing(true)}
+                                        style={{marginTop: '1rem'}}
+                                    >
+                                        Edit Thresholds
+                                    </button>
+                                )}
+
+                                {editing && (
+                                    <div style={{display: 'flex', gap: '10px', marginTop: '1rem'}}>
+                                        <button className="app interval-button" onClick={saveThresholds}>
+                                            Save Changes
+                                        </button>
+                                        <button
+                                            className="delete-button"
+                                            onClick={() => {
+                                                setLocalThreshold(thresholds);
+                                                setEditing(false);
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
+
+                <div className="app setting">Current Interval: {displayCurrentInterval(currentInterval)}</div>
+                
                 <div className="interval-container">
                     <fieldset className="fieldset">
                         <select defaultValue="" className="select setting" onChange={e => setSelectedInterval({
@@ -114,19 +205,7 @@ export default function DeviceSettings() {
                         Change Interval
                     </button>
                 </div>
-                <button className="app evaluate-button" onClick={() => {
-                    cleanAirClient.getMeasurementNow(jwt).then(success => {
-                        toast.success("Request sent for new measurements");
-                    }).catch(error => {
-                        toast.error("Error getting new measurements");
-                        console.error(error);
-                    });
-                }}>
-                    New Evaluation Now
-                </button>
                 <button className="app delete-button" onClick={handleDeleteData}>DELETE DATA</button>
-            </>
-            )}
         </section>
     );
 }
