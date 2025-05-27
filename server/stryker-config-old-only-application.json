@@ -1,0 +1,60 @@
+﻿{
+  "stryker-config": {
+    "solution": "../CleanAir.sln",
+    "test-projects": [
+      "Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj",
+      "Application.Tests/Application.Tests.csproj",
+      "Infrastructure.Websocket.Tests/Infrastructure.Websocket.Tests.csproj",
+      "Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj"
+    ],
+    "mutate": [
+      "**/*.cs",
+      "!**/Interfaces/*.cs",
+      "!**/Models/*.cs",
+      "!**/Dtos/*.cs",
+      "!**/Scaffolding/*.cs",
+      "!**/*Extensions.cs"
+    ],
+    "thresholds": {
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ]
+  }
+}
+
+{
+  "stryker-config": {
+    "solution": "CleanAir.sln",
+    "test-projects": [
+      "server/Application.Tests/Application.Tests.csproj",
+      "server/Infrastructure.Websocket.Tests/Infrastructure.Websocket.Tests.csproj",
+      "server/Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj",
+      "server/Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
+    ],
+    "mutate": [
+      "server/**/*.cs",
+      "!**/bin/**",
+      "!**/obj/**",
+      "!**/*.Designer.cs",
+      "!**/*Extensions.cs",
+      "!**/Scaffolding/**",
+      "!**/Dtos/**",
+      "!**/Interfaces/**",
+      "!**/Models/**",
+      "!server/Infrastructure.Websocket/DictionaryConnectionManager.cs"
+    ],
+
+    "coverage-analysis": "off",
+    "thresholds": {
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ]
+  }
+}
+
