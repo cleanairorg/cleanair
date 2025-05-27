@@ -17,6 +17,6 @@ public sealed class AppOptions
     public string MQTT_BROKER_HOST { get; set; } = null!;
     public string MQTT_USERNAME { get; set; } = null!;
     public string MQTT_PASSWORD { get; set; } = null!;
-    public string FEATUREHUB_API_KEY { get; set; } = null!;
-    public string FEATUREHUB_URL { get; set; } = null!;
+    [Required] public string FEATUREHUB_API_KEY { get; set; } = null!;
+    [Required] public string FEATUREHUB_URL { get; set; } = null!;
 }
