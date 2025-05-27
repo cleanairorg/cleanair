@@ -241,4 +241,60 @@ public class CleanAirControllerTests
         Assert.That(error!.StatusCode, Is.EqualTo(500));
         Assert.That(error.Value, Is.EqualTo("Internal server error"));
     }
+    
+    [Test]
+    public async Task DeleteData_AdminRole_ShouldReturnOk()
+    {
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("admin-token"))
+            .Returns(CreateJwt("admin"));
+
+        _cleanAirServiceMock
+            .Setup(s => s.DeleteDataAndBroadcast(It.IsAny<JwtClaims>()))
+            .Returns(Task.CompletedTask);
+
+        var result = await _controller.DeleteData("admin-token");
+
+        Assert.That(result, Is.InstanceOf<OkResult>());
+        _cleanAirServiceMock.Verify(s => s.DeleteDataAndBroadcast(It.IsAny<JwtClaims>()), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteData_NotAdmin_ShouldReturnUnauthorized()
+    {
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("user-token"))
+            .Returns(CreateJwt("user"));
+
+        var result = await _controller.DeleteData("user-token");
+
+        var unauthorized = result as UnauthorizedObjectResult;
+        Assert.That(unauthorized, Is.Not.Null);
+        Assert.That(unauthorized!.StatusCode, Is.EqualTo(401));
+        Assert.That(unauthorized.Value, Is.EqualTo("You are not authorized to delete data"));
+
+        _cleanAirServiceMock.Verify(s => s.DeleteDataAndBroadcast(It.IsAny<JwtClaims>()), Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteData_ServiceThrows_ShouldReturn500()
+    {
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow("admin-token"))
+            .Returns(CreateJwt("admin"));
+
+        _cleanAirServiceMock
+            .Setup(s => s.DeleteDataAndBroadcast(It.IsAny<JwtClaims>()))
+            .ThrowsAsync(new Exception("fail"));
+
+        var result = await _controller.DeleteData("admin-token");
+
+        var error = result as ObjectResult;
+        Assert.That(error, Is.Not.Null);
+        Assert.That(error!.StatusCode, Is.EqualTo(500));
+        Assert.That(error.Value, Is.EqualTo("Internal server error"));
+    }
+    
+
+    
 }

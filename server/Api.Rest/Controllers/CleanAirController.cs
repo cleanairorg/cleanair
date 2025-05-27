@@ -204,6 +204,6 @@ public class CleanAirController(
             return StatusCode(500, "An error occurred while retrieving today's logs.");
         }
     }
-
+    
     
 }
