@@ -16,7 +16,7 @@
       "html",
       "progress"
     ],
-    "ignoredMethods": [
+    "ignore-methods": [
       "LogInformation",
       "LogWarning",
       "LogError",
