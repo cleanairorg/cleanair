@@ -67,21 +67,34 @@ public class CleanAirController(
         
         return Ok();
     }
-    
+
     [HttpDelete]
     [Route(DeleteDataRoute)]
     public async Task<ActionResult> DeleteData([FromHeader] string authorization)
     {
+        logger.LogInformation("[CleanAirController] DeleteData endpoint called");
+
         var claims = securityService.VerifyJwtOrThrow(authorization);
+        logger.LogInformation("[CleanAirController] JWT verified.");
 
         if (claims.Role != "admin")
         {
+            logger.LogWarning(
+                "[CleanAirController] Unauthorized access to DeleteData endpoint called (non admin called deletion)");
             return Unauthorized("You are not authorized to delete data");
         }
 
-        await cleanAirService.DeleteDataAndBroadcast(claims);
-
-        return Ok();
+        try
+        {
+            await cleanAirService.DeleteDataAndBroadcast(claims);
+            logger.LogInformation("[CleanAirController] Deleted data");
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirController] Failed to delete data.");
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     [HttpGet]

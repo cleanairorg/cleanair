@@ -24,33 +24,44 @@ public class CleanAirService(
 {
     public Task AddToDbAndBroadcast(CollectDataDto? dto)
     {
-        
         if (dto == null)
         {
-            logger.LogWarning("CleanAirService: AddToDbAndBroadcast, dto is null");
+            logger.LogWarning("[CleanAirService] AddToDbAndBroadcast, dto is null");
             return Task.CompletedTask;
         }
-        
-        var deviceLog = new Devicelog
+
+        try
         {
-            Id = Guid.NewGuid().ToString(),
-            Deviceid = dto.DeviceId,
-            Timestamp = DateTime.UtcNow,
-            Temperature = (decimal)dto.Temperature,
-            Humidity = (decimal)dto.Humidity,
-            Pressure = (decimal)dto.Pressure,
-            Airquality = (int)dto.AirQuality,
-            Unit = "Celsius",
-            Interval = dto.Interval
-        };
-        logger.LogInformation("CleanAirService: AddToDbAndBroadcast, Added DeviceLog to Database");
-        cleanAirRepository.AddDeviceLog(deviceLog);
-        var recentLogs = cleanAirRepository.GetLatestLogs();
-        var broadcast = new ServerBroadcastsLatestReqestedMeasurement()
+            var deviceLog = new Devicelog
+            {
+                Id = Guid.NewGuid().ToString(),
+                Deviceid = dto.DeviceId,
+                Timestamp = DateTime.UtcNow,
+                Temperature = (decimal)dto.Temperature,
+                Humidity = (decimal)dto.Humidity,
+                Pressure = (decimal)dto.Pressure,
+                Airquality = (int)dto.AirQuality,
+                Unit = "Celsius",
+                Interval = dto.Interval
+            };
+
+            cleanAirRepository.AddDeviceLog(deviceLog);
+            logger.LogInformation("[CleanAirService] AddToDbAndBroadcast, Added DeviceLog to Database");
+
+            var recentLogs = cleanAirRepository.GetLatestLogs();
+            var broadcast = new ServerBroadcastsLatestReqestedMeasurement
+            {
+                LatestMeasurement = recentLogs
+            };
+
+            connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
+            logger.LogInformation("[CleanAirService] AddToDbAndBroadcast, Broadcasted latest measurement to dashboard");
+        }
+        catch (Exception ex)
         {
-            LatestMeasurement = recentLogs
-        };
-        connectionManager.BroadcastToTopic(StringConstants.Dashboard, broadcast);
+            logger.LogError("[CleanAirService] AddToDbAndBroadcast, an error occurred while adding to DB and broadcasting", ex);
+        }
+
         return Task.CompletedTask;
     }
 
@@ -123,8 +134,17 @@ public class CleanAirService(
 
     public async Task DeleteDataAndBroadcast(JwtClaims jwt)
     {
-        await cleanAirRepository.DeleteAllData();
-        await connectionManager.BroadcastToTopic(StringConstants.Dashboard, new AdminHasDeletedData());
+        try
+        {
+            await cleanAirRepository.DeleteAllData();
+            logger.LogInformation("[CleanAirService] All data for device deleted");
+            await connectionManager.BroadcastToTopic(StringConstants.Dashboard, new AdminHasDeletedData());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirService] Failed to delete data.", ex);
+            throw;
+        }
     }
 
     public async Task GetMeasurementNowAndBroadcast()
