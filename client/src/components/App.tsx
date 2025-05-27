@@ -20,13 +20,13 @@ export default function App() {
     }, [prod, baseUrl]);
 
     return (
-        <>
-            {serverUrl &&
+        <div className="app">
+            {serverUrl && (
                 <WsClientProvider url={serverUrl}>
                     <AppRoutes />
                 </WsClientProvider>
-            }
+            )}
             {!prod && <DevTools />}
-        </>
+        </div>
     );
 }

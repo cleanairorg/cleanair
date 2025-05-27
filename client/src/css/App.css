@@ -1,4 +1,13 @@
-﻿.app {
+﻿html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #2e3e50;
+    font-family: 'Georgia', serif;
+    color: white;
+}
+
+.app {
     display: flex;
     flex-direction: column;  
     height: 100%;
