@@ -1,0 +1,29 @@
+﻿{
+  "stryker-config": {
+    "solution": "CleanAir.sln",
+    "test-projects": [
+      "server/Application.Tests/Application.Tests.csproj",
+      "server/Infrastructure.Websocket.Tests/Infrastructure.Websocket.Tests.csproj",
+      "server/Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj",
+      "server/Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
+    ],
+    "mutate": [
+      "server/Application/**/*.cs",
+      "server/Infrastructure.Websocket/**/*.cs",
+      "server/Api.Rest/**/*.cs",
+      "server/Infrastructure.Postgres/**/*.cs",
+      "!**/Interfaces/*.cs",
+      "!**/Models/*.cs",
+      "!**/Dtos/*.cs",
+      "!**/Scaffolding/*.cs",
+      "!**/*Extensions.cs"
+    ],
+    "thresholds": {
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ]
+  }
+}
