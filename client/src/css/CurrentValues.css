@@ -31,19 +31,10 @@
 }
 
 .circle.green { background-color: #4CAF50; }
-.circle.yellow { background-color: #fbbf24; }
+.circle.yellow { background-color: #fcbf24; }
 .circle.red { background-color: #F44336; }
 .circle.gray { background-color: gray; }
 
 .value.green, .value.yellow, .value.red {
     background-color: #2b3d4f;
-}
-
-.last-week {
-    text-align: center;
-    background-color: green;
-    padding: 0.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: auto;
 }
