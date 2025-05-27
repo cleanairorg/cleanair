@@ -1,2 +1,2 @@
-﻿ALTER TABLE weatherstation.devicelog
+﻿ALTER TABLE cleanair.devicelog
     ADD COLUMN interval integer NOT NULL DEFAULT 15;

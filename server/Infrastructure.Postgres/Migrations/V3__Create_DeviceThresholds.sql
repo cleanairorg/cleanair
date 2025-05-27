@@ -1,4 +1,4 @@
-﻿CREATE TABLE weatherstation.device_threshold (
+﻿CREATE TABLE cleanair.device_threshold (
     id TEXT PRIMARY KEY,
     deviceid TEXT NOT NULL,
     metric TEXT NOT NULL,

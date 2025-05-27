@@ -1,4 +1,5 @@
 ﻿import '../css/CurrentValues.css';
+import {cleanAirClient} from "../apiControllerClients.ts";
 import { useWsClient } from "ws-request-hook";
 import {useEffect} from "react";
 import {
@@ -6,13 +7,14 @@ import {
     StringConstants,
 } from "../generated-client.ts";
 import { useAtom } from "jotai";
-import {CurrentValueAtom, EvaluationsAtom, JwtAtom} from "../atoms.ts";
+import {CurrentValueAtom, EvaluationsAtom, JwtAtom, UserInfoAtom} from "../atoms.ts";
 import toast from "react-hot-toast";
 import {getColorForstate} from "../utils/thresholdUtils.ts";
 
 export default function CurrentValues() {
 
     const [jwt] = useAtom(JwtAtom);
+    const [userInfo,] = useAtom(UserInfoAtom);
     const { onMessage, readyState } = useWsClient();
     const [currentValue, setCurrentValue] = useAtom(CurrentValueAtom);
     const [evaluations] = useAtom(EvaluationsAtom);
@@ -73,6 +75,20 @@ export default function CurrentValues() {
                 })
             ) : (
                 <div>Loading measurements...</div>
+            )}
+            {userInfo?.role === "admin" && (
+                <>
+            <button className="app evaluate-button" onClick={() => {
+                cleanAirClient.getMeasurementNow(jwt).then(success => {
+                    toast.success("Request sent for new measurements");
+                }).catch(error => {
+                    toast.error("Error getting new measurements");
+                    console.error(error);
+                });
+            }}>
+                New Evaluation Now
+            </button>
+                </>
             )}
         </section>
     );
