@@ -16,6 +16,13 @@
     "reporters": [
       "html",
       "progress"
+    ],
+    "ignore-methods": [
+      "LogInformation",
+      "LogWarning",
+      "LogError",
+      "LogDebug",
+      "WriteLine"
     ]
   }
 }

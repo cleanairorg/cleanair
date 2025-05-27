@@ -6,8 +6,8 @@
     ],
     "mutate": [
       "**/*.cs",
-      "!**/*Extensions.cs",
-      "!**/*Middleware.cs"
+      "!**/Extensions.cs",
+      "!**/Middleware.cs"
     ],
     "thresholds": {
       "break": 80
