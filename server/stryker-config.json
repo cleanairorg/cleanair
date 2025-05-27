@@ -5,7 +5,7 @@
       "Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj",
       "Application.Tests/Application.Tests.csproj",
       "Infrastructure.Websocket.Tests/Infrastructure.Websocket.Tests.csproj",
-      "Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj",
+      "Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj"
     ],
     "mutate": [
       "**/*.cs",
