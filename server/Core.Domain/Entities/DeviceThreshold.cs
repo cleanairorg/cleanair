@@ -7,6 +7,8 @@ public partial class DeviceThreshold
 {
     public string Id { get; set; } = null!;
 
+    public string Deviceid { get; set; } = null!;
+
     public string Metric { get; set; } = null!;
 
     public decimal WarnMin { get; set; }

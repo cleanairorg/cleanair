@@ -4,6 +4,7 @@ using Application.Interfaces.Infrastructure.Logging;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models.Dtos.RestDtos;
 using Core.Domain.Entities;
+using FeatureHubSDK;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Rest.Controllers;
@@ -13,7 +14,8 @@ public class CleanAirController(
     ICleanAirService cleanAirService,
     IConnectionManager connectionManager,
     ISecurityService securityService, 
-    ILoggingService logger) : ControllerBase
+    ILoggingService logger,  
+    IFeatureHubRepository featureHubRepo) : ControllerBase
 {
     public const string ControllerRoute = "api/";
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
@@ -194,6 +196,24 @@ public class CleanAirController(
         {
             var claims = securityService.VerifyJwtOrThrow(authorization);
             logger.LogInformation($"[Controller] GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
+
+            // Feature flag check
+            IFeature? feature = null;
+            try
+            {
+                feature = featureHubRepo.GetFeature("CleanFeature");
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning("[CleanAirController] FeatureHub connection failed, assuming feature is enabled by default. " + ex);
+            }
+
+            if (feature is not null && !feature.IsEnabled)
+            {
+                logger.LogWarning("[CleanAirController] GetLogsForToday is disabled via FeatureHub");
+                return StatusCode(403, "Feature GetLogsForToday Disabled via Featurehub");
+            }
+
             var logs = cleanAirService.GetLogsForToday(timeRangeDto);
             logger.LogInformation($"[Controller] GetLogsForToday succeeded. Returned {logs.Count} logs.");
             return Ok(logs);
@@ -204,6 +224,7 @@ public class CleanAirController(
             return StatusCode(500, "An error occurred while retrieving today's logs.");
         }
     }
+
     
     
 }

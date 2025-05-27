@@ -743,8 +743,8 @@ export interface AuthGetUserInfoDto {
 }
 
 export interface Devicelog {
-    id?: string;
     deviceid?: string;
+    id?: string;
     unit?: string;
     timestamp?: Date;
     temperature?: number;

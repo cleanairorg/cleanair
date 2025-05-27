@@ -26,4 +26,8 @@
         <ProjectReference Include="..\Infrastructure.MQTT\Infrastructure.MQTT.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Infrastructure.MQTT\Infrastructure.MQTT.csproj" />
+    </ItemGroup>
+
 </Project>
