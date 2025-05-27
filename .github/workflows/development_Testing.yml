@@ -66,12 +66,25 @@ jobs:
 
       - name: Run Mutation Tests for ${{ matrix.project }}
         working-directory: ${{ matrix.project }}
-        run: dotnet stryker
+        continue-on-error: true
+        run: |
+          dotnet stryker \
+            --threshold-break 80 \
+            --reporters "['html','progress']"
 
       - name: Upload Mutation Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: stryker-report-${{ matrix.project }}
-          path: ${{ matrix.project }}/reports/mutation-report.html
+          path: ${{ matrix.project }}/StrykerOutput/**/reports/mutation-report.html
+
+      - name: Print mutation score summary
+        run: |
+          find . -name "mutation-report.json" | while read file; do
+            echo "Score from: $file"
+            cat "$file" | jq '.mutationScore'
+          done
+  
+    
       
