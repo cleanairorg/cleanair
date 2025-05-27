@@ -696,8 +696,8 @@
             "format": "decimal"
           },
           "airquality": {
-            "type": "number",
-            "format": "double"
+            "type": "integer",
+            "format": "int32"
           },
           "interval": {
             "type": "integer",

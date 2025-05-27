@@ -38,7 +38,7 @@ export default function DeviceSettings() {
     const metricRanges: Record<string, { min: number; max: number }> = {
         temperature: { min: 10, max: 40 },
         humidity: { min: 0, max: 100 },
-        airquality: { min: 0, max: 2000 },
+        airquality: { min: 0, max: 3000 },
         pressure: { min: 990, max: 1030 },
     };
 
@@ -156,21 +156,20 @@ export default function DeviceSettings() {
                             <>
                                 {!editing && (
                                     <button
-                                        className="app interval-button"
+                                        className="green-button"
                                         onClick={() => setEditing(true)}
-                                        style={{marginTop: '1rem'}}
                                     >
                                         Edit Thresholds
                                     </button>
                                 )}
 
                                 {editing && (
-                                    <div style={{display: 'flex', gap: '10px', marginTop: '1rem'}}>
-                                        <button className="app interval-button" onClick={saveThresholds}>
+                                    <div style={{display: 'flex', gap: '10px'}}>
+                                        <button className="green-button" onClick={saveThresholds}>
                                             Save Changes
                                         </button>
                                         <button
-                                            className="delete-button"
+                                            className="red-button"
                                             onClick={() => {
                                                 setLocalThreshold(thresholds);
                                                 setEditing(false);

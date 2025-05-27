@@ -69,7 +69,7 @@ public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
                 Temperature = g.Average(x => x.Temperature),
                 Humidity = g.Average(x => x.Humidity),
                 Pressure = g.Average(x => x.Pressure),
-                Airquality = g.Average(x => x.Airquality),
+                Airquality = (int)g.Average(x => x.Airquality),
                 Unit = "Celsius"
             }).ToList();
     }

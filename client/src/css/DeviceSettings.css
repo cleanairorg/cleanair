@@ -73,12 +73,20 @@
 .green-button{
     text-align: center;
     background-color: green;
-    padding: 0.5rem;
     border-radius: 8px;
     cursor: pointer;
     height: 40px;
-    margin-top: auto;
+    width: 100%;
 }
+.red-button{
+    text-align: center;
+    background-color: red;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 40px;
+    width: 100%;
+}
+
 
 /*
 Kollapsible Thresholds Section - Simpel version
