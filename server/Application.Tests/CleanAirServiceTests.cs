@@ -386,6 +386,7 @@ namespace Application.Tests.Services
             _connectionManagerMock.Verify(c => c.BroadcastToTopic(StringConstants.Dashboard,
                 It.Is<ServerBroadcastsLatestReqestedMeasurement>(b => b.LatestMeasurement == latestLog)), Times.Once);
         }
+
         [Test]
         public async Task DeleteDataAndBroadcast_ShouldDeleteDataAndBroadcast()
         {
@@ -410,6 +411,112 @@ namespace Application.Tests.Services
                     It.Is<AdminHasDeletedData>(data => data != null)), Times.Once);
         }
 
-        }
+		[Test]
+		public void GetLatestDeviceLog_LogExists_ShouldReturnLogAndLogInfo()
+		{
+   			// Arrange
+   			var log = new Devicelog { Id = "log123" };
+   			_repositoryMock.Setup(r => r.GetLatestLogs()).Returns(log);
+
+  		 	// Act
+   		 	var result = _service.GetLatestDeviceLog();
+
+  		 	// Assert
+   		 	Assert.That(result, Is.EqualTo(log));
+
+   			_loggerMock.Verify(l => l.LogInformation(
+        	It.Is<string>(msg => msg.Contains("Attempting to get the latest device log"))), Times.Once);
+
+    		_loggerMock.Verify(l => l.LogInformation(
+        	It.Is<string>(msg => msg.Contains($"got the latest device log found, LogID: {log.Id}"))), Times.Once);
+		}
+
+		[Test]
+		public void GetLatestDeviceLog_NoLogExists_ShouldReturnNullAndLogWarning()
+		{
+    		// Arrange
+    		_repositoryMock.Setup(r => r.GetLatestLogs()).Returns((Devicelog)null!);
+
+    		// Act
+    		var result = _service.GetLatestDeviceLog();
+
+    		// Assert
+    		Assert.IsNull(result);
+
+   			_loggerMock.Verify(l => l.LogInformation(
+       		It.Is<string>(msg => msg.Contains("Attempting to get the latest device log"))), Times.Once);
+
+    		_loggerMock.Verify(l => l.LogWarning(
+        	It.Is<string>(msg => msg.Contains("No device logs found"))), Times.Once);
+		}
+
+	 	[Test]
+		public void GetLatestDeviceLog_RepositoryThrows_ShouldLogErrorAndRethrow()
+		{
+    		// Arrange
+    		var exception = new Exception("Database failure");
+    		_repositoryMock.Setup(r => r.GetLatestLogs()).Throws(exception);
+
+    		// Act & Assert
+    		var ex = Assert.Throws<Exception>(() => _service.GetLatestDeviceLog());
+    		Assert.That(ex!.Message, Is.EqualTo("Database failure"));
+
+    		_loggerMock.Verify(l => l.LogError(
+        	It.Is<string>(msg => msg.Contains("Failed to get the latest log")),
+        	exception), Times.Once);
+		}
+		
+		[Test]
+		public async Task UpdateDeviceIntervalAndBroadcast_ValidDto_ShouldPublishAndBroadcast()
+		{
+   			// Arrange
+    		var dto = new AdminChangesDeviceIntervalDto { Interval = 30 };
+
+    		// Act
+    		await _service.UpdateDeviceIntervalAndBroadcast(dto);
+
+    		// Assert: MQTT publish
+    		_mqttPublisherMock.Verify(p => p.Publish(dto.Interval, StringConstants.ChangeInterval), Times.Once);
+
+    		// Assert: WebSocket broadcast
+    		_connectionManagerMock.Verify(c =>
+       		c.BroadcastToTopic(StringConstants.Dashboard,
+       	    It.Is<ServerBroadcastsIntervalChange>(b => b.Interval == dto.Interval)), Times.Once);
+
+    		// Assert: Logs
+    		_loggerMock.Verify(l => l.LogInformation(
+        	It.Is<string>(msg => msg.Contains("Updating device interval"))), Times.Once);
+
+    		_loggerMock.Verify(l => l.LogInformation(
+        	It.Is<string>(msg => msg.Contains("broadcasting interval changes to dashboard"))), Times.Once);
+
+    		_loggerMock.Verify(l => l.LogInformation(
+        	It.Is<string>(msg => msg.Contains("Updated interval"))), Times.Once);
+		}
+
+		[Test]
+		public void UpdateDeviceIntervalAndBroadcast_PublishThrows_ShouldLogErrorAndRethrow()
+		{
+    		// Arrange
+    		var dto = new AdminChangesDeviceIntervalDto { Interval = 15 };
+    		var ex = new Exception("Publish failed");
+
+    		_mqttPublisherMock.Setup(p => p.Publish(dto.Interval, StringConstants.ChangeInterval))
+        	.Throws(ex);
+
+    		// Act & Assert
+    		var thrown = Assert.ThrowsAsync<Exception>(async () =>
+       		await _service.UpdateDeviceIntervalAndBroadcast(dto));
+
+    		Assert.That(thrown!.Message, Is.EqualTo("Publish failed"));
+
+    		// Verify error log
+    		_loggerMock.Verify(l => l.LogError(
+        	It.Is<string>(msg => msg.Contains("An error occurred while updating device interval")),
+        	ex), Times.Once);
+		}
+
+
+	}
     
-    }
+}
