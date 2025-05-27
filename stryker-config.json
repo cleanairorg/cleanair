@@ -13,6 +13,7 @@
       "server/Api.Rest/**/*.cs",
       "server/Infrastructure.Postgres/**/*.cs"
     ],
+    "coverage-analysis": "off",
     "thresholds": {
       "break": 80
     },
