@@ -836,14 +836,6 @@ export interface MemberLeftNotification extends BaseDto {
     topic?: string;
 }
 
-export interface ExampleClientDto extends BaseDto {
-    somethingTheClientSends?: string;
-}
-
-export interface ExampleServerResponse extends BaseDto {
-    somethingTheServerSends?: string;
-}
-
 export interface Ping extends BaseDto {
 }
 
@@ -862,8 +854,6 @@ export enum StringConstants {
     ServerBroadcastsLiveDataToDashboard = "ServerBroadcastsLiveDataToDashboard",
     ThresholdsBroadcastDto = "ThresholdsBroadcastDto",
     MemberLeftNotification = "MemberLeftNotification",
-    ExampleClientDto = "ExampleClientDto",
-    ExampleServerResponse = "ExampleServerResponse",
     Ping = "Ping",
     Pong = "Pong",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",

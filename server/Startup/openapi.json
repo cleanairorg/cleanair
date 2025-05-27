@@ -976,38 +976,6 @@
           }
         }
       },
-      "ExampleClientDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "somethingTheClientSends": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "ExampleServerResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "somethingTheServerSends": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
       "Ping": {
         "allOf": [
           {
@@ -1056,8 +1024,6 @@
           "ServerBroadcastsLiveDataToDashboard",
           "ThresholdsBroadcastDto",
           "MemberLeftNotification",
-          "ExampleClientDto",
-          "ExampleServerResponse",
           "Ping",
           "Pong",
           "ServerSendsErrorMessage",
