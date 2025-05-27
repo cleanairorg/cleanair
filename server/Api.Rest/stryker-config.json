@@ -5,7 +5,11 @@
       "../Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj"
     ],
     "mutate": [
-      "../Api.Rest/**/*.cs"
+      "**/*.cs",
+      "!**/Dtos/**",
+      "!**/obj/**",
+      "!**/bin/**",
+      "!**/*Extensions.cs"
     ],
     "thresholds": {
       "break": 80
