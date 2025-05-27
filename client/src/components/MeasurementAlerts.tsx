@@ -24,7 +24,7 @@ export default function MeasurementAlerts() {
 
     const alerts = evaluations
         .filter(e => e.state !== ThresholdStates.Good)
-        .sort((a, b) => b.state - a.state); // critical before warning
+        .sort((a, b) => b.state - a.state);
 
     return (
         <aside className="measurement-alerts">

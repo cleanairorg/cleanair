@@ -1,22 +1,18 @@
 import {useEffect} from "react";
 import {cleanAirClient} from "../apiControllerClients.ts";
-import { thresholdClient } from "../apiControllerClients.ts";
 import {useAtom} from "jotai";
 import {
     CurrentValueAtom,
     DeviceLogsAtom,
-    EvaluationsAtom,
-    ThresholdsAtom,
     JwtAtom
 } from "../atoms.ts";
+import useWebSocketThresholds from "./useWebSocketThresholds.ts";
 
 export default function useInitializeData() {
-
     const [jwt] = useAtom(JwtAtom);
     const [, setDeviceLogs] = useAtom(DeviceLogsAtom)
     const [, setCurrentValue] = useAtom(CurrentValueAtom);
-    const [, setEvaluations] = useAtom(EvaluationsAtom);
-    const [, setThresholds] = useAtom(ThresholdsAtom);
+    const { getThresholds, isConnected } = useWebSocketThresholds();
 
     useEffect(() => {
         if (jwt == null || jwt.length < 1)
@@ -35,16 +31,12 @@ export default function useInitializeData() {
         })
     }, [jwt])
 
-
     useEffect(() => {
-        if (jwt == null || jwt.length < 1) {
+        if (jwt == null || jwt.length < 1 || !isConnected) {
             return;
         }
-        thresholdClient.getThresholds(jwt).then((dto) => {
-            if (!dto) return;
-            setThresholds(dto.updatedThresholds || []);
-            setEvaluations(dto.evaluations || []);
-            console.log("Initial thresholds loaded", dto);
-        });
-    }, [jwt]);
+
+        console.log("Loading thresholds via WebSocket...");
+        getThresholds();
+    }, [jwt, isConnected, getThresholds]);
 }
