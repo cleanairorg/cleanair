@@ -56,14 +56,14 @@ jobs:
           - server/Infrastructure.Websocket.Tests
           - server/Infrastructure.Postgres.Tests
           - server/Api.Rest.ControllerTests
-
+  
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
+  
       - name: Install Stryker
         run: dotnet tool install -g dotnet-stryker
-
+  
       - name: Run Mutation Tests
         continue-on-error: true
         working-directory: ${{ matrix.project }}
@@ -73,20 +73,17 @@ jobs:
             --reporter html \
             --reporter progress \
             --output StrykerOutput
-
+  
+      - name: Normalize project name
+        id: sanitize
+        run: |
+          SANITIZED_NAME=$(echo "${{ matrix.project }}" | sed 's/\//-/g')
+          echo "name=$SANITIZED_NAME" >> $GITHUB_OUTPUT
+  
       - name: Upload Mutation Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: stryker-report-${{ matrix.project }}
+          name: stryker-report-${{ steps.sanitize.outputs.name }}
           path: ${{ matrix.project }}/StrykerOutput/**/reports/mutation-report.html
-
-      - name: Print mutation score summary
-        run: |
-          find . -name "mutation-report.json" | while read file; do
-            echo "Score from: $file"
-            cat "$file" | jq '.mutationScore'
-          done
   
-    
-      
