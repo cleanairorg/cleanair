@@ -30,7 +30,7 @@ public class ThresholdService(
             if (currentLog is null) 
             {
                 logger.LogError("[ThresholdService] No current log found for device - cannot proceed with threshold update");
-                throw new ArgumentNullException(nameof(currentLog), "No current log for device");
+                throw new InvalidOperationException("No current log for device");
             }
 
             if (adminUpdatesThresholdsDto.Thresholds != null)
@@ -81,7 +81,7 @@ public class ThresholdService(
             if (currentLog is null) 
             {
                 logger.LogError("[ThresholdService] No current log found for evaluation");
-                throw new ArgumentNullException(nameof(currentLog), "No log found for evaluation");
+                throw new InvalidOperationException("No log found for evaluation");
             }
             
             logger.LogInformation($"[ThresholdService] Using log ID: {currentLog.Id} with values - Temperature: {currentLog.Temperature}, Humidity: {currentLog.Humidity}, Pressure: {currentLog.Pressure}, AirQuality: {currentLog.Airquality}");
@@ -139,7 +139,7 @@ public class ThresholdService(
                     "humidity" => log.Humidity,
                     "pressure" => log.Pressure,
                     "airquality" => (decimal)log.Airquality,
-                    _ => throw new ArgumentException($"Unknown metric: {threshold.Metric}", nameof(threshold.Metric))
+                    _ => throw new ArgumentException($"Unknown metric: {threshold.Metric}")
                 };
                 
                 var evaluation = evaluator.Evaluate(threshold.Metric, value, threshold);

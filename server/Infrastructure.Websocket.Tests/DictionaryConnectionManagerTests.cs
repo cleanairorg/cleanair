@@ -44,8 +44,11 @@ public class DictionaryConnectionManagerTests
         var storedSocket = _manager.GetSocketFromClientId(clientId);
         var resolvedClientId = _manager.GetClientIdFromSocket(socketMock.Object);
 
-        Assert.That(resolvedClientId, Is.EqualTo(clientId));
-        Assert.That(storedSocket, Is.EqualTo(socketMock.Object));
+        Assert.Multiple(() =>
+        {
+            Assert.That(resolvedClientId, Is.EqualTo(clientId));
+            Assert.That(storedSocket, Is.EqualTo(socketMock.Object));
+        });
     }
 
     [Test]
@@ -73,8 +76,11 @@ public class DictionaryConnectionManagerTests
         var topics = await _manager.GetTopicsFromMemberId(clientId);
         var members = await _manager.GetMembersFromTopicId(topic);
 
-        Assert.That(topics, Does.Contain(topic));
-        Assert.That(members, Does.Contain(clientId));
+        Assert.Multiple(() =>
+        {
+            Assert.That(topics, Does.Contain(topic));
+            Assert.That(members, Does.Contain(clientId));
+        });
     }
 
     [Test]
@@ -89,9 +95,11 @@ public class DictionaryConnectionManagerTests
         var topics = await _manager.GetTopicsFromMemberId(clientId);
         var members = await _manager.GetMembersFromTopicId(topic);
 
-        Assert.That(topics, Does.Not.Contain(topic));
-        Assert.That(members, Does.Not.Contain(clientId));
-
+        Assert.Multiple(() =>
+        {
+            Assert.That(topics, Does.Not.Contain(topic));
+            Assert.That(members, Does.Not.Contain(clientId));
+        });
     }
 
     [Test]
@@ -439,8 +447,11 @@ public class DictionaryConnectionManagerTests
 
         var dict = _manager.GetConnectionIdToSocketDictionary();
 
-        Assert.That(dict.ContainsKey(clientId), Is.True, "Expected dictionary to contain client ID");
-        Assert.That(dict[clientId], Is.EqualTo(socket.Object));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dict.ContainsKey(clientId), Is.True, "Expected dictionary to contain client ID");
+            Assert.That(dict[clientId], Is.EqualTo(socket.Object));
+        });
     }
 
     [Test]
@@ -454,8 +465,11 @@ public class DictionaryConnectionManagerTests
 
         var dict = _manager.GetSocketIdToClientIdDictionary();
 
-        Assert.That(dict.ContainsKey(socketId), Is.True, "Expected dictionary to contain socket ID");
-        Assert.That(dict[socketId], Is.EqualTo(clientId));;
+        Assert.Multiple(() =>
+        {
+            Assert.That(dict.ContainsKey(socketId), Is.True, "Expected dictionary to contain socket ID");
+            Assert.That(dict[socketId], Is.EqualTo(clientId));
+        });
     }
     
     
