@@ -24,7 +24,7 @@ export default function MeasurementAlerts() {
 
     const alerts = evaluations
         .filter(e => e.state !== ThresholdStates.Good)
-        .sort((a, b) => b.state - a.state);
+        .sort((a, b) => b.state! - a.state!);
 
     return (
         <aside className="measurement-alerts">
@@ -37,9 +37,9 @@ export default function MeasurementAlerts() {
             ) : (
                 <div className="alert-grid">
                     {alerts.map((alert, i) => (
-                        <div key={i} className={`alert-card ${getClass(alert.state)}`}>
+                        <div key={i} className={`alert-card ${getClass(alert.state!)}`}>
                             <img src={danger} className="alert-icon" alt="Danger" />
-                            <div>{getMessage(alert.metric, alert.state)}</div>
+                            <div>{getMessage(alert.metric!, alert.state!)}</div>
                         </div>
                     ))}
                 </div>
