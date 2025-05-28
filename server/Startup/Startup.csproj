@@ -24,19 +24,5 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.1.3"/>
     </ItemGroup>
 
-    <!-- Exclude Stryker config files from publish -->
-    <ItemGroup>
-        <Content Remove="**/stryker-config.json" />
-        <None Remove="**/stryker-config.json" />
-        <EmbeddedResource Remove="**/stryker-config.json" />
-    </ItemGroup>
-
-    <!-- Additional exclusions for publish -->
-    <Target Name="ExcludeFilesFromPublish" BeforeTargets="PrepareForPublish">
-        <ItemGroup>
-            <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="$([System.String]::Copy('%(ResolvedFileToPublish.Identity)').EndsWith('stryker-config.json'))" />
-        </ItemGroup>
-    </Target>
-
 
 </Project>
