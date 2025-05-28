@@ -12,7 +12,6 @@ namespace Api.Rest.Controllers;
 [ApiController]
 public class CleanAirController(
     ICleanAirService cleanAirService,
-    IConnectionManager connectionManager,
     ISecurityService securityService, 
     ILoggingService logger) : ControllerBase
 {
@@ -49,7 +48,7 @@ public class CleanAirController(
         catch (Exception ex)
         {
             logger.LogError("[CleanAirController] Error occurred while retrieving logs", ex);
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "GetLogs failed, see inner exception");
         }
     }
 
@@ -90,7 +89,7 @@ public class CleanAirController(
         catch (Exception)
         {
             logger.LogError("[CleanAirController] Error occurred in AdminChangesDeviceInterval");
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "AdminChangesDeviceInterval failed, see inner exception");
         }
     }
 
@@ -119,7 +118,7 @@ public class CleanAirController(
         catch (Exception ex)
         {
             logger.LogError("[CleanAirController] Failed to delete data.", ex);
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "DeleteData failed, see inner exception");
         }
     }
 
@@ -144,7 +143,7 @@ public class CleanAirController(
         catch (Exception ex)
         {
             logger.LogError("[CleanAirController] Error occurred in GetMeasurementNow", ex);
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "GetMeasurementNow failed, see inner exception");
         }
     }
     
