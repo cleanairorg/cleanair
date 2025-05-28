@@ -34,7 +34,7 @@ public class CleanAirRepository(MyDbContext ctx) : ICleanAirRepository
 
     public async Task DeleteAllData()
     {
-        var allDataLogs = ctx.Devicelogs.ToList();
+        var allDataLogs = await ctx.Devicelogs.ToListAsync();
         ctx.RemoveRange(allDataLogs);
         await ctx.SaveChangesAsync();
     }
