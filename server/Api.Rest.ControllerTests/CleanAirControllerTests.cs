@@ -401,6 +401,68 @@ public class CleanAirControllerTests
         
         _securityServiceMock.Verify(s => s.VerifyJwtOrThrow(authorization), Times.Once);
     }
+    [Test]
+    public async Task GetLogs_ValidToken_ShouldReturnOkWithLogs()
+    {
+        // Arrange
+        var authorization = "valid-token";
+        var claims = CreateJwt("user");
+        var logs = new List<Devicelog> { new Devicelog { Id = "log1" }, new Devicelog { Id = "log2" } };
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow(authorization))
+            .Returns(claims);
+            
+        _cleanAirServiceMock
+            .Setup(s => s.GetDeviceFeed(claims))
+            .Returns(logs);
+
+        // Act
+        var result = await _controller.GetLogs(authorization);
+
+        // Assert
+        var okResult = result.Result as OkObjectResult;
+        Assert.Multiple(() =>
+        {
+            Assert.That(okResult, Is.Not.Null);
+            Assert.That(okResult.StatusCode, Is.EqualTo(200));
+            Assert.That(okResult.Value, Is.EqualTo(logs));
+        });
+
+        _securityServiceMock.Verify(s => s.VerifyJwtOrThrow(authorization), Times.Once);
+        _cleanAirServiceMock.Verify(s => s.GetDeviceFeed(claims), Times.Once);
+        _loggerMock.Verify(l => l.LogInformation("[CleanAirController] GetLogs endpoint called"), Times.Once);
+        _loggerMock.Verify(l => l.LogInformation($"[CleanAirController] Authorized user. Role: {claims.Role}"), Times.Once);
+        _loggerMock.Verify(l => l.LogInformation($"[CleanAirController] retrieved {logs.Count} logs"), Times.Once);
+    }
+
+    [Test]
+    public async Task GetLogs_InvalidToken_ShouldReturnInternalServerError()
+    {
+        // Arrange
+        var authorization = "invalid-token";
+        var exception = new Exception("Invalid token");
+
+        _securityServiceMock
+            .Setup(s => s.VerifyJwtOrThrow(authorization))
+            .Throws(exception);
+
+        // Act
+        var result = await _controller.GetLogs(authorization);
+
+        // Assert
+        var errorResult = result.Result as ObjectResult;
+        Assert.Multiple(() =>
+        {
+            Assert.That(errorResult, Is.Not.Null);
+            Assert.That(errorResult.StatusCode, Is.EqualTo(500));
+            Assert.That(errorResult.Value, Is.EqualTo("Internal server error"));
+        });
+
+        _securityServiceMock.Verify(s => s.VerifyJwtOrThrow(authorization), Times.Once);
+        _loggerMock.Verify(l => l.LogInformation("[CleanAirController] GetLogs endpoint called"), Times.Once);
+        _loggerMock.Verify(l => l.LogError("[CleanAirController] Error occurred while retrieving logs", exception), Times.Once);
+    }
 
     
 }

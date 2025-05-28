@@ -37,9 +37,20 @@ public class CleanAirController(
     [Route(GetLogsRoute)]
     public async Task<ActionResult<IEnumerable<Devicelog>>> GetLogs([FromHeader] string authorization)
     {
-        var claims = securityService.VerifyJwtOrThrow(authorization);
-        var feed =  cleanAirService.GetDeviceFeed(claims);
-        return Ok(feed);
+        try
+        {
+            logger.LogInformation("[CleanAirController] GetLogs endpoint called");
+            var claims = securityService.VerifyJwtOrThrow(authorization);
+            logger.LogInformation($"[CleanAirController] Authorized user. Role: {claims.Role}");
+            var feed = cleanAirService.GetDeviceFeed(claims);
+            logger.LogInformation($"[CleanAirController] retrieved {feed.Count} logs");
+            return Ok(feed);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirController] Error occurred while retrieving logs", ex);
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     [HttpPost]
