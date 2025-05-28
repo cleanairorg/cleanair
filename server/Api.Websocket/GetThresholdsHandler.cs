@@ -1,8 +1,6 @@
 ﻿using Application.Interfaces.Infrastructure.Logging;
 using Application.Interfaces;
 using Fleck;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Authentication;
 using Api.Websocket.Dtos;
 using WebSocketBoilerplate;
 
@@ -19,22 +17,18 @@ public class GetThresholdsHandler(
         
         try
         {
-            // Log token validation attempt
+            // Authentication logic
             logger.LogInformation("[GetThresholdsHandler] Validating authorization token");
-            
-            // Clean JWT token - fjern linjeskift og ekstra whitespace
             var cleanToken = dto.Authorization?.Replace("\n", "").Replace("\r", "").Trim();
             logger.LogInformation($"[GetThresholdsHandler] Token length after cleaning: {cleanToken?.Length ?? 0}");
             
-            // Verificer authorization
             var claims = securityService.VerifyJwtOrThrow(cleanToken);
             logger.LogInformation($"[GetThresholdsHandler] Token validated successfully for user with role: {claims.Role}");
             
-            // Retrieve thresholds
+            // Business logic
             logger.LogInformation("[GetThresholdsHandler] Retrieving thresholds with evaluations from service");
             var result = await thresholdService.GetThresholdsWithEvaluationsAsync();
             
-            // Log result details
             var thresholdCount = result.UpdatedThresholds?.Count ?? 0;
             var evaluationCount = result.Evaluations?.Count ?? 0;
             logger.LogInformation($"[GetThresholdsHandler] Retrieved {thresholdCount} thresholds and {evaluationCount} evaluations");
@@ -55,7 +49,6 @@ public class GetThresholdsHandler(
                 }
             }
             
-            // Send data directly back to requesting client
             socket.SendDto(new ServerRespondsWithThresholds
             {
                 ThresholdData = result,
@@ -64,41 +57,9 @@ public class GetThresholdsHandler(
             
             logger.LogInformation($"[GetThresholdsHandler] Threshold data sent successfully to client with requestId: {dto.requestId}");
         }
-        catch (ValidationException ex)
-        {
-            logger.LogWarning($"[GetThresholdsHandler] Validation error: {ex.Message}");
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "Invalid request: " + ex.Message,
-                requestId = dto.requestId
-            });
-        }
-        catch (AuthenticationException ex)
-        {
-            logger.LogWarning($"[GetThresholdsHandler] Authentication failed: {ex.Message}");
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "Authentication failed",
-                requestId = dto.requestId
-            });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            logger.LogWarning($"[GetThresholdsHandler] Unauthorized access attempt: {ex.Message}");
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "Access denied",
-                requestId = dto.requestId
-            });
-        }
         catch (Exception ex)
         {
-            logger.LogError("[GetThresholdsHandler] Unexpected error retrieving thresholds", ex);
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "An unexpected error occurred",
-                requestId = dto.requestId
-            });
+            WebSocketExceptionHandler.HandleException(ex, socket, dto.requestId, logger, "GetThresholdsHandler");
         }
     }
 }

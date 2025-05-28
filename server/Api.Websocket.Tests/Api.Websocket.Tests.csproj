@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Api.Websocket\Api.Websocket.csproj" />
-    <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
   
   <ItemGroup>
