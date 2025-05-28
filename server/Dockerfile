@@ -25,8 +25,7 @@ RUN dotnet publish "server/Startup/Startup.csproj" \
     -o /app/publish \
     --runtime linux-musl-x64 \
     --self-contained true \
-    /p:PublishSingleFile=true \
-    /p:ExcludeAssets="Api.Rest/stryker-config.json;Infrastructure/*"
+    /p:PublishSingleFile=true
 
 # === RUNTIME STAGE ===
 # Bruger minimal runtime image (ikke hele SDK)

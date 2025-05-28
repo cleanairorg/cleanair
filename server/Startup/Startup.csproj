@@ -24,5 +24,17 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.1.3"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Remove="..\Api.Rest\stryker-config.json" />
+        <None Remove="..\Infrastructure\**\*" />
+    </ItemGroup>
+
+    <Target Name="ExcludeFiles" BeforeTargets="Publish">
+        <ItemGroup>
+            <FilesToExclude Include="..\Api.Rest\stryker-config.json;..\Infrastructure\**\*" />
+            <FilesForPackagingFromProject Remove="@(FilesToExclude)" />
+        </ItemGroup>
+    </Target>
+
 
 </Project>
