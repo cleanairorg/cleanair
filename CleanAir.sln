@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{EC3E42FE-547E-48ED-88D0-4AD451366FF1}"
+	ProjectSection(SolutionItems) = preProject
+		server\spiketest.js = server\spiketest.js
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.Rest", "server\Api.Rest\Api.Rest.csproj", "{C60B19AE-3D05-4CE1-9B65-E4F36C9963C1}"
 EndProject
