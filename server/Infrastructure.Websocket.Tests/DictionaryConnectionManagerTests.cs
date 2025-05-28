@@ -44,7 +44,7 @@ public class DictionaryConnectionManagerTests
         var storedSocket = _manager.GetSocketFromClientId(clientId);
         var resolvedClientId = _manager.GetClientIdFromSocket(socketMock.Object);
 
-        Assert.AreEqual(clientId, resolvedClientId);
+        Assert.That(resolvedClientId, Is.EqualTo(clientId));
         Assert.That(storedSocket, Is.EqualTo(socketMock.Object));
     }
 
