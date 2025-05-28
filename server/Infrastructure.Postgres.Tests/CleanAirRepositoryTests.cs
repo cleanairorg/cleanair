@@ -333,7 +333,7 @@ public class CleanAirRepositoryTests
         var result = _repository.GetDailyAverages(dto);
 
         result.Should().ContainSingle()
-            .Which.Airquality.Should().BeApproximately(3.0, 0.01); // average of 2 and 4
+            .Which.Airquality.Should().Be((int)3.0); // average of 2 and 4
     }
     
     [Test]
@@ -341,8 +341,8 @@ public class CleanAirRepositoryTests
     {
         var today = DateTime.UtcNow.Date;
         _context.Devicelogs.AddRange(
-            new Devicelog { Id = "low", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(1), Airquality = 1.0 },
-            new Devicelog { Id = "high", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(2), Airquality = 5.0 }
+            new Devicelog { Id = "low", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(1), Airquality = (int)1.0 },
+            new Devicelog { Id = "high", Deviceid = "dev1", Unit = "Celsius", Timestamp = today.AddHours(2), Airquality = (int)5.0 }
         );
         _context.SaveChanges();
 
@@ -351,7 +351,7 @@ public class CleanAirRepositoryTests
         var result = _repository.GetDailyAverages(dto);
 
         result.Should().ContainSingle()
-            .Which.Airquality.Should().BeApproximately(3.0, 0.01); // avg of 1.0 and 5.0
+            .Which.Airquality.Should().Be((int)3.0); // avg of 1.0 and 5.0
     }
     
     [Test]
@@ -366,7 +366,7 @@ public class CleanAirRepositoryTests
             Temperature = 20,
             Humidity = 40,
             Pressure = 1000,
-            Airquality = 1.1
+            Airquality = (int)1.1
         };
 
         var result = _repository.AddDeviceLog(log);

@@ -12,5 +12,9 @@
     <Project Path="server\Infrastructure.Websocket\Infrastructure.Websocket.csproj" Type="Classic C#" />
     <Project Path="server/Application.Tests/Application.Tests.csproj" Type="Classic C#" />
     <Project Path="server/Api.Websocket.Tests/Api.Websocket.Tests.csproj" Type="Classic C#" />
+    <Project Path="server/Api.Rest.ControllerTests/Api.Rest.ControllerTests.csproj" Type="Classic C#" />
+    <Project Path="server\Infrastructure.MQTT.Tests\Infrastructure.MQTT.Tests.csproj" Type="Classic C#" />
+    <Project Path="server\Infrastructure.Postgres.Tests\Infrastructure.Postgres.Tests.csproj" Type="Classic C#" />
+    <Project Path="server\Infrastructure.Websocket.Tests\Infrastructure.Websocket.Tests.csproj" Type="Classic C#" />
   </Folder>
 </Solution>
