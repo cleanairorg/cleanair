@@ -45,7 +45,7 @@ jobs:
         run: |
           docker build \
             --build-arg VITE_API_BASE_URL="/api" \
-            --build-arg VITE_API_WS_URL="79.76.59.88:8181" \
+            --build-arg VITE_API_WS_URL="79.76.54.84:8181" \
             -t ghcr.io/${{ github.repository }}-frontend:production \
             -f client/Dockerfile .
           docker push ghcr.io/${{ github.repository }}-frontend:production
@@ -92,4 +92,4 @@ jobs:
             echo "${{ secrets.GHUB_TOKEN  }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose pull
             docker compose down
-            docker compose up -d backend frontend seq flyway postgres
+            docker compose up -d backend frontend seq postgres
