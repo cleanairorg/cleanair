@@ -7,9 +7,9 @@ using WebSocketBoilerplate;
 
 namespace Api.Websocket;
 
-/// <summary>
-/// Simple exception handler for all websocket handlers
-/// </summary>
+/*
+/ Simple exception handler for all websocket handlers
+*/
 public static class WebSocketExceptionHandler
 {
     public static void HandleException(

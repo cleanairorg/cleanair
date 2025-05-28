@@ -46,10 +46,8 @@ public static class Extensions
             {
                 try
                 {
-                    // TILFØJ DENNE DEBUG LOGGING:
                     logger.LogInformation("WebSocket received message: {Message}", message);
         
-                    // Parse JSON for at se eventType
                     var jsonDoc = JsonDocument.Parse(message);
                     if (jsonDoc.RootElement.TryGetProperty("eventType", out var eventTypeElement))
                     {

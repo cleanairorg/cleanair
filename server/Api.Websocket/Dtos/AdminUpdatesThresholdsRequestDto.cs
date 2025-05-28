@@ -3,16 +3,9 @@ using WebSocketBoilerplate;
 
 namespace Api.Websocket.Dtos;
 
-/// <summary>
-/// Client request to update thresholds
-/// Frontend should send:
-/// {
-///   "eventType": "AdminUpdatesThresholdsRequestDto",
-///   "authorization": "Bearer token...",
-///   "thresholdData": { ... },
-///   "requestId": "unique-id"
-/// }
-/// </summary>
+/*
+/ Client request to update thresholds
+*/
 public class AdminUpdatesThresholdsRequestDto : BaseDto
 {
     public string Authorization { get; set; } = string.Empty;

@@ -1,23 +1,20 @@
-﻿// DeviceSettings.tsx - OPDATER DENNE
-import '../css/DeviceSettings.css';
+﻿import '../css/DeviceSettings.css';
 import {CurrentValueAtom, DeviceIntervalAtom, JwtAtom, UserInfoAtom, ThresholdsAtom} from "../atoms.ts";
 import {useAtom} from "jotai";
 import {cleanAirClient} from "../apiControllerClients.ts";
-// FJERN DENNE LINJE:
-// import {cleanAirClient, thresholdClient} from "../apiControllerClients.ts";
 import toast from "react-hot-toast";
 import {useEffect, useState} from "react";
 import {useWsClient} from "ws-request-hook";
 import {ServerBroadcastsIntervalChange, StringConstants} from "../generated-client.ts";
 import ThresholdSlider from "../components/ThresholdSlider";
-// TILFØJ DENNE:
+
 import useWebSocketThresholds from "../hooks/useWebSocketThresholds";
 
 export default function DeviceSettings() {
 
     const [jwt] = useAtom(JwtAtom);
     const { onMessage, readyState } = useWsClient();
-    // TILFØJ DENNE:
+    
     const { updateThresholds, isConnected } = useWebSocketThresholds();
 
     const [userInfo,] = useAtom(UserInfoAtom);
@@ -30,7 +27,7 @@ export default function DeviceSettings() {
     const [thresholds, setThresholds] = useAtom(ThresholdsAtom);
     const [getLocalThreshold, setLocalThreshold] = useState(thresholds);
     const [thresholdsExpanded, setThresholdsExpanded] = useState(true);
-    // TILFØJ DENNE:
+    
     const [saving, setSaving] = useState(false);
 
     const intervals = [
@@ -50,7 +47,6 @@ export default function DeviceSettings() {
         pressure: { min: 990, max: 1030 },
     };
 
-    // TILFØJ DENNE useEffect:
     useEffect(() => {
         setLocalThreshold(thresholds);
     }, [thresholds]);
@@ -117,24 +113,8 @@ export default function DeviceSettings() {
             t.metric === metric ? { ...t, warnMin: values[0], goodMin: values[1], goodMax: values[2], warnMax: values[3] } : t
         ));
     };
+    
 
-    // ERSTAT DENNE FUNKTION:
-    /*
-    const saveThresholds = () => {
-        thresholdClient.updateThresholds({ thresholds: getLocalThreshold }, jwt)
-            .then(() => {
-                toast.success("Thresholds updated");
-                setThresholds(getLocalThreshold);
-                setEditing(false);
-            })
-            .catch(err => {
-                toast.error("Error updating thresholds");
-                console.error(err);
-            });
-    };
-    */
-
-    // MED DENNE:
     const saveThresholds = async () => {
         if (!isConnected) {
             toast.error("Not connected to server");
@@ -179,7 +159,7 @@ export default function DeviceSettings() {
                                 metric={t.metric || ''}
                                 values={[t.warnMin || 0, t.goodMin || 0, t.goodMax || 0, t.warnMax || 0]}
                                 onChange={vals => updateMetric(t.metric || '', vals)}
-                                disabled={!editing || !isConnected || saving} // OPDATER DENNE LINJE
+                                disabled={!editing || !isConnected || saving}
                                 min={metricRanges[t.metric || '']?.min || 0}
                                 max={metricRanges[t.metric || '']?.max || 100}
                             />
@@ -191,9 +171,9 @@ export default function DeviceSettings() {
                                     <button
                                         className="green-button"
                                         onClick={() => setEditing(true)}
-                                        disabled={!isConnected} // TILFØJ DENNE
+                                        disabled={!isConnected}
                                     >
-                                        {isConnected ? 'Edit Thresholds' : 'Disconnected'} {/* OPDATER DENNE */}
+                                        {isConnected ? 'Edit Thresholds' : 'Disconnected'}
                                     </button>
                                 )}
 
@@ -202,9 +182,9 @@ export default function DeviceSettings() {
                                         <button
                                             className="green-button"
                                             onClick={saveThresholds}
-                                            disabled={!isConnected || saving} // OPDATER DENNE
+                                            disabled={!isConnected || saving}
                                         >
-                                            {saving ? 'Saving...' : 'Save Changes'} {/* OPDATER DENNE */}
+                                            {saving ? 'Saving...' : 'Save Changes'}
                                         </button>
                                         <button
                                             className="red-button"
@@ -212,7 +192,7 @@ export default function DeviceSettings() {
                                                 setLocalThreshold(thresholds);
                                                 setEditing(false);
                                             }}
-                                            disabled={saving} // TILFØJ DENNE
+                                            disabled={saving} 
                                         >
                                             Cancel
                                         </button>

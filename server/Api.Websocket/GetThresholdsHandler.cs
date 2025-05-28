@@ -20,7 +20,6 @@ public class GetThresholdsHandler(
             var claims = securityService.VerifyJwtOrThrow(dto.Authorization);
             logger.LogInformation($"[GetThresholdsHandler] Token validated successfully for user with role: {claims.Role}");
             
-            // Business logic
             logger.LogInformation("[GetThresholdsHandler] Retrieving thresholds with evaluations from service");
             var result = await thresholdService.GetThresholdsWithEvaluationsAsync();
             
