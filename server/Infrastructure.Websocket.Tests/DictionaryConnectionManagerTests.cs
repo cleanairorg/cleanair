@@ -45,7 +45,7 @@ public class DictionaryConnectionManagerTests
         var resolvedClientId = _manager.GetClientIdFromSocket(socketMock.Object);
 
         Assert.AreEqual(clientId, resolvedClientId);
-        Assert.AreEqual(socketMock.Object, storedSocket);
+        Assert.That(storedSocket, Is.EqualTo(socketMock.Object));
     }
 
     [Test]
@@ -73,8 +73,8 @@ public class DictionaryConnectionManagerTests
         var topics = await _manager.GetTopicsFromMemberId(clientId);
         var members = await _manager.GetMembersFromTopicId(topic);
 
-        Assert.Contains(topic, topics);
-        Assert.Contains(clientId, members);
+        Assert.That(topics, Does.Contain(topic));
+        Assert.That(members, Does.Contain(clientId));
     }
 
     [Test]
@@ -89,8 +89,9 @@ public class DictionaryConnectionManagerTests
         var topics = await _manager.GetTopicsFromMemberId(clientId);
         var members = await _manager.GetMembersFromTopicId(topic);
 
-        Assert.IsFalse(topics.Contains(topic));
-        Assert.IsFalse(members.Contains(clientId));
+        Assert.That(topics, Does.Not.Contain(topic));
+        Assert.That(members, Does.Not.Contain(clientId));
+
     }
 
     [Test]
@@ -188,8 +189,8 @@ public class DictionaryConnectionManagerTests
         // Assert
         var remainingMembers = await _manager.GetMembersFromTopicId(topic);
 
-        Assert.IsTrue(remainingMembers.Contains(member2), "Expected other member to remain");
-        Assert.IsFalse(remainingMembers.Contains(member1), "Expected removed member to be gone");
+        Assert.That(remainingMembers, Does.Contain(member2), "Expected other member to remain");
+        Assert.That(remainingMembers, Does.Not.Contain(member1), "Expected removed member to be gone");
 
         var internalTopicsField = typeof(WebSocketConnectionManager)
             .GetField("_topicMembers",
@@ -213,7 +214,7 @@ public class DictionaryConnectionManagerTests
 
         // Assert
         var memberTopics = await _manager.GetTopicsFromMemberId(member);
-        Assert.IsEmpty(memberTopics, "Expected member to have no topics");
+        Assert.That(memberTopics, Is.Empty, "Expected member to have no topics");
 
         var internalField = typeof(WebSocketConnectionManager)
             .GetField("_memberTopics",
@@ -240,8 +241,9 @@ public class DictionaryConnectionManagerTests
         // Assert
         var remainingTopics = await _manager.GetTopicsFromMemberId(member);
 
-        Assert.IsFalse(remainingTopics.Contains(topic1), "Expected removed topic to be gone");
-        Assert.IsTrue(remainingTopics.Contains(topic2), "Expected second topic to remain");
+        Assert.That(remainingTopics, Does.Not.Contain(topic1), "Expected removed topic to be gone");
+        Assert.That(remainingTopics, Does.Contain(topic2), "Expected second topic to remain");
+
 
         var internalField = typeof(WebSocketConnectionManager)
             .GetField("_memberTopics",
@@ -354,11 +356,11 @@ public class DictionaryConnectionManagerTests
         await _manager.AddToTopic(topic1, clientId);
         await _manager.AddToTopic(topic2, clientId);
 
-        await _manager.OnOpen(socket.Object, clientId); // Triggers resubscribe
+        await _manager.OnOpen(socket.Object, clientId);
 
         var topics = await _manager.GetTopicsFromMemberId(clientId);
-        Assert.Contains(topic1, topics);
-        Assert.Contains(topic2, topics);
+        Assert.That(topics, Does.Contain(topic1));
+        Assert.That(topics, Does.Contain(topic2));
     }
 
     [Test]
@@ -369,10 +371,10 @@ public class DictionaryConnectionManagerTests
         var newSocket = BuildMockSocket(Guid.NewGuid().ToString());
 
         await _manager.OnOpen(oldSocket.Object, clientId);
-        await _manager.OnOpen(newSocket.Object, clientId); // Should remove old
+        await _manager.OnOpen(newSocket.Object, clientId);
 
         var resolvedSocket = _manager.GetSocketFromClientId(clientId);
-        Assert.AreEqual(newSocket.Object, resolvedSocket);
+        Assert.That(resolvedSocket, Is.EqualTo(newSocket.Object));
     }
 
     [Test]
@@ -388,7 +390,7 @@ public class DictionaryConnectionManagerTests
         await _manager.OnClose(socket.Object, clientId);
 
         var topics = await _manager.GetTopicsFromMemberId(clientId);
-        Assert.Contains(topic, topics); // Still subscribed after disconnect
+        Assert.That(topics, Does.Contain(topic));
     }
 
     [Test]
@@ -397,7 +399,7 @@ public class DictionaryConnectionManagerTests
         var topic = "offline-topic";
         var clientId = "offline-client";
         var socketId = Guid.NewGuid().ToString();
-        var socket = BuildMockSocket(socketId, isAvailable: false); // Not available
+        var socket = BuildMockSocket(socketId, isAvailable: false);
 
         await _manager.OnOpen(socket.Object, clientId);
         await _manager.AddToTopic(topic, clientId);
@@ -437,8 +439,8 @@ public class DictionaryConnectionManagerTests
 
         var dict = _manager.GetConnectionIdToSocketDictionary();
 
-        Assert.IsTrue(dict.ContainsKey(clientId), "Expected dictionary to contain client ID");
-        Assert.AreEqual(socket.Object, dict[clientId]);
+        Assert.That(dict.ContainsKey(clientId), Is.True, "Expected dictionary to contain client ID");
+        Assert.That(dict[clientId], Is.EqualTo(socket.Object));
     }
 
     [Test]
@@ -452,8 +454,8 @@ public class DictionaryConnectionManagerTests
 
         var dict = _manager.GetSocketIdToClientIdDictionary();
 
-        Assert.IsTrue(dict.ContainsKey(socketId), "Expected dictionary to contain socket ID");
-        Assert.AreEqual(clientId, dict[socketId]);
+        Assert.That(dict.ContainsKey(socketId), Is.True, "Expected dictionary to contain socket ID");
+        Assert.That(dict[socketId], Is.EqualTo(clientId));;
     }
     
     
