@@ -24,10 +24,9 @@ public partial class MyDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("device_threshold_pkey");
 
-            entity.ToTable("device_threshold", "weatherstation");
+            entity.ToTable("device_threshold", "cleanair");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Deviceid).HasColumnName("deviceid");
             entity.Property(e => e.GoodMax).HasColumnName("good_max");
             entity.Property(e => e.GoodMin).HasColumnName("good_min");
             entity.Property(e => e.Metric).HasColumnName("metric");
@@ -39,7 +38,7 @@ public partial class MyDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("devicelog_pkey");
 
-            entity.ToTable("devicelog", "weatherstation");
+            entity.ToTable("devicelog", "cleanair");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Airquality).HasColumnName("airquality");
@@ -47,7 +46,9 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Humidity)
                 .HasPrecision(4, 2)
                 .HasColumnName("humidity");
-            entity.Property(e => e.Interval).HasColumnName("interval");
+            entity.Property(e => e.Interval)
+                .HasDefaultValue(15)
+                .HasColumnName("interval");
             entity.Property(e => e.Pressure)
                 .HasPrecision(6, 2)
                 .HasColumnName("pressure");
@@ -62,7 +63,7 @@ public partial class MyDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("user_pkey");
 
-            entity.ToTable("user", "weatherstation");
+            entity.ToTable("user", "cleanair");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Email).HasColumnName("email");

@@ -499,79 +499,6 @@
           }
         }
       }
-    },
-    "/api/UpdateThresholds": {
-      "post": {
-        "tags": [
-          "Threshold"
-        ],
-        "operationId": "Threshold_UpdateThresholds",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminUpdatesThresholdsDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/GetThresholds": {
-      "get": {
-        "tags": [
-          "Threshold"
-        ],
-        "operationId": "Threshold_GetThresholds",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ThresholdsBroadcastDto"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -675,8 +602,8 @@
             "format": "decimal"
           },
           "airquality": {
-            "type": "number",
-            "format": "double"
+            "type": "integer",
+            "format": "int32"
           },
           "interval": {
             "type": "integer",
@@ -738,115 +665,6 @@
           }
         }
       },
-      "AdminUpdatesThresholdsDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "thresholds": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ThresholdDto"
-            }
-          }
-        }
-      },
-      "ThresholdDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "metric": {
-            "type": "string"
-          },
-          "warnMin": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "goodMin": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "goodMax": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "warnMax": {
-            "type": "number",
-            "format": "decimal"
-          }
-        }
-      },
-      "ThresholdsBroadcastDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApplicationBaseDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "eventType": {
-                "type": "string"
-              },
-              "updatedThresholds": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ThresholdDto"
-                }
-              },
-              "evaluations": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ThresholdEvaluationResult"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "ThresholdEvaluationResult": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "metric": {
-            "type": "string"
-          },
-          "value": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "state": {
-            "$ref": "#/components/schemas/ThresholdStates"
-          }
-        }
-      },
-      "ThresholdStates": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "CriticalLow",
-          "WarningLow",
-          "Good",
-          "WarningHigh",
-          "CriticalHigh"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ]
-      },
-      "ApplicationBaseDto": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "eventType": {
-            "type": "string"
-          }
-        }
-      },
       "AdminHasDeletedData": {
         "allOf": [
           {
@@ -862,6 +680,16 @@
             }
           }
         ]
+      },
+      "ApplicationBaseDto": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "eventType": {
+            "type": "string"
+          }
+        }
       },
       "ServerBroadcastsIntervalChange": {
         "allOf": [
@@ -922,6 +750,93 @@
               }
             }
           }
+        ]
+      },
+      "ThresholdsBroadcastDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationBaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "eventType": {
+                "type": "string"
+              },
+              "updatedThresholds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThresholdDto"
+                }
+              },
+              "evaluations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThresholdEvaluationResult"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ThresholdDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "warnMin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "goodMin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "goodMax": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "warnMax": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
+      "ThresholdEvaluationResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ThresholdStates"
+          }
+        }
+      },
+      "ThresholdStates": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "CriticalLow",
+          "WarningLow",
+          "Good",
+          "WarningHigh",
+          "CriticalHigh"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
         ]
       },
       "MemberLeftNotification": {
@@ -993,6 +908,88 @@
           }
         ]
       },
+      "AdminUpdatesThresholdsRequestDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "authorization": {
+                "type": "string"
+              },
+              "thresholdData": {
+                "$ref": "#/components/schemas/AdminUpdatesThresholdsDto"
+              }
+            }
+          }
+        ]
+      },
+      "AdminUpdatesThresholdsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "thresholds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThresholdDto"
+            }
+          }
+        }
+      },
+      "GetThresholdsRequestDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "authorization": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ServerConfirmsThresholdUpdate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ServerRespondsWithThresholds": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "thresholdData": {
+                "$ref": "#/components/schemas/ThresholdsBroadcastDto"
+              }
+            }
+          }
+        ]
+      },
       "StringConstants": {
         "type": "string",
         "description": "Available eventType and string constants",
@@ -1006,6 +1003,10 @@
           "Ping",
           "Pong",
           "ServerSendsErrorMessage",
+          "AdminUpdatesThresholdsRequestDto",
+          "GetThresholdsRequestDto",
+          "ServerConfirmsThresholdUpdate",
+          "ServerRespondsWithThresholds",
           "Dashboard",
           "Device",
           "ChangePreferences",

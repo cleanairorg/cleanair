@@ -19,7 +19,7 @@ public partial class Devicelog
 
     public decimal Pressure { get; set; }
 
-    public double Airquality { get; set; }
+    public int Airquality { get; set; }
 
     public int Interval { get; set; }
 }

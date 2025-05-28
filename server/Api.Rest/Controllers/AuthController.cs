@@ -22,7 +22,6 @@ public class AuthController(ISecurityService securityService, ILoggingService lo
     {
         logger.LogInformation($"Login request: {dto}");
         return Ok(securityService.Login(dto));
-        
     }
 
     [Route(RegisterRoute)]

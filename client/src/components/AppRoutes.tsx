@@ -12,7 +12,7 @@ import DeviceSettings from "./DeviceSettings.tsx";
 import CurrentValues from "./CurrentValues.tsx";
 import MeasurementAlerts from "./MeasurementAlerts.tsx";
 import Graphs from "./Graphs.tsx";
-import useThresholdBroadcastListener from "../hooks/useThresholdBroadcastListener";
+import useWebSocketThresholds from "../hooks/useWebSocketThresholds";
 
 export default function AppRoutes(){
 
@@ -20,7 +20,7 @@ export default function AppRoutes(){
     const [jwt, setJwt] = useAtom(JwtAtom);
     useInitializeData();
     useSubscribeToTopics();
-    useThresholdBroadcastListener();
+    useWebSocketThresholds();
 
     useEffect(() => {
         const storedJwt = localStorage.getItem("jwt");
