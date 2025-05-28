@@ -17,7 +17,7 @@ RUN dotnet restore "server/Startup/Startup.csproj"
 COPY ["server/", "server/"]
 
 # Add this line before your RUN dotnet publish command
-RUN find /src -name "stryker-config.json" -delete
+RUN find server -type f -name "stryker-config.json" -delete
 
 # Kompilerer og publisher applikationen
 # --runtime: Specificerer target runtime (Alpine Linux)
