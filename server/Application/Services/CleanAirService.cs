@@ -70,7 +70,7 @@ public class CleanAirService(
         return cleanAirRepository.GetRecentLogs();
     }
 
-    public Devicelog GetLatestDeviceLog()
+    public Devicelog? GetLatestDeviceLog()
     {
         try
         {
@@ -85,7 +85,6 @@ public class CleanAirService(
             {
                 logger.LogInformation($"[CleanAirService] got the latest device log found, LogID: {latestLog.Id}");
             }
-            
             return latestLog;
         }
         catch (Exception ex)

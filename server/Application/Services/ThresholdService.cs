@@ -18,7 +18,7 @@ public class ThresholdService(
     ILoggingService logger) : IThresholdService
 {
     
-    public async Task UpdateThresholdsAsync(AdminUpdatesThresholdsDto dto)
+    public async Task UpdateThresholdsAsync(AdminUpdatesThresholdsDto adminUpdatesThresholdsDto)
     {
         logger.LogInformation("[ThresholdService] Starting threshold update process, UpdateThresholdsAsync");
         
@@ -33,9 +33,9 @@ public class ThresholdService(
                 throw new Exception("No current log for device");
             }
 
-            if (dto.Thresholds != null)
+            if (adminUpdatesThresholdsDto.Thresholds != null)
             {
-                foreach (var t in dto.Thresholds)
+                foreach (var t in adminUpdatesThresholdsDto.Thresholds)
                 {
                     var threshold = new DeviceThreshold
                     {
@@ -53,8 +53,8 @@ public class ThresholdService(
 
             var updateDeviceThresholds = new AdminUpdatesDeviceThresholdsDto
             {
-                GoodMax = dto.Thresholds?.FirstOrDefault(g => g.Metric == "airquality")?.GoodMax ?? 1200,
-                WarnMax = dto.Thresholds?.FirstOrDefault(w => w.Metric == "airquality")?.WarnMax ?? 2500,
+                GoodMax = adminUpdatesThresholdsDto.Thresholds?.FirstOrDefault(g => g.Metric == "airquality")?.GoodMax ?? 1200,
+                WarnMax = adminUpdatesThresholdsDto.Thresholds?.FirstOrDefault(w => w.Metric == "airquality")?.WarnMax ?? 2500,
             };
             
             await mqttPublisher.Publish(updateDeviceThresholds, StringConstants.UpdateDeviceThresholds);
