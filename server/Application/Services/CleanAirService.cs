@@ -131,12 +131,6 @@ public class CleanAirService(
         }
     }
 
-    public Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims)
-    {
-        mqttPublisher.Publish(dto, StringConstants.Device + $"/{dto.DeviceId}/" + StringConstants.ChangePreferences);
-        return Task.CompletedTask;
-    }
-
     public Task UpdateDeviceIntervalAndBroadcast(AdminChangesDeviceIntervalDto dto)
     {
         try

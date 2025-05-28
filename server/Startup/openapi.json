@@ -154,49 +154,6 @@
         }
       }
     },
-    "/api/AdminChangesPreferences": {
-      "post": {
-        "tags": [
-          "CleanAir"
-        ],
-        "operationId": "CleanAir_AdminChangesPreferences",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminChangesPreferencesDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/AdminChangesDeviceInterval": {
       "post": {
         "tags": [
@@ -608,21 +565,6 @@
           "interval": {
             "type": "integer",
             "format": "int32"
-          }
-        }
-      },
-      "AdminChangesPreferencesDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "deviceId": {
-            "type": "string"
-          },
-          "unit": {
-            "type": "string"
-          },
-          "interval": {
-            "type": "string"
           }
         }
       },

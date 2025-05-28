@@ -18,8 +18,6 @@ public class CleanAirController(
 {
     public const string ControllerRoute = "api/";
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
-
-    public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);
     
     public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
     
@@ -51,16 +49,6 @@ public class CleanAirController(
             logger.LogError("[CleanAirController] Error occurred while retrieving logs", ex);
             return StatusCode(500, "GetLogs failed, see inner exception");
         }
-    }
-
-    [HttpPost]
-    [Route(AdminChangesPreferencesRoute)]
-    public async Task<ActionResult> AdminChangesPreferences([FromBody] AdminChangesPreferencesDto dto,
-        [FromHeader] string authorization)
-    {
-        var claims = securityService.VerifyJwtOrThrow(authorization);
-        await cleanAirService.UpdateDeviceFeed(dto, claims);
-        return Ok();
     }
     
     [HttpPost]
