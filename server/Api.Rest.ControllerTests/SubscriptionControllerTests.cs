@@ -38,11 +38,13 @@ public class SubscriptionControllerTests
             TopicIds = new List<string> { "topic1", "topic2" }
         };
 
-        _securityServiceMock.Setup(s => s.VerifyJwtOrThrow("token"));
+        _securityServiceMock.Setup(s => s.VerifyJwtOrThrow("token")); // Setup (optional if no return)
 
         var result = await _controller.Subscribe("token", dto);
 
         Assert.That(result, Is.InstanceOf<OkResult>());
+
+        _securityServiceMock.Verify(s => s.VerifyJwtOrThrow("token"), Times.Once);  // <-- verify called
         _subscriptionServiceMock.Verify(s => s.SubscribeToTopic("client123", dto.TopicIds), Times.Once);
     }
 
@@ -60,6 +62,8 @@ public class SubscriptionControllerTests
         var result = await _controller.Unsubscribe("auth", dto);
 
         Assert.That(result, Is.InstanceOf<OkResult>());
+
+        _securityServiceMock.Verify(s => s.VerifyJwtOrThrow("auth"), Times.Once);  // <-- verify called
         _subscriptionServiceMock.Verify(s => s.UnsubscribeFromTopic("client123", dto.TopicIds), Times.Once);
     }
 } 

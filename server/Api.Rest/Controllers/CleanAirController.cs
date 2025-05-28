@@ -12,6 +12,7 @@ namespace Api.Rest.Controllers;
 [ApiController]
 public class CleanAirController(
     ICleanAirService cleanAirService,
+    IConnectionManager connectionManager,
     ISecurityService securityService, 
     ILoggingService logger) : ControllerBase
 {

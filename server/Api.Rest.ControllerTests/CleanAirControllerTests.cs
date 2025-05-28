@@ -264,7 +264,7 @@ public class CleanAirControllerTests
         {
             Assert.That(error, Is.Not.Null);
             Assert.That(error!.StatusCode, Is.EqualTo(500));
-            Assert.That(error.Value, Is.EqualTo("Internal server error"));
+            Assert.That(error.Value, Is.EqualTo("AdminChangesDeviceInterval failed, see inner exception"));
         });
     }
     
@@ -325,7 +325,7 @@ public class CleanAirControllerTests
         {
             Assert.That(error, Is.Not.Null);
             Assert.That(error!.StatusCode, Is.EqualTo(500));
-            Assert.That(error.Value, Is.EqualTo("Internal server error"));
+            Assert.That(error.Value, Is.EqualTo("DeleteData failed, see inner exception"));
         });
 
     }
@@ -456,7 +456,7 @@ public class CleanAirControllerTests
         {
             Assert.That(errorResult, Is.Not.Null);
             Assert.That(errorResult.StatusCode, Is.EqualTo(500));
-            Assert.That(errorResult.Value, Is.EqualTo("Internal server error"));
+            Assert.That(errorResult.Value, Is.EqualTo("GetLogs failed, see inner exception"));
         });
 
         _securityServiceMock.Verify(s => s.VerifyJwtOrThrow(authorization), Times.Once);
