@@ -18,8 +18,6 @@ public class CleanAirController(
 {
     public const string ControllerRoute = "api/";
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
-
-    public const string AdminChangesPreferencesRoute = ControllerRoute + nameof(AdminChangesPreferences);
     
     public const string DeleteDataRoute = ControllerRoute + nameof(DeleteData);
     
@@ -37,19 +35,20 @@ public class CleanAirController(
     [Route(GetLogsRoute)]
     public async Task<ActionResult<IEnumerable<Devicelog>>> GetLogs([FromHeader] string authorization)
     {
-        var claims = securityService.VerifyJwtOrThrow(authorization);
-        var feed =  cleanAirService.GetDeviceFeed(claims);
-        return Ok(feed);
-    }
-
-    [HttpPost]
-    [Route(AdminChangesPreferencesRoute)]
-    public async Task<ActionResult> AdminChangesPreferences([FromBody] AdminChangesPreferencesDto dto,
-        [FromHeader] string authorization)
-    {
-        var claims = securityService.VerifyJwtOrThrow(authorization);
-        await cleanAirService.UpdateDeviceFeed(dto, claims);
-        return Ok();
+        try
+        {
+            logger.LogInformation("[CleanAirController] GetLogs endpoint called");
+            var claims = securityService.VerifyJwtOrThrow(authorization);
+            logger.LogInformation($"[CleanAirController] Authorized user. Role: {claims.Role}");
+            var feed = cleanAirService.GetDeviceFeed(claims);
+            logger.LogInformation($"[CleanAirController] retrieved {feed.Count} logs");
+            return Ok(feed);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("[CleanAirController] Error occurred while retrieving logs", ex);
+            return StatusCode(500, "GetLogs failed, see inner exception");
+        }
     }
     
     [HttpPost]
@@ -79,7 +78,7 @@ public class CleanAirController(
         catch (Exception)
         {
             logger.LogError("[CleanAirController] Error occurred in AdminChangesDeviceInterval");
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "AdminChangesDeviceInterval failed, see inner exception");
         }
     }
 
@@ -108,7 +107,7 @@ public class CleanAirController(
         catch (Exception ex)
         {
             logger.LogError("[CleanAirController] Failed to delete data.", ex);
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "DeleteData failed, see inner exception");
         }
     }
 
@@ -133,7 +132,7 @@ public class CleanAirController(
         catch (Exception ex)
         {
             logger.LogError("[CleanAirController] Error occurred in GetMeasurementNow", ex);
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "GetMeasurementNow failed, see inner exception");
         }
     }
     

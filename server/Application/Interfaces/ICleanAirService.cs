@@ -10,7 +10,6 @@ public interface ICleanAirService
     List<Devicelog> GetDeviceFeed(JwtClaims client);
     Task AddToDbAndBroadcast(CollectDataDto? dto);
     Devicelog GetLatestDeviceLog();
-    Task UpdateDeviceFeed(AdminChangesPreferencesDto dto, JwtClaims claims);
     Task UpdateDeviceIntervalAndBroadcast(AdminChangesDeviceIntervalDto dto);
     Task DeleteDataAndBroadcast(JwtClaims jwt);
     Task GetMeasurementNowAndBroadcast();
