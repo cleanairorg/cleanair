@@ -503,7 +503,7 @@ public class CleanAirControllerTests
         // Arrange
         _cleanAirServiceMock
             .Setup(s => s.GetLatestDeviceLog())
-            .Returns((Devicelog?)null);
+            .Returns(() => null!);
 
         // Act
         var result = await _controller.GetLatestMeasurement();
