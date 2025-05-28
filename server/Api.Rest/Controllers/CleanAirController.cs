@@ -14,8 +14,7 @@ public class CleanAirController(
     ICleanAirService cleanAirService,
     IConnectionManager connectionManager,
     ISecurityService securityService, 
-    ILoggingService logger,  
-    IFeatureHubRepository featureHubRepo) : ControllerBase
+    ILoggingService logger) : ControllerBase
 {
     public const string ControllerRoute = "api/";
     public const string GetLogsRoute = ControllerRoute + nameof(GetLogs);
@@ -183,7 +182,6 @@ public class CleanAirController(
             return StatusCode(500, "An error occurred while retrieving daily averages.");
         }
     }
-
     
 
     [HttpPost]
@@ -196,23 +194,7 @@ public class CleanAirController(
         {
             securityService.VerifyJwtOrThrow(authorization);
             logger.LogInformation($"[Controller] GetLogsForToday called with DTO: {JsonSerializer.Serialize(timeRangeDto)}");
-
-            // Feature flag check
-            IFeature? feature = null;
-            try
-            {
-                feature = featureHubRepo.GetFeature("CleanFeature");
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning("[CleanAirController] FeatureHub connection failed, assuming feature is enabled by default. " + ex);
-            }
-
-            if (feature is not null && !feature.IsEnabled)
-            {
-                logger.LogWarning("[CleanAirController] GetLogsForToday is disabled via FeatureHub");
-                return StatusCode(403, "Feature GetLogsForToday Disabled via Featurehub");
-            }
+            
 
             var logs = cleanAirService.GetLogsForToday(timeRangeDto);
             logger.LogInformation($"[Controller] GetLogsForToday succeeded. Returned {logs.Count} logs.");

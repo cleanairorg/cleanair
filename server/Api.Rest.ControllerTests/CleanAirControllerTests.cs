@@ -34,8 +34,7 @@ public class CleanAirControllerTests
             _cleanAirServiceMock.Object,
             _connectionManagerMock.Object,
             _securityServiceMock.Object,
-            _loggerMock.Object,
-            _featureHubRepoMock.Object
+            _loggerMock.Object
         );
     }
 
@@ -331,6 +330,66 @@ public class CleanAirControllerTests
 
     }
     
+    [Test]
+    public void GetLogsForToday_FeatureEnabled_ShouldReturnLogs()
+    {
+        // Arrange
+        var timeRangeDto = new TimeRangeDto(); // Populate as needed
+        var authorization = "valid-token";
+        var expectedLogs = new List<Devicelog> { new Devicelog() };
+
+        _securityServiceMock.Setup(s => s.VerifyJwtOrThrow(authorization));
+        _featureHubRepoMock.Setup(f => f.GetFeature("CleanFeature"))
+            .Returns(new Mock<IFeature> { DefaultValue = DefaultValue.Mock }.Object);
+
+        var featureMock = new Mock<IFeature>();
+        featureMock.Setup(f => f.IsEnabled).Returns(true);
+        _featureHubRepoMock.Setup(f => f.GetFeature("CleanFeature")).Returns(featureMock.Object);
+
+        _cleanAirServiceMock.Setup(s => s.GetLogsForToday(timeRangeDto)).Returns(expectedLogs);
+
+        // Act
+        var result = _controller.GetLogsForToday(timeRangeDto, authorization);
+
+        // Assert
+        var ok = result.Result as OkObjectResult;
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(ok, Is.Not.Null);
+            Assert.That(ok!.Value, Is.EqualTo(expectedLogs));
+        });
+        
+        // Verify that the right key was used
+        _featureHubRepoMock.Verify(f => f.GetFeature("CleanFeature"), Times.Once);
+        _securityServiceMock.Verify(s => s.VerifyJwtOrThrow(authorization), Times.Once);
+    }
+    
+    [Test]
+    public void GetDailyAverages_ShouldCallVerifyJwtOrThrow_AndReturnOk()
+    {
+        // Arrange
+        var authorization = "Bearer valid-token";
+        var dto = new TimeRangeDto(); // Provide real values if needed
+        var expectedResult = new List<Devicelog> { new Devicelog() };
+
+        _securityServiceMock.Setup(s => s.VerifyJwtOrThrow(authorization));
+        _cleanAirServiceMock.Setup(s => s.GetDailyAverages(dto)).Returns(expectedResult);
+
+        // Act
+        var result = _controller.GetDailyAverages(dto, authorization);
+
+        // Assert
+        var ok = result.Result as OkObjectResult;
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(ok, Is.Not.Null);
+            Assert.That(ok!.Value, Is.EqualTo(expectedResult));
+        });
+        
+        _securityServiceMock.Verify(s => s.VerifyJwtOrThrow(authorization), Times.Once);
+    }
 
     
 }
