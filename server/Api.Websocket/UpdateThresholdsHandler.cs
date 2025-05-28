@@ -17,7 +17,7 @@ public class UpdateThresholdsHandler(
         
         try
         {
-            // Authentication logic
+            // Authentication 
             logger.LogInformation("[UpdateThresholdsHandler] Validating authorization token");
             var claims = securityService.VerifyJwtOrThrow(dto.Authorization);
             logger.LogInformation($"[UpdateThresholdsHandler] Token validated successfully for user with role: {claims.Role}");
