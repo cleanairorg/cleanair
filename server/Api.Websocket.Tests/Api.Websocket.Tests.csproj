@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api.Websocket\Api.Websocket.csproj" />
+    <ProjectReference Include="../Api.Websocket/Api.Websocket.csproj" />
   </ItemGroup>
   
   <ItemGroup>
