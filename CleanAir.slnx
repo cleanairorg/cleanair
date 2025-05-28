@@ -11,5 +11,6 @@
     <Project Path="server\Infrastructure.Postgres\Infrastructure.Postgres.csproj" Type="Classic C#" />
     <Project Path="server\Infrastructure.Websocket\Infrastructure.Websocket.csproj" Type="Classic C#" />
     <Project Path="server/Application.Tests/Application.Tests.csproj" Type="Classic C#" />
+    <Project Path="server/Api.Websocket.Tests/Api.Websocket.Tests.csproj" Type="Classic C#" />
   </Folder>
 </Solution>

@@ -53,8 +53,8 @@ public class ThresholdService(
 
             var updateDeviceThresholds = new AdminUpdatesDeviceThresholdsDto
             {
-                GoodMax = dto.Thresholds.FirstOrDefault(g => g.Metric == "airquality")?.GoodMax ?? 1200,
-                WarnMax = dto.Thresholds.FirstOrDefault(w => w.Metric == "airquality")?.WarnMax ?? 2500,
+                GoodMax = dto.Thresholds?.FirstOrDefault(g => g.Metric == "airquality")?.GoodMax ?? 1200,
+                WarnMax = dto.Thresholds?.FirstOrDefault(w => w.Metric == "airquality")?.WarnMax ?? 2500,
             };
             
             await mqttPublisher.Publish(updateDeviceThresholds, StringConstants.UpdateDeviceThresholds);
