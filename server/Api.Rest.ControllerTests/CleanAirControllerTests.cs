@@ -15,7 +15,6 @@ namespace Api.Rest.ControllerTests;
 public class CleanAirControllerTests
 {
     private Mock<ICleanAirService> _cleanAirServiceMock = null!;
-    private Mock<IConnectionManager> _connectionManagerMock = null!;
     private Mock<ISecurityService> _securityServiceMock = null!;
     private Mock<ILoggingService> _loggerMock = null!;
     private CleanAirController _controller = null!;
@@ -25,14 +24,12 @@ public class CleanAirControllerTests
     public void SetUp()
     {
         _cleanAirServiceMock = new Mock<ICleanAirService>();
-        _connectionManagerMock = new Mock<IConnectionManager>();
         _securityServiceMock = new Mock<ISecurityService>();
         _loggerMock = new Mock<ILoggingService>();
         //_featureHubRepoMock = new Mock<IFeatureHubRepository>();
 
         _controller = new CleanAirController(
             _cleanAirServiceMock.Object,
-            _connectionManagerMock.Object,
             _securityServiceMock.Object,
             _loggerMock.Object
         );
@@ -429,7 +426,7 @@ public class CleanAirControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(okResult, Is.Not.Null);
-            Assert.That(okResult.StatusCode, Is.EqualTo(200));
+            Assert.That(okResult!.StatusCode, Is.EqualTo(200));
             Assert.That(okResult.Value, Is.EqualTo(logs));
         });
 
@@ -460,7 +457,7 @@ public class CleanAirControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(errorResult, Is.Not.Null);
-            Assert.That(errorResult.StatusCode, Is.EqualTo(500));
+            Assert.That(errorResult!.StatusCode, Is.EqualTo(500));
             Assert.That(errorResult.Value, Is.EqualTo("GetLogs failed, see inner exception"));
         });
 

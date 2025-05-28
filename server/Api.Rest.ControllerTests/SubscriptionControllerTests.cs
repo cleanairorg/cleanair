@@ -12,7 +12,6 @@ namespace Api.Rest.ControllerTests;
 public class SubscriptionControllerTests
 {
     private Mock<ISecurityService> _securityServiceMock = null!;
-    private Mock<IConnectionManager> _connectionManagerMock = null!;
     private Mock<IWebsocketSubscriptionService> _subscriptionServiceMock = null!;
     private SubscriptionController _controller = null!;
 
@@ -20,12 +19,10 @@ public class SubscriptionControllerTests
     public void SetUp()
     {
         _securityServiceMock = new Mock<ISecurityService>();
-        _connectionManagerMock = new Mock<IConnectionManager>();
         _subscriptionServiceMock = new Mock<IWebsocketSubscriptionService>();
 
         _controller = new SubscriptionController(
             _securityServiceMock.Object,
-            _connectionManagerMock.Object,
             _subscriptionServiceMock.Object);
     }
 

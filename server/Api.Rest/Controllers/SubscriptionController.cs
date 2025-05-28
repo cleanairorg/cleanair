@@ -6,20 +6,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Rest.Controllers;
 
 [ApiController]
+[Route("api")] 
 public class SubscriptionController(
     ISecurityService securityService,
-    IConnectionManager connectionManager,
     IWebsocketSubscriptionService websocketSubscriptionService) : ControllerBase
 {
-    public const string ControllerRoute = "api/";
-    
-    public const string SubscriptionRoute = ControllerRoute + nameof(Subscribe);
-
-    public const string UnsubscribeRoute = ControllerRoute + nameof(Unsubscribe);
-    
+    public const string SubscriptionRoute = "Subscribe";
+    public const string UnsubscribeRoute = "Unsubscribe";
 
     [HttpPost]
-    [Route(SubscriptionRoute)]
+    [Route(SubscriptionRoute)]  
     public async Task<ActionResult> Subscribe([FromHeader] string authorization, [FromBody] ChangeSubscriptionDto dto)
     {
         securityService.VerifyJwtOrThrow(authorization);
@@ -28,7 +24,7 @@ public class SubscriptionController(
     }
 
     [HttpPost]
-    [Route(UnsubscribeRoute)]
+    [Route(UnsubscribeRoute)]  
     public async Task<ActionResult> Unsubscribe([FromHeader] string authorization, [FromBody] ChangeSubscriptionDto dto)
     {
         securityService.VerifyJwtOrThrow(authorization);

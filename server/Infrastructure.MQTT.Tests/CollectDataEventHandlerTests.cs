@@ -27,7 +27,7 @@ public class CollectDataEventHandlerTests
         _handler = new CollectDataEventHandler(_cleanAirServiceMock.Object);
     }
 
-    private OnMessageReceivedEventArgs CreateEventArgs(string payload)
+    private static OnMessageReceivedEventArgs CreateEventArgs(string payload)
     {
         var publishMessage = new MQTT5PublishMessage("CollectData", QualityOfService.AtLeastOnceDelivery)
         {
