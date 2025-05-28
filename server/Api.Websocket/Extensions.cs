@@ -46,6 +46,15 @@ public static class Extensions
             {
                 try
                 {
+                    logger.LogInformation("WebSocket received message: {Message}", message);
+        
+                    var jsonDoc = JsonDocument.Parse(message);
+                    if (jsonDoc.RootElement.TryGetProperty("eventType", out var eventTypeElement))
+                    {
+                        var eventType = eventTypeElement.GetString();
+                        logger.LogInformation("Message eventType: {EventType}", eventType);
+                    }
+                    
                     await app.CallEventHandler(ws, message);
                 }
                 catch (Exception e)

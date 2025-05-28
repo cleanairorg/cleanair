@@ -1,0 +1,32 @@
+﻿html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #2e3e50;
+    font-family: 'Georgia', serif;
+    color: white;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;  
+    height: 100%;
+    background-color: #2e3e50;
+    color: white;
+    font-family: 'Georgia', serif;
+}
+
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    align-items: stretch; 
+    height: 100%;
+}
+
+h2, h3 {
+    text-align: center;
+    text-decoration: underline;
+}
+

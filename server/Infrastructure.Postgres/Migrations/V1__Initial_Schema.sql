@@ -1,6 +1,6 @@
-﻿CREATE SCHEMA IF NOT EXISTS weatherstation;
+﻿CREATE SCHEMA IF NOT EXISTS cleanair;
 
-CREATE TABLE weatherstation.devicelog (
+CREATE TABLE cleanair.devicelog (
                                           id text NOT NULL,
                                           deviceid text NOT NULL,
                                           value numeric NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE weatherstation.devicelog (
                                           CONSTRAINT devicelog_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE weatherstation."user" (
+CREATE TABLE cleanair."user" (
                                        id text NOT NULL,
                                        email text NOT NULL,
                                        hash text NOT NULL,

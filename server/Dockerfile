@@ -16,6 +16,9 @@ RUN dotnet restore "server/Startup/Startup.csproj"
 # Kopierer hele server mappen med alt kildekode
 COPY ["server/", "server/"]
 
+# Add this line before your RUN dotnet publish command
+RUN find server -type f -name "stryker-config.json" -delete
+
 # Kompilerer og publisher applikationen
 # --runtime: Specificerer target runtime (Alpine Linux)
 # --self-contained: Inkluderer .NET runtime i output

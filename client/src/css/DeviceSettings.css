@@ -1,0 +1,163 @@
+﻿.device-settings {
+    background-color: #1f2b38;
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    height: 100%;
+}
+
+.section-title {
+    background-color: transparent;
+    border-radius: 0;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.setting {
+    background-color: #2b3d4f;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    height: 40px;
+}
+
+.interval-button,
+.evaluate-button {
+    background-color: green;
+    color: white;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    height: 40px;
+}
+
+.interval-container{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.interval-container .fieldset {
+    margin: 0;
+    flex: 1.5;
+}
+
+.interval-container .select {
+    width: 100%;
+    height: 40px;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.interval-button {
+    height: 40px;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.delete-button {
+    text-align: center;
+    background-color: red;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 40px;
+    margin-top: auto;
+}
+
+.green-button{
+    text-align: center;
+    background-color: green;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 40px;
+    width: 100%;
+}
+.red-button{
+    text-align: center;
+    background-color: red;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 40px;
+    width: 100%;
+}
+
+
+/*
+Kollapsible Thresholds Section - Simpel version
+ */
+
+.thresholds-section {
+    background-color: #2b3d4f;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+}
+
+.thresholds-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    background-color: #34495e;
+    transition: background-color 0.2s ease;
+    user-select: none;
+    border-radius: 8px;
+}
+
+.thresholds-header:hover {
+    background-color: #3b536b;
+}
+
+.thresholds-title {
+    font-weight: bold;
+    color: white;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.expand-arrow {
+    color: white;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.expand-arrow.expanded {
+    transform: rotate(180deg);
+}
+
+/* Simpel show/hide uden fancy transitions */
+.thresholds-wrapper {
+    padding: 1rem;
+}
+
+/*
+Threshold sliders
+ */
+
+.threshold-slider {
+    margin: 0.5rem 0;
+    width: 100%;
+}
+
+.metric-label {
+    font-weight: bold;
+    color: white;
+    font-size: 12px;
+    margin-bottom: 0.5rem;
+}
+
+.slider-values {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 0 5px;
+    margin-top: 8px;
+    font-weight: 500;
+}

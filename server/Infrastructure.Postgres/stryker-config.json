@@ -1,0 +1,28 @@
+﻿{
+  "stryker-config": {
+    "solution": "../../CleanAir.sln",
+    "test-projects": [
+      "../Infrastructure.Postgres.Tests/Infrastructure.Postgres.Tests.csproj"
+    ],
+    "mutate": [
+      "**/*.cs",
+      "!**/*Extensions.cs",
+      "!**/*ISeeder.cs",
+      "!**/*Seeder.cs"
+    ],
+    "thresholds": {
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ],
+    "ignore-methods": [
+      "LogInformation",
+      "LogWarning",
+      "LogError",
+      "LogDebug",
+      "WriteLine"
+    ]
+  }
+}

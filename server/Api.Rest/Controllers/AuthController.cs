@@ -10,35 +10,37 @@ namespace Api.Rest.Controllers;
 public class AuthController(ISecurityService securityService, ILoggingService logger) : ControllerBase
 {
     public const string ControllerRoute = "api/auth/";
-
     public const string LoginRoute = ControllerRoute + nameof(Login);
-
-
     public const string RegisterRoute = ControllerRoute + nameof(Register);
-
-
+    public const string GetUserInfoRoute = ControllerRoute + nameof(GetUserInfo);
     public const string SecuredRoute = ControllerRoute + nameof(Secured);
 
 
-    [HttpPost]
     [Route(LoginRoute)]
-    public ActionResult<AuthResponseDto> Login([FromBody] AuthRequestDto dto)
+    [HttpPost]
+    public ActionResult<AuthResponseDto> Login([FromBody] AuthLoginRequestDto dto)
     {
         logger.LogInformation($"Login request: {dto}");
         return Ok(securityService.Login(dto));
-        
     }
 
     [Route(RegisterRoute)]
     [HttpPost]
-    public ActionResult<AuthResponseDto> Register([FromBody] AuthRequestDto dto)
+    public ActionResult<AuthResponseDto> Register([FromBody] AuthRegisterRequestDto dto)
     {
         logger.LogInformation($"Register request: {dto}");
         return Ok(securityService.Register(dto));
     }
 
+    [Route(GetUserInfoRoute)]
     [HttpGet]
+    public ActionResult<AuthGetUserInfoDto> GetUserInfo(string email)
+    {
+        return Ok(securityService.GetUserInfo(email));
+    }
+
     [Route(SecuredRoute)]
+    [HttpGet]
     public ActionResult Secured()
     {
         securityService.VerifyJwtOrThrow(HttpContext.GetJwt());

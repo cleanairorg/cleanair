@@ -16,6 +16,6 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
         await File.WriteAllTextAsync(outputPath,
             "-- This schema is generated based on the current DBContext. Please check the class " + nameof(Seeder) +
             " to see.\n" +
-            "" + context.Database.GenerateCreateScript());
+            "" + context.Database.GenerateCreateScript()); 
     }
 }

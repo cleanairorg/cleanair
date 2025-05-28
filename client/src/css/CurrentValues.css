@@ -1,0 +1,40 @@
+﻿.current-values {
+    background-color: #1f2b38;
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-title {
+    background-color: transparent;
+    border-radius: 0;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.value {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.circle {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 0.5rem;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.circle.green { background-color: #4CAF50; }
+.circle.yellow { background-color: #fcbf24; }
+.circle.red { background-color: #F44336; }
+.circle.gray { background-color: gray; }
+
+.value.green, .value.yellow, .value.red {
+    background-color: #2b3d4f;
+}

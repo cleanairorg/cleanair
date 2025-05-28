@@ -1,0 +1,29 @@
+﻿{
+  "stryker-config": {
+    "solution": "../../CleanAir.sln",
+    "test-projects": [
+      "../Application.Tests/Application.Tests.csproj"
+    ],
+    "mutate": [
+      "**/*.cs",
+      "!**/Interfaces/*.cs",
+      "!**/Models/*.cs",
+      "!**/Scaffolding/*.cs",
+      "!**/*Extensions.cs"
+    ],
+    "thresholds": {
+      "break": 80
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ],
+    "ignore-methods": [
+      "LogInformation",
+      "LogWarning",
+      "LogError",
+      "LogDebug",
+      "WriteLine"
+    ]
+  }
+}
