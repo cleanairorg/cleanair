@@ -17,12 +17,7 @@ public class GetThresholdsHandler(
         
         try
         {
-            // Authentication logic
-            logger.LogInformation("[GetThresholdsHandler] Validating authorization token");
-            var cleanToken = dto.Authorization?.Replace("\n", "").Replace("\r", "").Trim();
-            logger.LogInformation($"[GetThresholdsHandler] Token length after cleaning: {cleanToken?.Length ?? 0}");
-            
-            var claims = securityService.VerifyJwtOrThrow(cleanToken);
+            var claims = securityService.VerifyJwtOrThrow(dto.Authorization);
             logger.LogInformation($"[GetThresholdsHandler] Token validated successfully for user with role: {claims.Role}");
             
             // Business logic
