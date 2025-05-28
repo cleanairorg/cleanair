@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Authentication;
-using Api.Websocket.Dtos;
+﻿using Application.Interfaces.Infrastructure.Logging;
 using Application.Interfaces;
-using Application.Interfaces.Infrastructure.Logging;
 using Fleck;
+using Api.Websocket.Dtos;
 using WebSocketBoilerplate;
 
 namespace Api.Websocket;
@@ -19,13 +17,12 @@ public class UpdateThresholdsHandler(
         
         try
         {
-            // Log token validation attempt
+            // Authentication logic
             logger.LogInformation("[UpdateThresholdsHandler] Validating authorization token");
-            
-            // Verify admin rights
             var claims = securityService.VerifyJwtOrThrow(dto.Authorization);
             logger.LogInformation($"[UpdateThresholdsHandler] Token validated successfully for user with role: {claims.Role}");
             
+            // Authorization check
             if (claims.Role != "admin")
             {
                 logger.LogWarning($"[UpdateThresholdsHandler] Access denied - user role '{claims.Role}' is not admin");
@@ -37,7 +34,7 @@ public class UpdateThresholdsHandler(
                 return;
             }
 
-            // Validate threshold data
+            // Validation
             if (dto.ThresholdData == null)
             {
                 logger.LogWarning("[UpdateThresholdsHandler] No threshold data provided in request");
@@ -49,20 +46,11 @@ public class UpdateThresholdsHandler(
                 return;
             }
 
-            
-            if (dto.ThresholdData.Thresholds != null)
-            {
-                foreach (var threshold in dto.ThresholdData.Thresholds)
-                {
-                    logger.LogInformation($"[UpdateThresholdsHandler] Updating threshold for metric '{threshold.Metric}'");
-                }
-            }
-
-            // Update thresholds
+            // update thresholds
             await thresholdService.UpdateThresholdsAsync(dto.ThresholdData);
             logger.LogInformation("[UpdateThresholdsHandler] Thresholds updated and broadcast completed successfully");
         
-            // Send confirmation to sender
+            // Send success response
             socket.SendDto(new ServerConfirmsThresholdUpdate
             {
                 Success = true,
@@ -72,41 +60,9 @@ public class UpdateThresholdsHandler(
             
             logger.LogInformation($"[UpdateThresholdsHandler] Success response sent to client with requestId: {dto.requestId}");
         }
-        catch (ValidationException ex)
-        {
-            logger.LogWarning($"[UpdateThresholdsHandler] Validation error: {ex.Message}");
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "Invalid data provided: " + ex.Message,
-                requestId = dto.requestId
-            });
-        }
-        catch (AuthenticationException ex)
-        {
-            logger.LogWarning($"[UpdateThresholdsHandler] Authentication failed: {ex.Message}");
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "Authentication failed",
-                requestId = dto.requestId
-            });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            logger.LogWarning($"[UpdateThresholdsHandler] Unauthorized access attempt: {ex.Message}");
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "Access denied",
-                requestId = dto.requestId
-            });
-        }
         catch (Exception ex)
         {
-            logger.LogError("[UpdateThresholdsHandler] Unexpected error during threshold update", ex);
-            socket.SendDto(new ServerSendsErrorMessage
-            {
-                Message = "An unexpected error occurred",
-                requestId = dto.requestId
-            });
+            WebSocketExceptionHandler.HandleException(ex, socket, dto.requestId, logger, "UpdateThresholdsHandler");
         }
     }
 }
