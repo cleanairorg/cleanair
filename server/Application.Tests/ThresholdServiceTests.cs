@@ -88,7 +88,7 @@ public class ThresholdServiceTests
         _logRepo.Setup(r => r.GetCurrentLogAsync()).ReturnsAsync((Devicelog?)null);
 
         // Act & Assert
-        Assert.ThrowsAsync<Exception>(() => _service.UpdateThresholdsAsync(dto));
+        Assert.ThrowsAsync<ArgumentNullException>(() => _service.UpdateThresholdsAsync(dto));
     }
     
     [TestCase("temperature", 10, 18, 25, ThresholdStates.CriticalLow)]
