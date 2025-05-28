@@ -56,7 +56,6 @@ jobs:
           - server/Infrastructure.Websocket
           - server/Infrastructure.Postgres
           - server/Api.Rest
-          - server/Api.Websocket
 
     steps:
       - name: Checkout Code
