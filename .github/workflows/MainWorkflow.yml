@@ -19,11 +19,11 @@ jobs:
         with:
           fetch-depth: 0
       
-      #- name: Semantic Application Version
-      #  id: semver-app
-      #  uses: paulhatch/semantic-version@v5.4.0
-      #  with:
-      #    bump_each_commit: true    
+      - name: Semantic Application Version
+        id: semver-app
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          bump_each_commit: true
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -36,19 +36,19 @@ jobs:
       - name: Build and Push Backend Docker image
         run: |
           docker build \
-            -t ghcr.io/${{ github.repository }}-backend:staging \
+            -t ghcr.io/${{ github.repository }}-backend:production \
             -f server/Dockerfile .
-          docker push ghcr.io/${{ github.repository }}-backend:staging
+          docker push ghcr.io/${{ github.repository }}-backend:production
           
           
       - name: Build and Push Frontend Docker image
         run: |
           docker build \
             --build-arg VITE_API_BASE_URL="/api" \
-            --build-arg VITE_AP I_WS_URL="79.76.52.174:8181" \
-            -t ghcr.io/${{ github.repository }}-frontend:staging \
+            --build-arg VITE_API_WS_URL="79.76.59.88:8181" \
+            -t ghcr.io/${{ github.repository }}-frontend:production \
             -f client/Dockerfile .
-          docker push ghcr.io/${{ github.repository }}-frontend:staging
+          docker push ghcr.io/${{ github.repository }}-frontend:production
           
           
       - name: Create .env file for staging
@@ -65,31 +65,31 @@ jobs:
           SEQ_URL=${{ vars.SEQ_URL }}
           FEATUREHUB_API_KEY=${{ secrets.FEATURE_HUB_API_KEY }}
           FEATUREHUB_URL=${{ vars.FEATURE_HUB_URL }}
-          ENVIRONMENT=Staging
+          ENVIRONMENT=Production
+          BACKEND_IMAGE=${{ vars.PROD_BACKEND_IMAGE }}
+          FRONTEND_IMAGE=${{ vars.PROD_FRONTEND_IMAGE }}
           EOL
+          
 
-
-      - name: Deploy to staging server
+      - name: Deploy to production server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ vars.STAGING_SERVER_IP }}
-          username: ${{ vars.STAGING_SERVER_USERNAME }}
-          key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
+          host: ${{ vars.PROD_SERVER_IP }}
+          username: ${{ vars.PROD_SERVER_USERNAME }}
+          key: ${{ secrets.PROD_SERVER_SSH_KEY }}
           source: "./docker-compose.yml,.env,./server/Infrastructure.Postgres/Migrations/**.sql,./client/default.conf"
           target: cleanair/
 
 
-      - name: Start containers on staging server
+      - name: Start containers on production server
         uses: appleboy/ssh-action@v1.2.1
         with:
-          host: ${{ vars.STAGING_SERVER_IP }}
-          username: ${{ vars.STAGING_SERVER_USERNAME }}
-          key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
+          host: ${{ vars.PROD_SERVER_IP }}
+          username: ${{ vars.PROD_SERVER_USERNAME }}
+          key: ${{ secrets.PROD_SERVER_SSH_KEY }}
           script: |
             cd /home/ubuntu/cleanair
             echo "${{ secrets.GHUB_TOKEN  }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose pull
             docker compose down
-            docker compose up -d featurehub backend
-          
-          #  docker compose up -d 
+            docker compose up -d backend frontend seq flyway postgres
