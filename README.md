@@ -4,8 +4,8 @@ Device that measures temperature, pressure, humidity and air quality
 
 Jonas Roar, Anders Thomsen, Mads Autzen and Casper Jensen
 
-
-http://79.76.59.88/login
+Deployed Server
+http://79.76.54.84/login
 
 
 Login Creds
